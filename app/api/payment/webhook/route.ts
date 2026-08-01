@@ -7,10 +7,11 @@ export const runtime = "nodejs";
 /**
  * Webhook Midtrans Payment Notification.
  * URL: /api/payment/webhook
- * Midtrans mengirim POST ke URL ini saat status transaksi berubah.
  *
- * SECURITY: signature_key diverifikasi SHA512(order_id + status_code + gross_amount + server_key)
- * — payload palsu ditolak.
+ * SECURITY: signature diverifikasi SHA512(order_id + status_code + gross_amount + server_key)
+ * → payload palsu ditolak. Setelah verifikasi, update status booking
+ * via RPC handle_midtrans_webhook (SECURITY DEFINER) — karena webhook
+ * datang tanpa session login, RLS normal akan memblokir update.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,6 @@ export async function POST(req: NextRequest) {
     const transactionStatus = body.transaction_status ?? "";
     const fraudStatus = body.fraud_status ?? "";
     const transactionId = body.transaction_id ?? "";
-    const paymentType = body.payment_type ?? "";
 
     // 1. Verifikasi signature — tolak payload palsu
     if (!verifySignature(orderId, statusCode, grossAmount, signatureKey)) {
@@ -31,43 +31,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
     }
 
-    // 2. Cari booking berdasarkan order_id (format: booking-{bookingId}-{timestamp})
-    const orderParts = String(orderId).split("-");
-    // order_id = booking-{uuid}-{timestamp} → uuid ada di index 1-2 (UUID punya dash!)
-    // Lebih aman: cari via DB dengan prefix
-    const bookingIdMatch = String(orderId).match(/^booking-([0-9a-f-]{36})-/);
-    if (!bookingIdMatch) {
-      console.warn("[payment/webhook] Order ID tidak dikenal:", orderId);
-      return NextResponse.json({ error: "Unknown order" }, { status: 400 });
-    }
-    const bookingId = bookingIdMatch[1];
-
-    const supabase = await createClient();
-
-    // Ambil booking + pastikan order_id cocok (anti replay)
-    const { data: booking, error: bErr } = await supabase
-      .from("bookings")
-      .select("*, rooms:room_id(kos:kos_id(id, owner_id, name))")
-      .eq("id", bookingId)
-      .maybeSingle();
-    if (bErr || !booking) {
-      console.warn("[payment/webhook] Booking tidak ditemukan:", bookingId);
-      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-    }
-    if (booking.midtrans_order_id !== orderId) {
-      console.warn("[payment/webhook] order_id tidak cocok dengan booking:", orderId);
-      return NextResponse.json({ error: "Order mismatch" }, { status: 400 });
-    }
-
-    // 3. Mapping status Midtrans → payment_status
+    // 2. Mapping status Midtrans → payment_status
     let paymentStatus: string;
     if (transactionStatus === "settlement" || transactionStatus === "capture") {
-      // capture: cek fraud_status — sandbox accept
-      if (transactionStatus === "capture" && fraudStatus === "challenge") {
-        paymentStatus = "menunggu_konfirmasi";
-      } else {
-        paymentStatus = "lunas";
-      }
+      paymentStatus = transactionStatus === "capture" && fraudStatus === "challenge"
+        ? "menunggu_konfirmasi"
+        : "lunas";
     } else if (transactionStatus === "pending") {
       paymentStatus = "menunggu_konfirmasi";
     } else if (
@@ -80,65 +49,22 @@ export async function POST(req: NextRequest) {
       paymentStatus = "belum_bayar";
     }
 
-    const { error: upErr } = await supabase
-      .from("bookings")
-      .update({
-        payment_status: paymentStatus,
-        payment_method: "midtrans",
-        midtrans_transaction_id: transactionId,
-        midtrans_status: transactionStatus,
-        paid_at: paymentStatus === "lunas" ? new Date().toISOString() : null,
-      })
-      .eq("id", bookingId);
-    if (upErr) {
-      console.error("[payment/webhook] Gagal update booking:", upErr.message);
-      return NextResponse.json({ error: "Update failed" }, { status: 500 });
-    }
+    // 3. Update via SECURITY DEFINER RPC — bypass RLS (webhook anon)
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("handle_midtrans_webhook", {
+      p_order_id: orderId,
+      p_transaction_id: transactionId,
+      p_midtrans_status: transactionStatus,
+      p_payment_status: paymentStatus,
+    });
 
-    // 4. Trigger notifikasi in-app (pakai RPC notify_user)
-    const ownerId = booking.rooms?.kos?.owner_id;
-    const kosName = booking.rooms?.kos?.name ?? "Kos";
-    const studentId = booking.student_id;
-
-    if (paymentStatus === "lunas") {
-      // Ke student
-      try {
-        await supabase.rpc("notify_user", {
-          p_user_id: studentId,
-          p_title: "Pembayaran berhasil",
-          p_message: `Pembayaran untuk ${kosName} telah dikonfirmasi. Siap check-in!`,
-          p_link: "/bookings",
-        });
-      } catch {} // notifikasi opsional — jangan gagalkan webhook
-      // Ke owner
-      if (ownerId) {
-        try {
-          await supabase.rpc("notify_user", {
-            p_user_id: ownerId,
-            p_title: "Pembayaran diterima",
-            p_message: `Pembayaran untuk ${kosName} telah lunas.`,
-            p_link: "/owner/bookings",
-          });
-        } catch {} // notifikasi opsional
+    if (error) {
+      console.error("[payment/webhook] Gagal update booking:", JSON.stringify(error, null, 2));
+      // Order tak dikenal → 400 (Midtrans stop retry)
+      if (error.message?.includes("tidak ditemukan")) {
+        return NextResponse.json({ error: "Order not found" }, { status: 400 });
       }
-    } else if (paymentStatus === "menunggu_konfirmasi") {
-      try {
-        await supabase.rpc("notify_user", {
-          p_user_id: studentId,
-          p_title: "Menunggu pembayaran",
-          p_message: `Transaksi untuk ${kosName} menunggu pembayaran Anda.`,
-          p_link: "/bookings",
-        });
-      } catch {} // notifikasi opsional
-    } else if (paymentStatus === "expired") {
-      try {
-        await supabase.rpc("notify_user", {
-          p_user_id: studentId,
-          p_title: "Pembayaran kedaluwarsa",
-          p_message: `Transaksi untuk ${kosName} telah kedaluwarsa. Silakan coba bayar lagi.`,
-          p_link: "/bookings",
-        });
-      } catch {} // notifikasi opsional
+      return NextResponse.json({ error: "Update failed" }, { status: 500 });
     }
 
     // Midtrans harapkan respon 200
@@ -149,7 +75,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Midtrans juga bisa kirim HEAD (untuk cek endpoint)
+// Midtrans juga bisa kirim GET/HEAD (cek endpoint)
 export async function GET() {
   return NextResponse.json({ status: "ok" });
 }
