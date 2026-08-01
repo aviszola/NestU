@@ -55,17 +55,21 @@ export async function POST(req: NextRequest) {
       booking.total_amount ??
       (booking.rooms?.price_per_month ?? 0) * (booking.duration_months ?? 1);
 
-    // Order ID unik: booking-{bookingId}-{timestamp} — anti collision
-    const orderId = `booking-${bookingId}-${Date.now()}`;
-    const kosName = booking.rooms?.kos?.name ?? "Kos";
-    const roomNumber = booking.rooms?.room_number ?? "";
+    // Order ID unik: booking-{shortId}-{timestamp} — Max 50 chars (Midtrans limit)
+    // UUID penuh 36 char + prefix > 50 — pakai 8 char pertama UUID
+    const shortId = bookingId.replace(/-/g, "").slice(0, 8);
+    const orderId = `book-${shortId}-${Date.now()}`;
+    const kosName = (booking.rooms?.kos?.name ?? "Kos").slice(0, 40);
+    const roomNumber = (booking.rooms?.room_number ?? "").slice(0, 20);
+    const customerName = (profile?.full_name ?? "Student NetsU").slice(0, 20);
 
     const result = await createSnapTransaction({
       orderId,
-      grossAmount: total,
-      customerName: profile?.full_name ?? "Student NetsU",
+      grossAmount: Math.round(total),
+      customerName,
       customerEmail: user.email ?? "student@netsu.id",
-      itemName: `Sewa Kos ${kosName}${roomNumber ? ` - Kamar ${roomNumber}` : ""}`,
+      customerPhone: undefined,
+      itemName: `Sewa Kos ${kosName}${roomNumber ? ` - Kamar ${roomNumber}` : ""}`.slice(0, 45),
       itemQty: booking.duration_months ?? 1,
     });
 
@@ -84,11 +88,25 @@ export async function POST(req: NextRequest) {
       redirect_url: result.redirect_url,
     });
   } catch (e: any) {
-    console.error("[payment/create-transaction]", e);
+    // DEBUG: log detail lengkap error Midtrans — lihat di Vercel Logs
+    console.error(
+      "[payment/create-transaction] ERROR DETAIL:",
+      JSON.stringify(
+        {
+          message: e?.message,
+          http_status: e?.httpStatusCode ?? e?.statusCode ?? e?.status,
+          api_response: e?.ApiResponse ?? e?.apiResponse ?? e?.response?.data ?? e?.body ?? null,
+          code: e?.code ?? null,
+          name: e?.name ?? null,
+        },
+        null,
+        2
+      )
+    );
     const msg =
       e?.message?.includes("Midtrans belum dikonfigurasi")
         ? e.message
-        : "Gagal membuat transaksi pembayaran. Coba lagi.";
+        : `Gagal membuat transaksi: ${e?.message ?? "Unknown error"}`;
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

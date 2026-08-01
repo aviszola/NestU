@@ -1,4 +1,5 @@
 import { Snap, CoreApi } from "midtrans-client";
+import type { CustomerDetails } from "midtrans-client";
 
 let snapInstance: Snap | null = null;
 let coreInstance: CoreApi | null = null;
@@ -47,6 +48,15 @@ export interface CreateTransactionParams {
 
 export async function createSnapTransaction(params: CreateTransactionParams) {
   const snap = getSnap();
+  const customerDetails: CustomerDetails = {
+    first_name: params.customerName,
+    email: params.customerEmail,
+  };
+  // SDK Midtrans lempar error kalau phone kosong string — ommit kalau tak ada
+  if (params.customerPhone) {
+    customerDetails.phone = params.customerPhone;
+  }
+
   return snap.createTransaction({
     transaction_details: {
       order_id: params.orderId,
@@ -54,17 +64,13 @@ export async function createSnapTransaction(params: CreateTransactionParams) {
     },
     item_details: [
       {
-        id: params.orderId,
+        id: params.orderId.slice(0, 20),
         price: params.grossAmount,
         quantity: params.itemQty || 1,
         name: params.itemName,
       },
     ],
-    customer_details: {
-      first_name: params.customerName,
-      email: params.customerEmail,
-      phone: params.customerPhone || "",
-    },
+    customer_details: customerDetails,
     // enable_payments: biarkan default — Snap tampilkan semua metode
   });
 }
