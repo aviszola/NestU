@@ -1,5 +1,5 @@
 import { Snap, CoreApi } from "midtrans-client";
-import type { CustomerDetails } from "midtrans-client";
+import type { CustomerDetails, ItemDetails } from "midtrans-client";
 
 let snapInstance: Snap | null = null;
 let coreInstance: CoreApi | null = null;
@@ -43,7 +43,7 @@ export interface CreateTransactionParams {
   customerEmail: string;
   customerPhone?: string;
   itemName: string;
-  itemQty: number;
+  itemQty?: number;
 }
 
 export async function createSnapTransaction(params: CreateTransactionParams) {
@@ -57,19 +57,34 @@ export async function createSnapTransaction(params: CreateTransactionParams) {
     customerDetails.phone = params.customerPhone;
   }
 
+  // item_details: 1 item mewakili SELURUH booking (qty=1, price=total)
+  // quantity TIDAK dipakai untuk duration_months — itu menyebabkan
+  // gross_amount != sum(item.price × item.quantity) → ditolak Midtrans.
+  const itemDetails: ItemDetails[] = [
+    {
+      id: params.orderId.slice(0, 20),
+      price: Math.round(params.grossAmount),
+      quantity: 1,
+      name: params.itemName,
+    },
+  ];
+
+  // Hitung gross_amount DARI item_details — dijamin sinkron, tak mungkin mismatch
+  const grossAmount = itemDetails.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // ASSERT pre-kirim: kalau sum item ≠ gross yang diminta, tolak sebelum ke Midtrans
+  if (grossAmount !== Math.round(params.grossAmount)) {
+    const errMsg = `Mismatch pembayaran: gross_amount(${grossAmount}) != total booking(${params.grossAmount}). Tolong laporkan bug ini.`;
+    console.error("[midtrans] PRE-SEND ASSERT FAIL:", JSON.stringify({ grossAmount, expected: params.grossAmount, itemDetails }, null, 2));
+    throw new Error(errMsg);
+  }
+
   return snap.createTransaction({
     transaction_details: {
       order_id: params.orderId,
-      gross_amount: params.grossAmount,
+      gross_amount: grossAmount,
     },
-    item_details: [
-      {
-        id: params.orderId.slice(0, 20),
-        price: params.grossAmount,
-        quantity: params.itemQty || 1,
-        name: params.itemName,
-      },
-    ],
+    item_details: itemDetails,
     customer_details: customerDetails,
     // enable_payments: biarkan default — Snap tampilkan semua metode
   });

@@ -70,7 +70,6 @@ export async function POST(req: NextRequest) {
       customerEmail: user.email ?? "student@netsu.id",
       customerPhone: undefined,
       itemName: `Sewa Kos ${kosName}${roomNumber ? ` - Kamar ${roomNumber}` : ""}`.slice(0, 45),
-      itemQty: booking.duration_months ?? 1,
     });
 
     // Simpan order_id + payment_method = midtrans
