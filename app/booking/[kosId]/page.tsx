@@ -1,0 +1,407 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { getKosById } from "@/lib/supabase/queries";
+import { notFound, redirect, useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import SubmitBookingButton from "@/components/SubmitBookingButton";
+import PublicNav from "@/components/layout/PublicNav";
+
+const FACILITY_ICONS: Record<string, string> = {
+  wifi: "wifi",
+  ac: "ac_unit",
+  "kamar mandi": "bathroom",
+  bathroom: "bathroom",
+  dapur: "kitchen",
+  kitchen: "kitchen",
+  listrik: "bolt",
+  keamanan: "shield",
+  security: "shield",
+  parkir: "local_parking",
+  parking: "local_parking",
+  tv: "tv",
+  lemari: "checklist",
+  meja: "table_restaurant",
+  kasur: "bed",
+};
+
+function getIcon(name: string, dbIcon?: string | null) {
+  if (dbIcon) return dbIcon;
+  return FACILITY_ICONS[name.toLowerCase()] ?? "check";
+}
+
+export default function BookingPage({
+  params,
+}: {
+  params: Promise<{ kosId: string }>;
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [kos, setKos] = useState<any>(null);
+  const [room, setRoom] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [duration, setDuration] = useState("1");
+  const [kosId, setKosId] = useState<string>("");
+
+  useEffect(() => {
+    (async () => {
+      const resolvedParams = await params;
+      setKosId(resolvedParams.kosId);
+    })();
+  }, [params]);
+
+  useEffect(() => {
+    if (!kosId) return;
+    
+    (async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      setUser(user);
+
+      const kosData = await getKosById(supabase, kosId);
+      if (!kosData) {
+        notFound();
+        return;
+      }
+      setKos(kosData);
+
+      const { data: allRooms } = await supabase
+        .from("rooms")
+        .select("id, price_per_month, room_number")
+        .eq("kos_id", kosData.id)
+        .eq("status", "tersedia")
+        .order("price_per_month", { ascending: true })
+        .limit(1);
+      setRoom(allRooms?.[0]);
+
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("id", user.id)
+        .single();
+      setProfile(profileData);
+      setLoading(false);
+    })();
+  }, [kosId, router]);
+
+  const price = room?.price_per_month ?? 0;
+  const serviceFee = 25000;
+  const adminFee = 5000;
+  
+  // Calculate total based on duration - LINEAR: harga bulanan × jumlah bulan
+  const calculateTotal = (months: number) => {
+    const monthlyTotal = price * months;
+    return monthlyTotal + serviceFee + adminFee;
+  };
+
+  // Calculate breakdown for display - LINEAR (sama setiap bulan)
+  const calculateBreakdown = (months: number, basePrice: number) => {
+    const monthlyTotal = basePrice * months;
+    return `${months} bulan × Rp ${basePrice.toLocaleString("id-ID")} = Rp ${monthlyTotal.toLocaleString("id-ID")}`;
+  };
+
+  const total = calculateTotal(parseInt(duration));
+  const monthlyPriceTotal = total - serviceFee - adminFee;
+  const facilities = kos?.fasilitas || [];
+  const foto = kos?.foto?.[0] || "/images/placeholder.jpg";
+  const avatarUrl = profile?.avatar_url;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-outline">Memuat halaman booking...</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <PublicNav />
+
+      <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg min-h-[calc(100vh-160px)]">
+        {/* Back Button & Page Title */}
+        <div className="mb-stack-lg">
+          <Link
+            href={`/kos/${kos?.id || ""}`}
+            className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-stack-sm"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+            <span className="font-label-md text-label-md">KEMBALI KE DETAIL</span>
+          </Link>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">Pengajuan Booking</h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+          {/* Left Side: Form & Summary */}
+          <div className="lg:col-span-8 space-y-gutter">
+            {/* Room Summary Card */}
+            <section className="bg-white rounded-xl shadow-sm overflow-hidden border border-outline-variant">
+              <div className="flex flex-col md:flex-row">
+                <div className="w-full md:w-1/3 h-48 md:h-auto">
+                  <Image
+                    src={foto}
+                    alt={kos?.name || "Kos"}
+                    width={400}
+                    height={300}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-stack-md flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      {kos?.verification_status === "verified" && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-secondary/10 text-secondary rounded-lg font-label-md text-label-md mb-2">
+                          <span className="material-symbols-outlined text-[14px]">verified</span> Terverifikasi
+                        </span>
+                      )}
+                      <h3 className="font-headline-md text-headline-md text-on-surface">{kos?.name || "Kos"}</h3>
+                      {room && (
+                        <p className="font-body-md text-body-md text-on-surface-variant">
+                          Kamar {room.room_number || "Tipe Standar"}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="font-headline-md text-headline-md text-primary">
+                        Rp {price.toLocaleString("id-ID")}
+                      </p>
+                      <p className="font-body-sm text-body-sm text-outline">/ bulan</p>
+                    </div>
+                  </div>
+                  {facilities.length > 0 && (
+                    <div className="mt-stack-md flex flex-wrap gap-stack-sm">
+                      {facilities.slice(0, 6).map((f: any, i: number) => (
+                        <div
+                          key={f.id || i}
+                          className="flex items-center gap-1 px-3 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md text-label-md"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">{getIcon(f.name, f.icon)}</span>
+                          {f.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Booking Form */}
+            <section className="bg-white rounded-xl p-stack-md shadow-sm border border-outline-variant">
+              <h4 className="font-title-lg text-title-lg mb-stack-md text-on-surface">
+                Informasi Penyewaan
+              </h4>
+              <div className="space-y-stack-md">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+                  <div className="flex flex-col gap-1">
+                    <label
+                      className="font-label-md text-label-md text-on-surface-variant"
+                      htmlFor="start_date"
+                    >
+                      Tanggal Pindah
+                    </label>
+                    <div className="relative">
+                      <input
+                        className="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary focus:ring-3 focus:ring-primary/10 outline-none transition-all font-body-md text-body-md"
+                        id="start_date"
+                        name="start_date"
+                        type="date"
+                        required
+                      />
+                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none">
+                        calendar_today
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label
+                      className="font-label-md text-label-md text-on-surface-variant"
+                      htmlFor="duration"
+                    >
+                      Durasi Sewa
+                    </label>
+                    <select
+                      className="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary focus:ring-3 focus:ring-primary/10 outline-none transition-all font-body-md text-body-md bg-white"
+                      id="duration"
+                      name="duration"
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                    >
+                      <option value="1">1 Bulan</option>
+                      <option value="2">2 Bulan</option>
+                      <option value="3">3 Bulan</option>
+                      <option value="4">4 Bulan</option>
+                      <option value="5">5 Bulan</option>
+                      <option value="6">6 Bulan (Semester)</option>
+                      <option value="12">12 Bulan (Tahun)</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label
+                    className="font-label-md text-label-md text-on-surface-variant"
+                    htmlFor="notes"
+                  >
+                    Catatan Tambahan untuk Pemilik (Opsional)
+                  </label>
+                  <textarea
+                    className="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary focus:ring-3 focus:ring-primary/10 outline-none transition-all font-body-md text-body-md resize-none"
+                    id="notes"
+                    name="notes"
+                    placeholder="Misal: Saya akan membawa motor, apakah ada parkir khusus?"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                  <span className="material-symbols-outlined text-primary">info</span>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Dengan mengajukan booking, Anda menyetujui{" "}
+                    <a className="text-primary font-bold hover:underline" href="#">
+                      Syarat &amp; Ketentuan
+                    </a>{" "}
+                    yang berlaku. Pemilik akan merespons pengajuan Anda dalam maksimal 24 jam.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Right Side: Payment Details */}
+          <div className="lg:col-span-4">
+            <aside className="sticky top-24 space-y-stack-md">
+              <div className="bg-white rounded-xl shadow-lg border border-outline-variant p-stack-md">
+                <h4 className="font-title-lg text-title-lg mb-stack-md text-on-surface">
+                  Rincian Pembayaran
+                </h4>
+                <div className="space-y-stack-sm mb-stack-md">
+                  <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                    <span>Harga Sewa ({duration} Bulan)</span>
+                    <span>Rp {monthlyPriceTotal.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="text-xs text-outline pl-2">
+                    <p>Perhitungan: {calculateBreakdown(parseInt(duration), price)}</p>
+                  </div>
+                  <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                    <span>Biaya Layanan</span>
+                    <span>Rp {serviceFee.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                    <span>Biaya Admin</span>
+                    <span>Rp {adminFee.toLocaleString("id-ID")}</span>
+                  </div>
+                  <hr className="border-outline-variant my-2" />
+                  <div className="flex justify-between font-title-lg text-title-lg text-on-surface">
+                    <span>Total Pembayaran</span>
+                    <span className="text-primary font-bold">Rp {total.toLocaleString("id-ID")}</span>
+                  </div>
+                </div>
+                {kos && room && (
+                  <SubmitBookingButton kosId={kos?.id || ""} roomId={room?.id || ""} />
+                )}
+                <p className="text-center font-label-md text-label-md text-outline mt-3">
+                  Pembayaran akan dilakukan setelah pemilik menyetujui pengajuan Anda.
+                </p>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="p-stack-md bg-surface-container-low rounded-xl border border-outline-variant flex items-center gap-stack-md">
+                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-secondary">security</span>
+                </div>
+                <div>
+                  <p className="font-label-md text-label-md text-on-surface font-bold">
+                    Keamanan Terjamin
+                  </p>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant leading-tight">
+                    Uang Anda hanya akan diteruskan ke pemilik setelah check-in.
+                  </p>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full py-stack-lg px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-3 gap-gutter bg-surface-container-highest mt-stack-lg">
+        <div>
+          <h3 className="font-title-lg text-title-lg font-bold text-primary mb-stack-sm">
+            NetsU
+          </h3>
+          <p className="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
+            Platform pencarian hunian terpercaya untuk mahasiswa di seluruh Indonesia.
+            Nyaman, Aman, dan Transparan.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-stack-md">
+          <div className="flex flex-col gap-2">
+            <Link href="/about" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
+              About Us
+            </Link>
+            <Link href="/terms" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
+              Privacy Policy
+            </Link>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="/support" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
+              Contact Support
+            </Link>
+            <Link href="/partner" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
+              Partner with Us
+            </Link>
+          </div>
+        </div>
+        <div className="text-on-surface-variant">
+          <p className="font-body-sm text-body-sm">
+            &copy; 2024 NetsU. Academic Reliability &amp; Community Warmth.
+          </p>
+          <div className="flex gap-stack-md mt-stack-sm">
+            <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+              <span className="material-symbols-outlined text-[20px]">public</span>
+            </button>
+            <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+              <span className="material-symbols-outlined text-[20px]">group</span>
+            </button>
+            <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+              <span className="material-symbols-outlined text-[20px]">mail</span>
+            </button>
+          </div>
+        </div>
+      </footer>
+
+      {/* BottomNav Mobile */}
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-lg rounded-t-xl border-t border-outline-variant">
+        <Link href="/kos" className="flex flex-col items-center justify-center text-on-surface-variant">
+          <span className="material-symbols-outlined">search</span>
+          <span className="font-label-md text-label-md">Search</span>
+        </Link>
+        <Link href="/favorites" className="flex flex-col items-center justify-center text-on-surface-variant">
+          <span className="material-symbols-outlined">favorite</span>
+          <span className="font-label-md text-label-md">Favorites</span>
+        </Link>
+        <Link
+          href="/bookings"
+          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1"
+        >
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+            receipt_long
+          </span>
+          <span className="font-label-md text-label-md">Bookings</span>
+        </Link>
+        <Link href="/profile" className="flex flex-col items-center justify-center text-on-surface-variant">
+          <span className="material-symbols-outlined">person</span>
+          <span className="font-label-md text-label-md">Profile</span>
+        </Link>
+      </nav>
+    </>
+  );
+}
