@@ -305,7 +305,7 @@ export default function BookingPage({
                   <SubmitBookingButton kosId={kos?.id || ""} roomId={room?.id || ""} />
                 )}
                 <p className="text-center font-label-md text-label-md text-outline mt-3">
-                  Pembayaran akan dilakukan setelah pemilik menyetujui pengajuan Anda.
+                  Setelah diajukan, pemilik kos akan meninjau permintaan Anda. Anda akan diminta membayar setelah booking disetujui.
                 </p>
               </div>
 

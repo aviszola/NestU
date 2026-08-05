@@ -81,6 +81,7 @@ export default function AdminBookingsContent({
     pending: "Menunggu",
     approved: "Disetujui",
     cancelled: "Ditolak",
+    rejected: "Ditolak",
     completed: "Selesai",
   };
 
@@ -88,6 +89,7 @@ export default function AdminBookingsContent({
     pending: "bg-on-tertiary-container/10 text-on-tertiary-container",
     approved: "bg-secondary/10 text-secondary",
     cancelled: "bg-error/10 text-error",
+    rejected: "bg-error/10 text-error",
     completed: "bg-primary-container text-on-primary-container",
   };
 

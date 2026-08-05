@@ -34,19 +34,44 @@ interface BookingDetail {
   };
 }
 
-const paymentLabels: Record<string, string> = {
-  belum_bayar: "Belum Bayar",
-  menunggu_konfirmasi: "Menunggu Konfirmasi",
+const statusLabels: Record<string, string> = {
+  pending: "Menunggu Persetujuan Pemilik",
+  approved: "Menunggu Pembayaran",
+  menunggu_konfirmasi: "Menunggu Konfirmasi Pembayaran",
   lunas: "Lunas",
-  expired: "Kedaluwarsa",
+  cancelled: "Dibatalkan",
+  rejected: "Ditolak",
+  completed: "Selesai",
 };
 
-const paymentStyles: Record<string, string> = {
-  belum_bayar: "bg-tertiary/10 text-tertiary",
+const statusStyles: Record<string, string> = {
+  pending: "bg-tertiary/10 text-tertiary",
+  approved: "bg-tertiary/10 text-tertiary",
   menunggu_konfirmasi: "bg-tertiary-container/20 text-on-tertiary-container",
   lunas: "bg-secondary/10 text-secondary",
-  expired: "bg-error/10 text-error",
+  cancelled: "bg-error/10 text-error",
+  rejected: "bg-error/10 text-error",
+  completed: "bg-primary/10 text-primary",
 };
+
+const statusIcons: Record<string, string> = {
+  pending: "hourglass_top",
+  approved: "payment",
+  menunggu_konfirmasi: "hourglass_top",
+  lunas: "check_circle",
+  cancelled: "cancel",
+  rejected: "cancel",
+  completed: "task_alt",
+};
+
+function getStatusKey(booking: BookingDetail): string {
+  if (booking.status === "approved") {
+    if (booking.payment_status === "lunas") return "lunas";
+    if (booking.payment_status === "menunggu_konfirmasi") return "menunggu_konfirmasi";
+    return "approved";
+  }
+  return booking.status;
+}
 
 function formatPrice(n: number | null | undefined): string {
   return new Intl.NumberFormat("id-ID", {
@@ -252,11 +277,14 @@ export default function BookingDetailPage() {
             </div>
             <div className="text-right">
               <span
-                className={`px-3 py-1 rounded-full text-label-md font-bold ${
-                  paymentStyles[booking.payment_status] || "bg-surface-variant text-on-surface-variant"
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-label-md font-bold ${
+                  statusStyles[getStatusKey(booking)] || "bg-surface-variant text-on-surface-variant"
                 }`}
               >
-                {paymentLabels[booking.payment_status] || booking.payment_status}
+                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {statusIcons[getStatusKey(booking)] || "info"}
+                </span>
+                {statusLabels[getStatusKey(booking)] || booking.status}
               </span>
             </div>
           </div>
@@ -268,7 +296,7 @@ export default function BookingDetailPage() {
               </p>
             </div>
             <div>
-              <p className="font-label-md text-[10px] uppercase text-outline mb-1">Total Bayar</p>
+              <p className="font-label-md text-[10px] uppercase text-outline mb-1">Total Sewa</p>
               <p className="font-body-md font-semibold text-primary">{formatPrice(total)}</p>
             </div>
             <div>
@@ -279,7 +307,9 @@ export default function BookingDetailPage() {
             </div>
             <div>
               <p className="font-label-md text-[10px] uppercase text-outline mb-1">Status Booking</p>
-              <p className="font-body-md font-semibold text-on-surface">{booking.status}</p>
+              <p className="font-body-md font-semibold text-on-surface">
+                {statusLabels[getStatusKey(booking)] || booking.status}
+              </p>
             </div>
           </div>
         </div>
@@ -288,7 +318,7 @@ export default function BookingDetailPage() {
         {isApproved && !isPaid && (
           <div className="bg-surface-container-lowest rounded-xl card-shadow p-stack-md mb-gutter">
             <h2 className="font-headline-md text-headline-md text-primary mb-stack-md">
-              {waitingConfirm ? "Menunggu Konfirmasi" : "Instruksi Pembayaran"}
+              Booking Disetujui — Silakan Lanjutkan Pembayaran
             </h2>
 
             {waitingConfirm ? (

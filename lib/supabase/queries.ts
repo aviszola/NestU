@@ -414,6 +414,41 @@ export async function updateBookingStatus(
   id: string,
   status: "approved" | "cancelled" | "completed"
 ): Promise<Booking | null> {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+
+  // Verifikasi eksplisit: user adalah owner kos dari booking ini ATAU admin
+  // (admin bypass via RLS; non-owner dapat pesan jelas, bukan 400 diam-diam)
+  const { data: profile } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
+  const { data: booking } = await client
+    .from("bookings")
+    .select("id, room_id")
+    .eq("id", id)
+    .single();
+  if (!booking) throw new Error("Booking tidak ditemukan.");
+
+  const { data: room } = await client
+    .from("rooms")
+    .select("kos_id")
+    .eq("id", booking.room_id)
+    .single();
+  if (!room) throw new Error("Kamar tidak ditemukan.");
+
+  const { data: kos } = await client
+    .from("kos")
+    .select("owner_id")
+    .eq("id", room.kos_id)
+    .single();
+  if (!kos || (kos.owner_id !== user.id && !isAdmin)) {
+    throw new Error("Anda tidak memiliki izin untuk mengubah status booking ini.");
+  }
+
   const { data, error } = await client
     .from("bookings")
     .update({ status })
@@ -754,6 +789,41 @@ export async function confirmPayment(
   client: any,
   bookingId: string
 ): Promise<void> {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+
+  // Verifikasi eksplisit: user adalah owner kos dari booking ini ATAU admin
+  // (bukan hanya andalkan RLS — cegah PATCH diam-diam 400 saat sesi berubah)
+  const { data: profile } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
+  const { data: booking } = await client
+    .from("bookings")
+    .select("id, room_id")
+    .eq("id", bookingId)
+    .single();
+  if (!booking) throw new Error("Booking tidak ditemukan.");
+
+  const { data: room } = await client
+    .from("rooms")
+    .select("kos_id")
+    .eq("id", booking.room_id)
+    .single();
+  if (!room) throw new Error("Kamar tidak ditemukan.");
+
+  const { data: kos } = await client
+    .from("kos")
+    .select("owner_id")
+    .eq("id", room.kos_id)
+    .single();
+  if (!kos || (kos.owner_id !== user.id && !isAdmin)) {
+    throw new Error("Anda tidak memiliki izin untuk mengonfirmasi pembayaran booking ini.");
+  }
+
   const { error } = await client
     .from("bookings")
     .update({

@@ -34,16 +34,19 @@ CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id) WH
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- User membaca notifikasi sendiri
+DROP POLICY IF EXISTS "notifications_select_own" ON notifications;
 CREATE POLICY "notifications_select_own" ON notifications
   FOR SELECT
   USING (user_id = auth.uid());
 
 -- User menandai notifikasi sendiri sebagai dibaca
+DROP POLICY IF EXISTS "notifications_update_own" ON notifications;
 CREATE POLICY "notifications_update_own" ON notifications
   FOR UPDATE
   USING (user_id = auth.uid());
 
 -- Admin baca semua (opsional, untuk debugging)
+DROP POLICY IF EXISTS "notifications_select_admin" ON notifications;
 CREATE POLICY "notifications_select_admin" ON notifications
   FOR SELECT
   USING (public.is_admin());
@@ -102,6 +105,15 @@ BEGIN
       '/owner/bookings'
     );
   END IF;
+
+  -- Notifikasi ke student: booking sedang ditinjau (tanpa menyebut pembayaran)
+  PERFORM public.notify_user(
+    NEW.student_id,
+    'Booking diajukan',
+    'Booking Anda sedang ditinjau pemilik kos.',
+    '/bookings/' || NEW.id
+  );
+
   RETURN NEW;
 END;
 $$;
@@ -123,17 +135,17 @@ BEGIN
   IF NEW.status = 'approved' AND OLD.status <> 'approved' THEN
     PERFORM public.notify_user(
       NEW.student_id,
-      'Booking disetujui',
-      'Booking kamar Anda telah disetujui. Silakan lanjut ke pembayaran.',
-      '/bookings'
+      'Booking disetujui!',
+      'Booking disetujui! Silakan lakukan pembayaran.',
+      '/bookings/' || NEW.id
     );
-  ELSIF NEW.status = 'cancelled' AND OLD.status <> 'cancelled' THEN
+  ELSIF NEW.status IN ('cancelled', 'rejected') AND OLD.status NOT IN ('cancelled', 'rejected') THEN
     PERFORM public.notify_user(
       NEW.student_id,
       'Booking ditolak',
       'Booking kamar Anda ditolak' ||
         CASE WHEN NEW.rejection_reason IS NOT NULL THEN ': ' || NEW.rejection_reason ELSE '.' END,
-      '/bookings'
+      '/bookings/' || NEW.id
     );
   END IF;
   RETURN NEW;

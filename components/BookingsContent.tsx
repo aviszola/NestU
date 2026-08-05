@@ -8,6 +8,7 @@ type FilterTab = "all" | "active" | "history";
 interface Booking {
   id: string;
   status: string;
+  payment_status?: string;
   created_at: string;
   move_in_date?: string;
   notes?: string;
@@ -31,32 +32,32 @@ const tabs: { key: FilterTab; label: string }[] = [
   { key: "history", label: "History" },
 ];
 
-const statusCfg: Record<
-  string,
-  { label: string; dot?: boolean; icon?: string; style: string }
-> = {
-  pending: {
-    label: "Menunggu",
-    dot: true,
-    style:
-      "bg-on-tertiary-container/10 text-on-tertiary-container",
-  },
-  approved: {
-    label: "Disetujui",
-    icon: "verified",
-    style: "bg-secondary/10 text-secondary border border-secondary/20",
-  },
-  completed: {
-    label: "Selesai",
-    icon: "task_alt",
-    style: "bg-primary-container text-on-primary-container",
-  },
-  cancelled: {
-    label: "Dibatalkan",
-    icon: "cancel",
-    style: "bg-error-container text-error",
-  },
-};
+type StatusCfg = { label: string; dot?: boolean; icon?: string; style: string };
+
+function getStatusCfg(b: Booking): StatusCfg {
+  if (b.status === "pending")
+    return {
+      label: "Menunggu Persetujuan",
+      dot: true,
+      style: "bg-tertiary/10 text-tertiary",
+    };
+  if (b.status === "approved") {
+    if (b.payment_status === "lunas")
+      return { label: "Lunas", icon: "check_circle", style: "bg-secondary/10 text-secondary" };
+    if (b.payment_status === "menunggu_konfirmasi")
+      return {
+        label: "Menunggu Konfirmasi",
+        icon: "hourglass_top",
+        style: "bg-tertiary-container/20 text-on-tertiary-container",
+      };
+    return { label: "Menunggu Pembayaran", icon: "payment", style: "bg-tertiary/10 text-tertiary" };
+  }
+  if (b.status === "completed")
+    return { label: "Selesai", icon: "task_alt", style: "bg-primary-container text-on-primary-container" };
+  if (b.status === "cancelled")
+    return { label: "Dibatalkan", icon: "cancel", style: "bg-error-container text-error" };
+  return { label: "Ditolak", icon: "cancel", style: "bg-error-container text-error" };
+}
 
 function formatBookingId(id: string): string {
   return `#SL-${id.slice(-4).toUpperCase()}`;
@@ -133,7 +134,7 @@ export default function BookingsContent({ bookings }: Props) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
           {filtered.map((b) => {
-            const cfg = statusCfg[b.status] ?? statusCfg.pending;
+            const cfg = getStatusCfg(b);
             const isPast =
               b.status === "completed" || b.status === "cancelled";
             const imgSrc =
