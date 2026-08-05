@@ -300,15 +300,57 @@ export async function submitBooking(formData: FormData) {
   }
 }
 
+// ─── Booking status ────────────────────────────────────────────
+// Verifikasi eksplisit: user adalah owner kos dari booking ini ATAU admin.
+// Cegah error RLS mentah (HTTP 400) saat sesi lama/role berubah —
+// beri pesan jelas sebelum PATCH. Pola sama seperti updateBookingStatus di queries.ts.
+async function assertCanManageBooking(supabase: Awaited<ReturnType<typeof createClient>>, bookingId: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
+  const { data: booking } = await supabase
+    .from("bookings")
+    .select("id, room_id")
+    .eq("id", bookingId)
+    .maybeSingle();
+  if (!booking) throw new Error("Booking tidak ditemukan.");
+
+  const { data: room } = await supabase
+    .from("rooms")
+    .select("kos_id")
+    .eq("id", booking.room_id)
+    .maybeSingle();
+  if (!room) throw new Error("Kamar tidak ditemukan.");
+
+  const { data: kos } = await supabase
+    .from("kos")
+    .select("owner_id")
+    .eq("id", room.kos_id)
+    .maybeSingle();
+  if (!kos || (kos.owner_id !== user.id && !isAdmin)) {
+    throw new Error("Anda tidak memiliki izin untuk mengubah booking ini.");
+  }
+
+  return { supabase, booking, user };
+}
+
 export async function approveBooking(bookingId: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  const { booking } = await assertCanManageBooking(supabase, bookingId);
 
   const { error } = await supabase
     .from("bookings")
     .update({ status: "approved", updated_at: new Date().toISOString() })
-    .eq("id", bookingId);
+    .eq("id", booking.id);
   if (error) throw error;
 
   revalidatePath("/owner");
@@ -317,13 +359,12 @@ export async function approveBooking(bookingId: string) {
 
 export async function rejectBooking(bookingId: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  const { booking } = await assertCanManageBooking(supabase, bookingId);
 
   const { error } = await supabase
     .from("bookings")
     .update({ status: "rejected", updated_at: new Date().toISOString() })
-    .eq("id", bookingId);
+    .eq("id", booking.id);
   if (error) throw error;
 
   revalidatePath("/owner");

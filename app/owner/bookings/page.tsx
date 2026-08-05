@@ -8,6 +8,7 @@ import { confirmPayment } from "@/lib/supabase/queries";
 import { useEffect, useState } from "react";
 import OwnerShell from "@/components/layout/OwnerShell";
 import { toastSuccess, toastError } from "@/lib/toast";
+import { toReadableError } from "@/lib/utils";
 
 type PaymentKey =
   | "pending"
@@ -154,8 +155,8 @@ export default function OwnerBookingsPage() {
       toastSuccess("Status booking diperbarui.");
       loadAllBookings();
     } catch (err: any) {
-      setError(err.message);
-      toastError("Gagal memperbarui booking: " + (err.message || "Terjadi kesalahan"));
+      setError(toReadableError(err));
+      toastError("Gagal memperbarui booking: " + toReadableError(err));
     } finally {
       setActionLoading(null);
     }
@@ -170,8 +171,8 @@ export default function OwnerBookingsPage() {
       toastSuccess("Pembayaran dikonfirmasi. Status booking: Lunas.");
       loadAllBookings();
     } catch (err: any) {
-      setError(err.message);
-      toastError("Gagal konfirmasi pembayaran: " + (err.message || "Terjadi kesalahan"));
+      setError(toReadableError(err));
+      toastError("Gagal konfirmasi pembayaran: " + toReadableError(err));
     } finally {
       setActionLoading(null);
     }

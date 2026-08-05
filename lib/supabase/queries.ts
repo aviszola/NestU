@@ -428,23 +428,39 @@ export async function updateBookingStatus(
 
   const { data: booking } = await client
     .from("bookings")
-    .select("id, room_id")
+    .select("id, room_id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
   if (!booking) throw new Error("Booking tidak ditemukan.");
+
+  // Stale-data guard: cek status terbaru sebelum PATCH.
+  // Cegah aksi ke data yang sudah berubah (mis. sudah di-approve/dibatalkan
+  // oleh owner lain / sesi lama) — hindari PATCH diam-diam 400 dari RLS.
+  // Transisi valid: pending → approved/cancelled; approved → completed.
+  const validFrom: Record<string, string[]> = {
+    approved: ["pending"],
+    cancelled: ["pending", "approved"],
+    completed: ["approved"],
+  };
+  const allowedFrom = validFrom[status];
+  if (allowedFrom && !allowedFrom.includes(booking.status)) {
+    throw new Error(
+      `Booking sudah diproses (status: ${booking.status}). Muat ulang halaman untuk melihat status terbaru.`
+    );
+  }
 
   const { data: room } = await client
     .from("rooms")
     .select("kos_id")
     .eq("id", booking.room_id)
-    .single();
+    .maybeSingle();
   if (!room) throw new Error("Kamar tidak ditemukan.");
 
   const { data: kos } = await client
     .from("kos")
     .select("owner_id")
     .eq("id", room.kos_id)
-    .single();
+    .maybeSingle();
   if (!kos || (kos.owner_id !== user.id && !isAdmin)) {
     throw new Error("Anda tidak memiliki izin untuk mengubah status booking ini.");
   }
@@ -761,10 +777,26 @@ export async function submitPaymentProof(
   proofPath: string,
   note?: string | null
 ): Promise<void> {
+  // Verifikasi eksplisit: hanya student pemilik booking yang bisa kirim bukti.
+  // (RLS insert-only student sudah membatasi, tapi beri pesan jelas sebelum PATCH.)
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+
+  const { data: booking } = await client
+    .from("bookings")
+    .select("id, student_id")
+    .eq("id", bookingId)
+    .maybeSingle();
+  if (!booking) throw new Error("Booking tidak ditemukan.");
+  if (booking.student_id !== user.id) {
+    throw new Error("Anda tidak memiliki izin untuk mengubah booking ini.");
+  }
+
   const { error } = await client
     .from("bookings")
     .update({
       payment_status: "menunggu_konfirmasi",
+      payment_method: "manual",
       payment_proof_path: proofPath,
       payment_note: note ?? null,
     })

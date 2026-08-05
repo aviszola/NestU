@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { approveBooking, rejectBooking } from "@/lib/supabase/actions";
+import { toastError } from "@/lib/toast";
 
 export default function ApproveRejectButtons({
   bookingId,
@@ -14,15 +15,23 @@ export default function ApproveRejectButtons({
 
   const handleApprove = () => {
     startTransition(async () => {
-      await approveBooking(bookingId);
-      router.refresh();
+      try {
+        await approveBooking(bookingId);
+        router.refresh();
+      } catch (e: any) {
+        toastError(e?.message || "Gagal menyetujui booking");
+      }
     });
   };
 
   const handleReject = () => {
     startTransition(async () => {
-      await rejectBooking(bookingId);
-      router.refresh();
+      try {
+        await rejectBooking(bookingId);
+        router.refresh();
+      } catch (e: any) {
+        toastError(e?.message || "Gagal menolak booking");
+      }
     });
   };
 

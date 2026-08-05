@@ -6,6 +6,7 @@ import { updateBookingStatus } from "@/lib/supabase/queries";
 import { confirmPayment } from "@/lib/supabase/queries";
 import { getSignedProofUrl } from "@/lib/supabase/queries";
 import { toastSuccess, toastError } from "@/lib/toast";
+import { toReadableError } from "@/lib/utils";
 
 interface Student {
   full_name?: string;
@@ -83,9 +84,10 @@ export default function OwnerBookingsContent({
       if (!result) throw new Error("Booking tidak ditemukan atau tidak memiliki izin");
       window.location.reload();
     } catch (err: any) {
-      setError(err.message);
+      const readable = toReadableError(err);
+      setError(readable);
       setActionLoading(null);
-      toastError("Gagal memproses booking: " + (err.message || "Terjadi kesalahan"));
+      toastError("Gagal memproses booking: " + readable);
     }
   }
 
@@ -99,9 +101,9 @@ export default function OwnerBookingsContent({
       toastSuccess("Pembayaran dikonfirmasi. Status booking: Lunas.");
       window.location.reload();
     } catch (err: any) {
-      setError(err.message);
+      setError(toReadableError(err));
       setActionLoading(null);
-      toastError("Gagal konfirmasi pembayaran: " + (err.message || "Terjadi kesalahan"));
+      toastError("Gagal konfirmasi pembayaran: " + toReadableError(err));
     }
   }
 

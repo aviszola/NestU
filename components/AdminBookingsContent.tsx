@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { updateBookingStatus } from "@/lib/supabase/queries";
+import { toReadableError } from "@/lib/utils";
 import AdminShell from "@/components/layout/AdminShell";
 
 interface Student {
@@ -72,7 +73,7 @@ export default function AdminBookingsContent({
       if (!result) throw new Error("Booking tidak ditemukan atau tidak memiliki izin");
       window.location.reload();
     } catch (err: any) {
-      setError(err.message);
+      setError(toReadableError(err));
       setActionLoading(null);
     }
   }
