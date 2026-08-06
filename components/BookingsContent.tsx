@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { getBookingStatus } from "@/lib/bookingStatus";
 
 type FilterTab = "all" | "active" | "history";
 
@@ -31,33 +32,6 @@ const tabs: { key: FilterTab; label: string }[] = [
   { key: "active", label: "Active" },
   { key: "history", label: "History" },
 ];
-
-type StatusCfg = { label: string; dot?: boolean; icon?: string; style: string };
-
-function getStatusCfg(b: Booking): StatusCfg {
-  if (b.status === "pending")
-    return {
-      label: "Menunggu Persetujuan",
-      dot: true,
-      style: "bg-tertiary/10 text-tertiary",
-    };
-  if (b.status === "approved") {
-    if (b.payment_status === "lunas")
-      return { label: "Lunas", icon: "check_circle", style: "bg-secondary/10 text-secondary" };
-    if (b.payment_status === "menunggu_konfirmasi")
-      return {
-        label: "Menunggu Konfirmasi",
-        icon: "hourglass_top",
-        style: "bg-tertiary-container/20 text-on-tertiary-container",
-      };
-    return { label: "Menunggu Pembayaran", icon: "payment", style: "bg-tertiary/10 text-tertiary" };
-  }
-  if (b.status === "completed")
-    return { label: "Selesai", icon: "task_alt", style: "bg-primary-container text-on-primary-container" };
-  if (b.status === "cancelled")
-    return { label: "Dibatalkan", icon: "cancel", style: "bg-error-container text-error" };
-  return { label: "Ditolak", icon: "cancel", style: "bg-error-container text-error" };
-}
 
 function formatBookingId(id: string): string {
   return `#SL-${id.slice(-4).toUpperCase()}`;
@@ -134,7 +108,7 @@ export default function BookingsContent({ bookings }: Props) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
           {filtered.map((b) => {
-            const cfg = getStatusCfg(b);
+            const cfg = getBookingStatus(b);
             const isPast =
               b.status === "completed" || b.status === "cancelled";
             const imgSrc =
@@ -162,11 +136,8 @@ export default function BookingsContent({ bookings }: Props) {
                   />
                   <div className="absolute top-4 right-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur-md ${cfg.style}`}
+                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur-md ${cfg.className}`}
                     >
-                      {cfg.dot && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                      )}
                       {cfg.icon && (
                         <span
                           className="material-symbols-outlined text-xs"

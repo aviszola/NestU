@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import OwnerShell from "@/components/layout/OwnerShell";
 import { toastSuccess, toastError } from "@/lib/toast";
 import { toReadableError } from "@/lib/utils";
+import { BOOKING_STATUS, getStatusKey as sharedGetStatusKey } from "@/lib/bookingStatus";
 
 type PaymentKey =
   | "pending"
@@ -19,51 +20,16 @@ type PaymentKey =
   | "rejected"
   | "completed";
 
+// Label OK yang spesifik konteks owner, sisanya pakai shared map.
 const statusCfg: Record<PaymentKey, { label: string; icon: string; className: string }> = {
-  pending: {
-    label: "Menunggu Persetujuan",
-    icon: "hourglass_top",
-    className: "bg-tertiary/10 text-tertiary",
-  },
-  approved: {
-    label: "Disetujui — Belum Bayar",
-    icon: "schedule_send",
-    className: "bg-tertiary/10 text-tertiary",
-  },
-  menunggu_konfirmasi: {
-    label: "Menunggu Konfirmasi Pembayaran",
-    icon: "hourglass_top",
-    className: "bg-tertiary/10 text-tertiary",
-  },
-  lunas: {
-    label: "Lunas",
-    icon: "check_circle",
-    className: "bg-secondary/10 text-secondary",
-  },
-  cancelled: {
-    label: "Dibatalkan",
-    icon: "cancel",
-    className: "bg-error/10 text-error",
-  },
-  rejected: {
-    label: "Ditolak",
-    icon: "cancel",
-    className: "bg-error/10 text-error",
-  },
-  completed: {
-    label: "Selesai",
-    icon: "task_alt",
-    className: "bg-primary/10 text-primary",
-  },
+  ...BOOKING_STATUS,
+  approved: { label: "Disetujui — Belum Bayar", icon: "schedule_send", className: "bg-tertiary/10 text-tertiary" },
+  pending: { label: "Menunggu Persetujuan", icon: "hourglass_top", className: "bg-tertiary/10 text-tertiary" },
+  menunggu_konfirmasi: { label: "Menunggu Konfirmasi Pembayaran", icon: "hourglass_top", className: "bg-tertiary/10 text-tertiary" },
 };
 
 function getStatusKey(b: any): PaymentKey {
-  if (b.status === "approved") {
-    if (b.payment_status === "lunas") return "lunas";
-    if (b.payment_status === "menunggu_konfirmasi") return "menunggu_konfirmasi";
-    return "approved";
-  }
-  return b.status as PaymentKey;
+  return sharedGetStatusKey(b);
 }
 
 const FILTERS: { key: string; label: string }[] = [
@@ -136,7 +102,7 @@ export default function OwnerBookingsPage() {
         setBookings([]);
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(toReadableError(err));
     } finally {
       setLoading(false);
     }

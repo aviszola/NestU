@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { toastSuccess, toastError, toastInfo, toastLoading, toastDismiss } from "@/lib/toast";
 import { getSnapScriptUrl } from "@/lib/midtrans";
+import { BOOKING_STATUS, getStatusKey } from "@/lib/bookingStatus";
 
 interface BookingDetail {
   id: string;
@@ -35,44 +36,22 @@ interface BookingDetail {
 }
 
 const statusLabels: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(BOOKING_STATUS).map(([k, v]) => [k, v.label])),
   pending: "Menunggu Persetujuan Pemilik",
-  approved: "Menunggu Pembayaran",
-  menunggu_konfirmasi: "Menunggu Konfirmasi Pembayaran",
-  lunas: "Lunas",
-  cancelled: "Dibatalkan",
-  rejected: "Ditolak",
-  completed: "Selesai",
 };
 
+
 const statusStyles: Record<string, string> = {
-  pending: "bg-tertiary/10 text-tertiary",
-  approved: "bg-tertiary/10 text-tertiary",
-  menunggu_konfirmasi: "bg-tertiary-container/20 text-on-tertiary-container",
-  lunas: "bg-secondary/10 text-secondary",
-  cancelled: "bg-error/10 text-error",
-  rejected: "bg-error/10 text-error",
-  completed: "bg-primary/10 text-primary",
+  ...Object.fromEntries(Object.entries(BOOKING_STATUS).map(([k, v]) => [k, v.className])),
 };
 
 const statusIcons: Record<string, string> = {
-  pending: "hourglass_top",
-  approved: "payment",
-  menunggu_konfirmasi: "hourglass_top",
-  lunas: "check_circle",
-  cancelled: "cancel",
-  rejected: "cancel",
-  completed: "task_alt",
+  ...Object.fromEntries(Object.entries(BOOKING_STATUS).map(([k, v]) => [k, v.icon])),
 };
 
-function getStatusKey(booking: BookingDetail): string {
-  if (booking.status === "approved") {
-    if (booking.payment_status === "lunas") return "lunas";
-    if (booking.payment_status === "menunggu_konfirmasi") return "menunggu_konfirmasi";
-    return "approved";
-  }
-  return booking.status;
+function getStatusKeyLocal(booking: BookingDetail): string {
+  return getStatusKey(booking);
 }
-
 function formatPrice(n: number | null | undefined): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -278,13 +257,13 @@ export default function BookingDetailPage() {
             <div className="text-right">
               <span
                 className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-label-md font-bold ${
-                  statusStyles[getStatusKey(booking)] || "bg-surface-variant text-on-surface-variant"
+                  statusStyles[getStatusKeyLocal(booking)] || "bg-surface-variant text-on-surface-variant"
                 }`}
               >
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {statusIcons[getStatusKey(booking)] || "info"}
+                  {statusIcons[getStatusKeyLocal(booking)] || "info"}
                 </span>
-                {statusLabels[getStatusKey(booking)] || booking.status}
+                {statusLabels[getStatusKeyLocal(booking)] || booking.status}
               </span>
             </div>
           </div>
@@ -308,7 +287,7 @@ export default function BookingDetailPage() {
             <div>
               <p className="font-label-md text-[10px] uppercase text-outline mb-1">Status Booking</p>
               <p className="font-body-md font-semibold text-on-surface">
-                {statusLabels[getStatusKey(booking)] || booking.status}
+                {statusLabels[getStatusKeyLocal(booking)] || booking.status}
               </p>
             </div>
           </div>

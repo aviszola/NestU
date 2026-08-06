@@ -1,21 +1,5 @@
 import Link from "next/link";
-
-function getStatus(booking: any): { label: string; className: string } {
-  if (booking.status === "pending")
-    return { label: "Menunggu Persetujuan", className: "bg-tertiary/10 text-tertiary" };
-  if (booking.status === "approved") {
-    if (booking.payment_status === "lunas")
-      return { label: "Lunas", className: "bg-secondary/10 text-secondary" };
-    if (booking.payment_status === "menunggu_konfirmasi")
-      return { label: "Menunggu Konfirmasi", className: "bg-tertiary-container/20 text-on-tertiary-container" };
-    return { label: "Menunggu Pembayaran", className: "bg-tertiary/10 text-tertiary" };
-  }
-  if (booking.status === "cancelled")
-    return { label: "Dibatalkan", className: "bg-error-container text-on-error-container" };
-  if (booking.status === "completed")
-    return { label: "Selesai", className: "bg-primary/10 text-primary" };
-  return { label: "Ditolak", className: "bg-error-container text-on-error-container" };
-}
+import { getBookingStatus } from "@/lib/bookingStatus";
 
 export default function BookingCard({
   booking,
@@ -24,7 +8,7 @@ export default function BookingCard({
   booking: any;
   ownerName?: string | null;
 }) {
-  const status = getStatus(booking);
+  const status = getBookingStatus(booking);
   const room = booking.rooms;
   const kos = room?.kos;
   const needsPayment =
