@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       const shortId = bookingId.replace(/-/g, "").slice(0, 8);
       const kosName = (booking.rooms?.kos?.name ?? "Kos").slice(0, 40);
       const roomNumber = (booking.rooms?.room_number ?? "").slice(0, 20);
-      const customerName = (profile?.full_name ?? "Student NetsU").slice(0, 20);
+      const customerName = (profile?.full_name ?? "Student NestU").slice(0, 20);
 
       const result = await createSnapTransaction({
         orderId,
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const orderId = `book-${shortId}-${Date.now()}`;
     const kosName = (booking.rooms?.kos?.name ?? "Kos").slice(0, 40);
     const roomNumber = (booking.rooms?.room_number ?? "").slice(0, 20);
-    const customerName = (profile?.full_name ?? "Student NetsU").slice(0, 20);
+    const customerName = (profile?.full_name ?? "Student NestU").slice(0, 20);
 
     const result = await createSnapTransaction({
       orderId,

@@ -46,7 +46,7 @@ export default function RegisterPage() {
             <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-6">
               <span className="material-symbols-outlined text-3xl text-white">home</span>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">NetsU</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">NestU</h2>
             <p className="text-white/70 text-sm leading-relaxed max-w-xs mx-auto">
               Temukan kos terbaik untuk perjalanan akademik Anda. Bergabung dengan ribuan mahasiswa lainnya.
             </p>

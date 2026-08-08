@@ -36,6 +36,13 @@ const STEPS = [
 
 const PAYMENT_METHODS = ["Bank Transfer", "E-Wallet", "Virtual Account"];
 
+const FOOTER_LINK_ROUTES: Record<string, string> = {
+  "Contact Support": "/contact",
+  "Syarat & Ketentuan": "/terms",
+  "Kebijakan Privasi": "/privacy",
+  "About Us": "/about",
+};
+
 const FOOTER_COLUMNS = [
   {
     title: "Pencarian",
@@ -83,7 +90,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 md:px-10">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <Logo variant="full" className="h-10 w-auto text-primary" />
+              <Logo variant="full" className="h-12 w-auto text-primary" />
             </Link>
             <nav className="hidden md:flex items-center gap-8">
               <Link
@@ -93,13 +100,13 @@ export default async function HomePage() {
                 Cari Kos
               </Link>
               <Link
-                href="#"
+                href="/about"
                 className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200"
               >
                 Tentang Kami
               </Link>
               <Link
-                href="#"
+                href="/contact"
                 className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200"
               >
                 Bantuan
@@ -280,7 +287,7 @@ export default async function HomePage() {
           <ScrollReveal className="mt-10 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/50 flex items-start gap-3 max-w-3xl mx-auto">
             <span className="material-symbols-outlined text-primary text-xl mt-0.5 shrink-0">info</span>
             <p className="text-sm text-on-surface-variant leading-relaxed">
-              Pembayaran hanya dilakukan setelah booking disetujui oleh pemilik kos. Dana Anda akan ditahan oleh sistem NetsU untuk menjamin keamanan hingga proses check-in selesai.
+              Pembayaran hanya dilakukan setelah booking disetujui oleh pemilik kos. Dana Anda akan ditahan oleh sistem NestU untuk menjamin keamanan hingga proses check-in selesai.
             </p>
           </ScrollReveal>
         </div>
@@ -336,7 +343,7 @@ export default async function HomePage() {
                   Ajukan Booking Sekarang
                 </button>
                 <p className="mt-3 text-xs text-on-surface-variant text-center leading-relaxed">
-                  Dengan mengklik tombol di atas, Anda menyetujui Syarat &amp; Ketentuan Layanan NetsU.
+                  Dengan mengklik tombol di atas, Anda menyetujui Syarat &amp; Ketentuan Layanan NestU.
                 </p>
               </div>
             </ScrollReveal>
@@ -350,10 +357,10 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <ScrollReveal>
               <Link href="/" className="flex items-center gap-2 shrink-0">
-                <Logo variant="full" className="h-9 w-auto text-white" />
+                <Logo variant="full" className="h-11 w-auto text-white" />
               </Link>
               <p className="mt-3 text-sm text-white/60 leading-relaxed">
-                NetsU: Academic Reliability &amp; Community Warmth. Solusi hunian aman bagi pelajar masa kini.
+                NestU: Academic Reliability &amp; Community Warmth. Solusi hunian aman bagi pelajar masa kini.
               </p>
               <div className="mt-5 flex items-center gap-4">
                 <Link
@@ -381,7 +388,7 @@ export default async function HomePage() {
                 <ul className="space-y-3">
                   {col.links.map((link) => (
                     <li key={link}>
-                      <Link href="#" className="text-sm text-white/60 hover:text-white transition-colors">
+                      <Link href={FOOTER_LINK_ROUTES[link] || "#"} className="text-sm text-white/60 hover:text-white transition-colors">
                         {link}
                       </Link>
                     </li>
@@ -392,7 +399,7 @@ export default async function HomePage() {
           </div>
           <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-white/40 text-center md:text-left">
-              &copy; 2024 NetsU. Academic Reliability &amp; Community Warmth.
+              &copy; 2024 NestU. Academic Reliability &amp; Community Warmth.
             </p>
             <div className="flex items-center gap-4">
               <span className="px-3 py-1 text-[10px] font-bold text-white/80 bg-white/10 rounded-full">

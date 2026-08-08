@@ -54,8 +54,20 @@ export default function KosCard({
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container text-gray-400">
-            <span className="material-symbols-outlined text-4xl">home</span>
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-surface-container-high via-surface-container to-surface-container-lowest relative overflow-hidden">
+            {/* Grid pattern halus — kesan "belum difoto" yang disengaja */}
+            <div
+              className="absolute inset-0 opacity-[0.35]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(0,35,111,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0,35,111,0.12) 1px, transparent 1px)",
+                backgroundSize: "28px 28px",
+              }}
+            />
+            <span className="material-symbols-outlined text-3xl text-primary/30 relative">photo_camera</span>
+            <span className="text-[11px] font-medium text-on-surface-variant/70 relative">
+              Foto belum tersedia
+            </span>
           </div>
         )}
         {showFavorite && (

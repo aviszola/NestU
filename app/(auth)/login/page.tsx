@@ -147,7 +147,7 @@ export default function LoginPage() {
               Academic Reliability & Community Warmth
             </span>
             <h1 className="font-display-lg text-display-lg mb-stack-md leading-tight">
-              NetsU
+              NestU
             </h1>
             <p className="font-body-lg text-body-lg text-primary-fixed opacity-90">
               Temukan hunian yang aman, nyaman, dan mendukung perjalanan
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 Terverifikasi
               </h3>
               <p className="font-body-sm text-body-sm text-white/80">
-                Semua hunian telah melalui kurasi ketat tim NetsU.
+                Semua hunian telah melalui kurasi ketat tim NestU.
               </p>
             </div>
             <div className="glass-effect p-stack-md rounded-xl">
@@ -187,7 +187,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Logo Mobile */}
           <div className="md:hidden mb-stack-lg flex items-center justify-center">
-            <Logo variant="full" className="h-14 w-auto text-primary" />
+            <Logo variant="full" className="h-16 w-auto text-primary" />
           </div>
 
           {/* Toggle Masuk / Daftar */}
@@ -363,7 +363,7 @@ export default function LoginPage() {
                 Buat Akun Baru
               </h2>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Bergabunglah dengan ekosistem NetsU hari ini.
+                Bergabunglah dengan ekosistem NestU hari ini.
               </p>
             </div>
 
@@ -543,7 +543,7 @@ export default function LoginPage() {
               </a>
             </p>
             <p className="font-label-md text-label-md text-outline mt-4">
-              &copy; 2024 NetsU. Academic Reliability &
+              &copy; 2024 NestU. Academic Reliability &
               Community Warmth.
             </p>
           </div>

@@ -41,7 +41,7 @@ export default async function MyBookingsPage() {
         </main>
 
         <Footer
-          brandName="NetsU"
+          brandName="NestU"
           tagline="Academic Reliability &amp; Community Warmth."
         />
       </div>

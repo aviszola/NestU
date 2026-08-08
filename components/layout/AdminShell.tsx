@@ -52,7 +52,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
       {/* Top Bar */}
       <header className="sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-sm bg-surface shadow-sm">
         <div className="flex items-center gap-stack-md">
-          <Logo variant="full" className="h-9 w-auto text-primary" />
+          <Logo variant="full" className="h-11 w-auto text-primary" />
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant">
@@ -140,9 +140,9 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
       {/* Footer */}
       <footer className="w-full py-stack-lg px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-3 gap-gutter bg-surface-container-highest border-t border-outline-variant">
         <div>
-          <span className="font-title-lg text-title-lg font-bold text-primary mb-4 block">NetsU</span>
+          <span className="font-title-lg text-title-lg font-bold text-primary mb-4 block">NestU</span>
           <p className="text-body-sm text-on-surface-variant mb-4">Academic Reliability & Community Warmth for the modern student housing market.</p>
-          <p className="text-body-sm text-on-surface-variant">© 2024 NetsU.</p>
+          <p className="text-body-sm text-on-surface-variant">© 2024 NestU.</p>
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Resources</h3>

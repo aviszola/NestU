@@ -6,7 +6,7 @@ export default function PublicNav() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Logo variant="full" className="h-10 w-auto text-primary" />
+          <Logo variant="full" className="h-12 w-auto text-primary" />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/kos" className="flex flex-col items-center text-xs font-medium text-primary transition-colors">
