@@ -223,7 +223,7 @@ export default function EditKosPage() {
               try {
                 const res = await fetch(
                   `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLat}&lon=${newLng}&accept-language=id`,
-                  { headers: { "User-Agent": "NetsU-App/1.0" } }
+                  { headers: { "User-Agent": "NestU-App/1.0" } }
                 );
                 const data = await res.json();
                 if (data?.display_name) setAddress(data.display_name);

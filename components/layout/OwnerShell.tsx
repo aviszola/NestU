@@ -60,7 +60,7 @@ export default function OwnerShell({ children, activePage, userName }: OwnerShel
         </main>
       </div>
       <Footer
-        brandName="NetsU"
+        brandName="NestU"
         tagline="Academic Reliability & Community Warmth."
         showPartnerSection
       />

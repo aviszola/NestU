@@ -49,7 +49,7 @@ export default function AdminDashboardContent({
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
             <div className="relative z-10 p-6 md:p-8">
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                NetsU
+                NestU
               </h2>
               <p className="mt-2 text-blue-200 max-w-xl">
                 Kelola dan pantau seluruh aktivitas kos, booking, dan pengguna dalam satu dashboard terpusat.

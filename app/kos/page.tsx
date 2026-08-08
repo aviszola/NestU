@@ -245,7 +245,7 @@ export default async function KosPage({
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <Logo variant="full" className="h-9 w-auto text-white" />
+              <Logo variant="full" className="h-11 w-auto text-white" />
             </Link>
             <p className="text-sm text-white/60 mt-3 max-w-md leading-relaxed">
               Misi kami adalah menyediakan hunian yang terjangkau, aman, dan
@@ -310,7 +310,7 @@ export default async function KosPage({
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-center">
           <p className="text-sm text-white/40">
-            &copy; 2024 NetsU. Academic Reliability &amp;
+            &copy; 2024 NestU. Academic Reliability &amp;
             Community Warmth.
           </p>
         </div>

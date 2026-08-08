@@ -332,7 +332,7 @@ export default function BookingPage({
       <footer className="w-full py-stack-lg px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-3 gap-gutter bg-surface-container-highest mt-stack-lg">
         <div>
           <h3 className="font-title-lg text-title-lg font-bold text-primary mb-stack-sm">
-            NetsU
+            NestU
           </h3>
           <p className="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
             Platform pencarian hunian terpercaya untuk mahasiswa di seluruh Indonesia.
@@ -362,7 +362,7 @@ export default function BookingPage({
         </div>
         <div className="text-on-surface-variant">
           <p className="font-body-sm text-body-sm">
-            &copy; 2024 NetsU. Academic Reliability &amp; Community Warmth.
+            &copy; 2024 NestU. Academic Reliability &amp; Community Warmth.
           </p>
           <div className="flex gap-stack-md mt-stack-sm">
             <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">

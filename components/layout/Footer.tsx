@@ -1,4 +1,5 @@
 import Logo from "@/components/ui/Logo";
+import Link from "next/link";
 
 interface FooterProps {
   brandName: string;
@@ -17,7 +18,7 @@ export default function Footer({
         {/* Brand */}
         <div>
             <div className="flex items-center gap-2">
-              <Logo variant="full" className="h-9 w-auto text-primary" />
+              <Logo variant="full" className="h-11 w-auto text-primary" />
             </div>
           {tagline && (
             <p className="text-xs text-outline leading-relaxed max-w-xs">
@@ -36,24 +37,24 @@ export default function Footer({
           </h4>
           <ul className="space-y-2">
             <li>
-              <a href="#" className="text-xs text-outline hover:text-on-surface transition-colors">
+              <Link href="/about" className="text-xs text-outline hover:text-on-surface transition-colors">
                 About Us
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-xs text-outline hover:text-on-surface transition-colors">
+              <Link href="/terms" className="text-xs text-outline hover:text-on-surface transition-colors">
                 Terms of Service
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-xs text-outline hover:text-on-surface transition-colors">
+              <Link href="/privacy" className="text-xs text-outline hover:text-on-surface transition-colors">
                 Privacy Policy
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-xs text-outline hover:text-on-surface transition-colors">
+              <Link href="/contact" className="text-xs text-outline hover:text-on-surface transition-colors">
                 Contact Support
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

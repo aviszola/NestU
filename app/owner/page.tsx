@@ -88,7 +88,7 @@ export default async function OwnerDashboardPage() {
             <div className="flex items-center gap-2 mb-1">
               <span className="material-symbols-outlined text-lg">home</span>
               <span className="text-base font-bold text-on-surface">
-                NetsU
+                NestU
               </span>
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-on-surface mt-2">
@@ -214,7 +214,7 @@ export default async function OwnerDashboardPage() {
       </div>
 
       <Footer
-        brandName="NetsU"
+        brandName="NestU"
         tagline="Academic Reliability & Community Warmth."
         showPartnerSection
       />

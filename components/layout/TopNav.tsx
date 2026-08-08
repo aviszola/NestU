@@ -49,10 +49,10 @@ export default function TopNav({
 }: TopNavProps) {
   const title =
     userRole === "admin"
-      ? "Dashboard NetsU"
+      ? "Dashboard NestU"
       : userRole === "pemilik"
         ? "Owner Dashboard"
-        : "NetsU";
+        : "NestU";
   const subtitle =
     userRole === "admin" ? "Welcome back, Admin" : undefined;
 

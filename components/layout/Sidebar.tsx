@@ -62,9 +62,9 @@ export default function Sidebar({ activePage, userRole = "siswa", userName }: Si
     <aside className="hidden md:flex md:flex-col md:w-64 md:fixed md:inset-y-0 bg-surface-container-low border-r border-outline-variant z-30">
       {/* Logo + User Name */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-outline-variant">
-        <Logo variant="icon" className="h-7 w-auto text-primary" />
+        <Logo variant="icon" className="h-8 w-auto text-primary" />
         <div>
-          <span className="text-base font-bold text-primary">Nets</span>
+          <span className="text-base font-bold text-primary">Nest</span>
           <span className="text-base font-bold text-secondary">U</span>
           {userName && (
             <p className="text-[10px] text-outline mt-0.5">{userName}</p>

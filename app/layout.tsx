@@ -9,20 +9,20 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "NetsU",
+  title: "NestU",
   description:
     "Platform pencarian dan pengelolaan kos untuk siswa dan mahasiswa.",
   openGraph: {
-    title: "NetsU",
+    title: "NestU",
     description:
       "Platform pencarian dan pengelolaan kos untuk siswa dan mahasiswa.",
     type: "website",
     locale: "id_ID",
-    siteName: "NetsU",
+    siteName: "NestU",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NetsU",
+    title: "NestU",
     description:
       "Platform pencarian dan pengelolaan kos untuk siswa dan mahasiswa.",
   },

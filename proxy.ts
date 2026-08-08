@@ -18,6 +18,10 @@ import { createServerClient } from "@supabase/ssr";
 const PUBLIC_PATHS: string[] = [
   "/",
   "/kos",
+  "/about",
+  "/terms",
+  "/privacy",
+  "/contact",
 ];
 
 // Auth paths (accessible without auth, for auth flow)

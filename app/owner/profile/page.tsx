@@ -127,7 +127,7 @@ export default function OwnerProfilePage() {
         </main>
       </div>
 
-      <Footer brandName="NetsU" tagline="Academic Reliability & Community Warmth." showPartnerSection />
+      <Footer brandName="NestU" tagline="Academic Reliability & Community Warmth." showPartnerSection />
       <BottomNav activePage="profile" userRole="pemilik" />
     </>
   );
