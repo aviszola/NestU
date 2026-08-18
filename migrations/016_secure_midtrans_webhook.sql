@@ -1,36 +1,37 @@
 -- ============================================================
--- Migration: 016_secure_midtrans_webhook
+-- Migration: 016_secure_midtrans_webhook (v2)
 -- Date: 2026-08-18
--- Purpose: Security fix dari audit:
---   1. CELAH KRITIS: handle_midtrans_webhook bisa dipanggil anon
---      langsung (bypass signature) karena GRANT EXECUTE ke anon.
---      Fix: revoke akses anon/authenticated + tambah parameter
---      p_webhook_secret (shared secret server-side) — webhook
---      route pakai service-role key + secret sama.
---   2. IDEMPOTENCY: webhook retry/replay 2x mengubah paid_at
---      + menimpa txn_id. Fix: guard — kalau sudah lunas & status
---      baru juga lunas, abort tanpa perubahan.
---   3. Revoke CREATE grants anon/authenticated (defense in depth)
---      supaya user tak bisa bikin function sewenang-wenang.
+-- Revisi: v1 revoke akses anon + grant hanya service_role.
+--         Ternyata webhook route pakai anon key (createClient
+--         di lib/supabase/server.ts), jadi grant service_role
+--         SAJA bikin webhook gagal call function.
+--         Revisi: function tetap GRANT anon/authenticated,
+--         tapi dilindungi shared-secret guard DI DALAM function.
+--
+-- Fix:
+--   1. Function lama handle_midtrans_webhook (tanpa secret)
+--      di-DROP — celah anon bypass signature.
+--   2. Function baru handle_midtrans_webhook_secure + param
+--      p_webhook_secret — constant-time compare dengan
+--      app_config.midtrans_webhook_secret. Tanpa secret benar
+--      → RAISE EXCEPTION, TIDAK update apa pun.
+--   3. GRANT anon/authenticated ke function BARU (webhook
+--      route butuh). Proteksi = secret, bukan grant.
+--   4. Idempotency guard: paid_at IS NOT NULL + lunas → no-op.
+--   5. Revoke CREATE on schema anon/authenticated.
 -- ============================================================
 
 BEGIN;
 
 -- ------------------------------------------------------------
--- 1. Revoke akses publik ke function lama
+-- 1. DROP function lama (tanpa secret) — celah bypass signature.
+--    REVOKE saja tidak cukup (verified: masih callable).
 -- ------------------------------------------------------------
-REVOKE EXECUTE ON FUNCTION public.handle_midtrans_webhook(TEXT, TEXT, TEXT, TEXT)
-  FROM anon, authenticated;
+DROP FUNCTION IF EXISTS public.handle_midtrans_webhook(TEXT, TEXT, TEXT, TEXT);
 
 -- ------------------------------------------------------------
 -- 2. Function baru + p_webhook_secret guard
---    Hanya bisa dipanggil dengan secret yang cocok dengan
---    midtrans_webhook_secret (didapat dari table, di-set via SQL).
---    Secret dibanding pakai pg_catalog.pg_comparetext? No —
---    pakai constant-time compare manual. Di produksi, service role
---    memanggil function ini lewat RPC (masih anon di PostgREST? No —
---    service-role key = role service_role, bukan anon).
--- ============================================================
+-- ------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.handle_midtrans_webhook_secure(
   p_order_id TEXT,
   p_transaction_id TEXT,
@@ -59,7 +60,6 @@ BEGIN
     RAISE EXCEPTION 'Webhook secret belum dikonfigurasi';
   END IF;
 
-  -- Constant-time compare (hash both sides, compare hashes)
   IF encode(digest(v_expected_secret, 'sha256'), 'hex') <>
      encode(digest(COALESCE(p_webhook_secret, ''), 'sha256'), 'hex') THEN
     RAISE EXCEPTION 'Invalid webhook secret';
@@ -75,9 +75,9 @@ BEGIN
     RAISE EXCEPTION 'Booking dengan order_id % tidak ditemukan', p_order_id;
   END IF;
 
-  -- 3. IDEMPOTENCY: kalau sudah lunas (paid_at set) & status baru juga lunas → abort
+  -- 3. IDEMPOTENCY: sudah lunas + status baru lunas → no-op
   IF v_booking.paid_at IS NOT NULL AND p_payment_status = 'lunas' THEN
-    RETURN TRUE;  -- sudah diproses, jangan update 2x
+    RETURN TRUE;
   END IF;
 
   -- Ambil owner kos terkait + nama kos (untuk notifikasi)
@@ -136,16 +136,14 @@ END;
 $$;
 
 -- ------------------------------------------------------------
--- 3. GRANT: HANYA service_role (bukan anon/authenticated)
+-- 3. GRANT: anon + authenticated (webhook route pakai anon key).
+--    Proteksi function = shared secret, bukan grant.
 -- ------------------------------------------------------------
 GRANT EXECUTE ON FUNCTION public.handle_midtrans_webhook_secure(TEXT, TEXT, TEXT, TEXT, TEXT)
-  TO service_role;
+  TO anon, authenticated;
 
 -- ------------------------------------------------------------
--- 4. app_config table + seed secret placeholder
---    (diisi value riil dari env oleh admin, atau webhook route
---     set via RPC service-role. Secret disimpan di tabel config,
---     BUKAN di client.)
+-- 4. app_config table + secret placeholder
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.app_config (
   key TEXT PRIMARY KEY,
@@ -153,7 +151,6 @@ CREATE TABLE IF NOT EXISTS public.app_config (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Seed placeholder — akan di-override via SQL editor / setup script
 INSERT INTO app_config (key, value)
 VALUES ('midtrans_webhook_secret', 'CHANGE_ME_WEBHOOK_SECRET')
 ON CONFLICT (key) DO NOTHING;
