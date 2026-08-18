@@ -5,7 +5,7 @@ import Image from "next/image";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
+
 
 export default async function OwnerDashboardPage() {
   const supabase = await createClient();
@@ -213,12 +213,8 @@ export default async function OwnerDashboardPage() {
         </main>
       </div>
 
-      <Footer
-        brandName="NestU"
-        tagline="Academic Reliability & Community Warmth."
-        showPartnerSection
-      />
-      <BottomNav activePage="dashboard" userRole="pemilik" />
+      <Footer />
+
     </>
   );
 }

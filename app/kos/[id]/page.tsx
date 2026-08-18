@@ -5,6 +5,7 @@ import Image from "next/image";
 import { formatWhatsAppNumber } from "@/lib/utils";
 import FavoriteButton from "@/components/FavoriteButton";
 import PublicNav from "@/components/layout/PublicNav";
+import Footer from "@/components/layout/Footer";
 
 const FACILITY_ICONS: Record<string, string> = {
   wifi: "wifi",
@@ -244,6 +245,7 @@ export default async function DetailKosSiswaPage({
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

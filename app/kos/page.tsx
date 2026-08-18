@@ -8,6 +8,8 @@ import Pagination from "@/components/Pagination";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import PublicNav from "@/components/layout/PublicNav";
+import Footer from "@/components/layout/Footer";
+import BottomNav from "@/components/layout/BottomNav";
 
 export default async function KosPage({
   searchParams,
@@ -240,81 +242,9 @@ export default async function KosPage({
         </div>
       </main>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="bg-[#0b1c30] text-white py-12 px-4 mt-12">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <Logo variant="full" className="h-11 w-auto text-white" />
-            </Link>
-            <p className="text-sm text-white/60 mt-3 max-w-md leading-relaxed">
-              Misi kami adalah menyediakan hunian yang terjangkau, aman, dan
-              nyaman bagi seluruh pelajar di Indonesia.
-            </p>
-            <div className="flex gap-6 mt-4 text-sm text-white/60">
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">
-                  mail
-                </span>
-                halo@netsu.id
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">
-                  call
-                </span>
-                (021) 1234–5678
-              </span>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-white/80">
-              Tautan Cepat
-            </h4>
-            <ul className="mt-3 space-y-2">
-              {[
-                { label: "About Us", href: "/about" },
-                { label: "Terms of Service", href: "/terms" },
-                { label: "Privacy Policy", href: "/privacy" },
-              ].map((l) => (
-                <li key={l.label}>
-                  <Link
-                    href={l.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-white/80">
-              Kontak Kami
-            </h4>
-            <ul className="mt-3 space-y-2">
-              {[
-                { label: "Contact Support", href: "/contact" },
-                { label: "Partner with Us", href: "/partner" },
-              ].map((l) => (
-                <li key={l.label}>
-                  <Link
-                    href={l.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-center">
-          <p className="text-sm text-white/40">
-            &copy; 2024 NestU. Academic Reliability &amp;
-            Community Warmth.
-          </p>
-        </div>
-      </footer>
+            <Footer />
+
+      <BottomNav activePage="search" userRole="siswa" />
     </>
   );
 }

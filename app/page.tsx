@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getFeaturedKos, getTotalKosCount } from "@/lib/supabase/queries";
 import ScrollReveal from "@/components/ScrollReveal";
 import KosCard from "@/components/KosCard";
+import Footer from "@/components/layout/Footer";
+import BottomNav from "@/components/layout/BottomNav";
 import Logo from "@/components/ui/Logo";
 
 const HERO_IMG =
@@ -351,92 +353,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="bg-on-surface text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            <ScrollReveal>
-              <Link href="/" className="flex items-center gap-2 shrink-0">
-                <Logo variant="full" className="h-11 w-auto text-white" />
-              </Link>
-              <p className="mt-3 text-sm text-white/60 leading-relaxed">
-                NestU: Academic Reliability &amp; Community Warmth. Solusi hunian aman bagi pelajar masa kini.
-              </p>
-              <div className="mt-5 flex items-center gap-4">
-                <Link
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-                  aria-label="Website"
-                >
-                  <span className="material-symbols-outlined text-white/80 text-lg">public</span>
-                </Link>
-                <Link
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-                  aria-label="Email"
-                >
-                  <span className="material-symbols-outlined text-white/80 text-lg">mail</span>
-                </Link>
-              </div>
-            </ScrollReveal>
-            {FOOTER_COLUMNS.map((col, i) => (
-              <ScrollReveal
-                key={col.title}
-                style={{ transitionDelay: `${0.05 + i * 0.05}s` }}
-              >
-                <h4 className="text-sm font-bold text-white mb-4">{col.title}</h4>
-                <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link}>
-                      <Link href={FOOTER_LINK_ROUTES[link] || "#"} className="text-sm text-white/60 hover:text-white transition-colors">
-                        {link}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollReveal>
-            ))}
-          </div>
-          <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-white/40 text-center md:text-left">
-              &copy; 2024 NestU. Academic Reliability &amp; Community Warmth.
-            </p>
-            <div className="flex items-center gap-4">
-              <span className="px-3 py-1 text-[10px] font-bold text-white/80 bg-white/10 rounded-full">
-                ISO 27001 Certified
-              </span>
-              <span className="px-3 py-1 text-[10px] font-bold text-white/80 bg-white/10 rounded-full">
-                Verified by OJK
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
-      {/* ===== MOBILE BOTTOM NAV ===== */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-dark border-t border-outline-variant/30 px-2 pb-1 safe-area-pb">
-        <div className="flex items-center justify-around">
-          {[
-            { icon: "search", label: "Cari" },
-            { icon: "favorite", label: "Favorit" },
-            { icon: "book_online", label: "Booking" },
-            { icon: "person", label: "Profil" },
-          ].map((item) => (
-            <Link
-              key={item.label}
-              href="#"
-              className="bottom-nav-item flex flex-col items-center py-2 px-3 rounded-lg"
-            >
-              <span className="material-symbols-outlined text-on-surface-variant text-xl">
-                {item.icon}
-              </span>
-              <span className="text-[10px] font-semibold text-on-surface-variant mt-0.5">
-                {item.label}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </nav>
+      {/* ===== MOBILE BOTTOM NAV — shared ===== */}
+      <BottomNav activePage="search" userRole="siswa" />
     </>
   );
 }

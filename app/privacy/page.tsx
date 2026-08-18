@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
+import Footer from "@/components/layout/Footer";
 
 const SECTIONS = [
   {
@@ -115,6 +116,7 @@ export default function PrivacyPage() {
           </div>
         </div>
       </section>
+          <Footer />
     </>
   );
 }

@@ -138,7 +138,7 @@ export default function KosCard({
           <span className="text-primary font-bold text-sm">
             {price != null
               ? `Rp${price.toLocaleString("id-ID")}/bln`
-              : "Hubungi pemilik"}
+              : "Harga belum tersedia"}
           </span>
           <Link
             href={`/kos/${kos.id}`}
