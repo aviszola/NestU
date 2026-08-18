@@ -1,10 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
-import { updateBookingStatus } from "@/lib/supabase/queries";
-import { confirmPayment } from "@/lib/supabase/queries";
+import { updateBookingStatus, confirmPayment } from "@/lib/supabase/queries";
 import { useEffect, useState } from "react";
 import OwnerShell from "@/components/layout/OwnerShell";
 import { toastSuccess, toastError } from "@/lib/toast";
@@ -32,6 +29,8 @@ function getStatusKey(b: any): PaymentKey {
   return sharedGetStatusKey(b);
 }
 
+// ── Filter tabs — key "rejected" dihapus (getStatusKey tak pernah return "rejected";
+//    DB hanya punya cancelled). Ditolak tercakup oleh tab "Ditolak/Dibatalkan". ──
 const FILTERS: { key: string; label: string }[] = [
   { key: "all", label: "Semua" },
   { key: "pending", label: "Menunggu Persetujuan" },
@@ -39,9 +38,17 @@ const FILTERS: { key: string; label: string }[] = [
   { key: "menunggu_konfirmasi", label: "Menunggu Konfirmasi" },
   { key: "lunas", label: "Lunas" },
   { key: "cancelled", label: "Ditolak/Dibatalkan" },
-  { key: "rejected", label: "Ditolak" },
   { key: "completed", label: "Selesai" },
 ];
+
+function formatPrice(n: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n);
+}
 
 export default function OwnerBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -149,17 +156,94 @@ export default function OwnerBookingsPage() {
       ? bookings
       : bookings.filter((b) => getStatusKey(b) === filter);
 
-  if (loading) return <p className="text-outline">Memuat...</p>;
+  // ── Stat cards — dihitung dari data yang sudah dimuat (bukan query baru) ──
+  const total = bookings.length;
+  const menunggu = bookings.filter((b) => getStatusKey(b) === "pending").length;
+  const menungguKonfirmasi = bookings.filter(
+    (b) => getStatusKey(b) === "menunggu_konfirmasi"
+  ).length;
+
+  const statCards = [
+    {
+      label: "Total Booking",
+      value: total,
+      icon: "event_available",
+      iconCls: "text-tertiary bg-tertiary-fixed",
+      cardCls: "bg-white rounded-xl card-shadow border border-outline-variant",
+      valueCls: "text-primary",
+    },
+    {
+      label: "Menunggu Persetujuan",
+      value: menunggu,
+      icon: "hourglass_top",
+      iconCls: "text-secondary bg-secondary-container",
+      cardCls: "bg-white rounded-2xl card-shadow border border-outline-variant border-l-4 border-l-secondary",
+      valueCls: "text-secondary",
+    },
+    {
+      label: "Menunggu Konfirmasi",
+      value: menungguKonfirmasi,
+      icon: "payments",
+      iconCls: "text-primary bg-primary-fixed",
+      cardCls: "bg-secondary/5 rounded-xl shadow-sm border border-outline-variant",
+      valueCls: "text-tertiary-container",
+    },
+  ];
 
   return (
     <OwnerShell activePage="bookings">
-      <div className="px-margin-mobile md:px-margin-desktop py-stack-lg">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface font-bold mb-stack-lg">
-          Permintaan Booking
-        </h1>
+      {/* ── Header hero gelap — pola konsisten Kelola Kos ── */}
+      <section className="px-margin-mobile md:px-margin-desktop pt-6 md:pt-10 pb-2">
+        <div className="relative overflow-hidden rounded-2xl bg-on-surface card-shadow">
+          {/* Grid pattern halus — konsisten hero dashboard */}
+          <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{
+            backgroundImage:
+              "linear-gradient(rgba(11,28,48,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(11,28,48,0.6) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }} />
 
-        {/* Filter status pembayaran */}
-        <div className="flex flex-wrap gap-2 mb-stack-lg">
+          <div className="relative p-6 md:p-8">
+            <div className="space-y-2">
+              <p className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary-fixed backdrop-blur-sm">
+                <span className="material-symbols-outlined !text-sm">event_note</span>
+                Permintaan Booking
+              </p>
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white text-balance">
+                Kelola Booking Masuk
+              </h1>
+              <p className="text-sm md:text-base text-white/70 max-w-md leading-relaxed">
+                Tinjau, setujui, atau tolak permintaan booking dan konfirmasi pembayaran siswa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stat cards — hierarki radius/shadow beda per kartu (pola Kelola Kos) ── */}
+      <div className="px-margin-mobile md:px-margin-desktop py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          {statCards.map((card) => (
+            <div
+              key={card.label}
+              className={`p-stack-md flex flex-col justify-between h-32 ${card.cardCls}`}
+            >
+              <div className="flex justify-between items-start">
+                <span className="font-label-md text-on-surface-variant uppercase tracking-wider">
+                  {card.label}
+                </span>
+                <span className={`material-symbols-outlined p-2 rounded-lg ${card.iconCls}`}>
+                  {card.icon}
+                </span>
+              </div>
+              <p className={`font-headline-md text-headline-md font-bold ${card.valueCls}`}>
+                {card.value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Filter tabs — 7 tab (rejected dihapus) ── */}
+        <div className="mt-8 flex flex-wrap gap-2">
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -175,18 +259,47 @@ export default function OwnerBookingsPage() {
           ))}
         </div>
 
-        {bookings.length === 0 ? (
-          <div className="text-center py-12 text-on-surface-variant font-body-md">
-            <span className="material-symbols-outlined text-4xl text-outline block mb-2">calendar_month</span>
-            Belum ada permintaan booking untuk properti Anda.
+        {/* ── Daftar booking ── */}
+        {loading ? (
+          <div className="space-y-4 mt-4">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl card-shadow border border-outline-variant p-5 animate-pulse"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 w-1/2 bg-surface-container-high rounded-full" />
+                    <div className="h-3 w-1/3 bg-surface-container-high rounded-full" />
+                  </div>
+                  <div className="h-6 w-32 bg-surface-container-high rounded-full shrink-0" />
+                </div>
+                <div className="h-9 w-full bg-surface-container-high rounded-xl mt-5" />
+              </div>
+            ))}
+          </div>
+        ) : bookings.length === 0 ? (
+          <div className="mt-4 rounded-3xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center">
+            <span className="material-symbols-outlined text-5xl text-outline block mb-3">calendar_month</span>
+            <h3 className="font-title-lg text-title-lg text-on-surface font-bold">
+              Belum ada permintaan booking
+            </h3>
+            <p className="text-body-md text-on-surface-variant mt-1 max-w-sm mx-auto">
+              Permintaan booking dari siswa akan muncul di sini.
+            </p>
           </div>
         ) : filteredBookings.length === 0 ? (
-          <div className="text-center py-12 text-on-surface-variant font-body-md">
-            <span className="material-symbols-outlined text-4xl text-outline block mb-2">inbox</span>
-            Tidak ada booking yang sesuai filter.
+          <div className="mt-4 rounded-3xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center">
+            <span className="material-symbols-outlined text-5xl text-outline block mb-3">inbox</span>
+            <h3 className="font-title-lg text-title-lg text-on-surface font-bold">
+              Tidak ada booking yang sesuai filter
+            </h3>
+            <p className="text-body-md text-on-surface-variant mt-1 max-w-sm mx-auto">
+              Coba pilih filter lain.
+            </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="mt-4 space-y-4">
             {filteredBookings.map((b: any) => {
               const cfg = statusCfg[getStatusKey(b)] ?? statusCfg.pending;
               const isPending = b.status === "pending";
@@ -199,18 +312,42 @@ export default function OwnerBookingsPage() {
                 !!b.payment_method;
 
               return (
-                <Card key={b.id}>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-on-surface">
-                        {b.student?.full_name ?? "User"} — {b.rooms?.kos?.name}
-                      </p>
-                      <p className="text-sm text-on-surface-variant">
-                        {b.rooms?.room_number} ·{" "}
-                        {new Date(b.created_at).toLocaleDateString("id-ID")}
+                <div
+                  key={b.id}
+                  className="bg-white rounded-2xl card-shadow border border-outline-variant overflow-hidden transition-shadow hover:card-shadow-hover"
+                >
+                  {/* Body */}
+                  <div className="p-5 md:p-6 flex items-start justify-between gap-4">
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p className="font-title-lg text-title-lg text-on-surface truncate">
+                          {b.student?.full_name ?? "User"}
+                        </p>
+                        <span className="text-on-surface-variant text-body-md">—</span>
+                        <span className="text-body-md text-on-surface font-medium truncate">
+                          {b.rooms?.kos?.name}
+                        </span>
+                      </div>
+                      <p className="text-body-sm text-on-surface-variant flex flex-wrap items-center gap-x-2">
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined !text-[14px]">meeting_room</span>
+                          Kamar {b.rooms?.room_number}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined !text-[14px]">payments</span>
+                          {b.rooms?.price_per_month ? formatPrice(b.rooms.price_per_month) : "—"}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined !text-[14px]">event</span>
+                          {new Date(b.created_at).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
                       </p>
                       {b.notes && (
-                        <p className="text-xs text-outline">
+                        <p className="text-xs text-outline bg-surface-container-low rounded-lg px-3 py-2 mt-2">
                           Catatan: {b.notes}
                         </p>
                       )}
@@ -225,64 +362,76 @@ export default function OwnerBookingsPage() {
                     </span>
                   </div>
 
-                  {isPending && (
-                    <div className="mt-4 flex gap-2 border-t border-outline-variant pt-4">
-                      <Button
-                        onClick={() => handleStatus(b.id, "approved")}
-                        disabled={actionLoading === b.id}
-                      >
-                        {actionLoading === b.id ? "..." : "Konfirmasi"}
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => handleStatus(b.id, "cancelled")}
-                        disabled={actionLoading === b.id}
-                      >
-                        {actionLoading === b.id ? "..." : "Tolak"}
-                      </Button>
-                    </div>
-                  )}
-
-                  {isApproved && !isWaitingConfirm && (
-                    <div className="mt-4 flex gap-2 border-t border-outline-variant pt-4">
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleStatus(b.id, "completed")}
-                        disabled={actionLoading === b.id}
-                      >
-                        {actionLoading === b.id ? "..." : "Tandai Selesai"}
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => handleStatus(b.id, "cancelled")}
-                        disabled={actionLoading === b.id}
-                      >
-                        {actionLoading === b.id ? "..." : "Batalkan"}
-                      </Button>
-                    </div>
-                  )}
-
-                  {isApproved && isWaitingConfirm && (
-                    <div className="mt-4 flex gap-2 border-t border-outline-variant pt-4">
-                      {isManual && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => handleConfirmPayment(b.id)}
-                          disabled={actionLoading === b.id}
-                        >
-                          {actionLoading === b.id ? "..." : "Konfirmasi Pembayaran"}
-                        </Button>
+                  {/* Aksi */}
+                  {(isPending || isApproved) && (
+                    <div className="px-5 md:px-6 py-4 flex flex-wrap gap-2 border-t border-outline-variant bg-surface-container-low/50">
+                      {isPending && (
+                        <>
+                          <button
+                            onClick={() => handleStatus(b.id, "approved")}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">check_circle</span>
+                            {actionLoading === b.id ? "Memproses..." : "Konfirmasi"}
+                          </button>
+                          <button
+                            onClick={() => handleStatus(b.id, "cancelled")}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-error text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">cancel</span>
+                            {actionLoading === b.id ? "Memproses..." : "Tolak"}
+                          </button>
+                        </>
                       )}
-                      <Button
-                        variant="danger"
-                        onClick={() => handleStatus(b.id, "cancelled")}
-                        disabled={actionLoading === b.id}
-                      >
-                        {actionLoading === b.id ? "..." : "Batalkan"}
-                      </Button>
+
+                      {isApproved && !isWaitingConfirm && (
+                        <>
+                          <button
+                            onClick={() => handleStatus(b.id, "completed")}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">task_alt</span>
+                            {actionLoading === b.id ? "Memproses..." : "Tandai Selesai"}
+                          </button>
+                          <button
+                            onClick={() => handleStatus(b.id, "cancelled")}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-error text-error rounded-xl font-bold text-sm hover:bg-error/5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">cancel</span>
+                            {actionLoading === b.id ? "Memproses..." : "Batalkan"}
+                          </button>
+                        </>
+                      )}
+
+                      {isApproved && isWaitingConfirm && (
+                        <>
+                          {isManual && (
+                            <button
+                              onClick={() => handleConfirmPayment(b.id)}
+                              disabled={actionLoading === b.id}
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <span className="material-symbols-outlined !text-[18px]">verified</span>
+                              {actionLoading === b.id ? "Memproses..." : "Konfirmasi Pembayaran"}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleStatus(b.id, "cancelled")}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-error text-error rounded-xl font-bold text-sm hover:bg-error/5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">cancel</span>
+                            {actionLoading === b.id ? "Memproses..." : "Batalkan"}
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
-                </Card>
+                </div>
               );
             })}
           </div>
