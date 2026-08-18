@@ -64,9 +64,14 @@ export default function KosCard({
                 backgroundSize: "28px 28px",
               }}
             />
-            <span className="material-symbols-outlined text-3xl text-primary/30 relative">photo_camera</span>
-            <span className="text-[11px] font-medium text-on-surface-variant/70 relative">
-              Foto belum tersedia
+            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary/20 to-primary/10 flex items-center justify-center mb-1.5">
+              <span className="material-symbols-outlined text-3xl text-secondary-fixed">home</span>
+            </div>
+            <span className="text-[11px] font-semibold text-on-surface-variant/80 relative">
+              Foto menyusul
+            </span>
+            <span className="text-[10px] text-on-surface-variant/50 relative">
+              Pemilik sedang mengunggah
             </span>
           </div>
         )}

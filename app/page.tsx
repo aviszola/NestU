@@ -301,7 +301,10 @@ export default async function HomePage() {
             </ScrollReveal>
             <ScrollReveal style={{ transitionDelay: "0.15s" }}>
               <div className="rounded-2xl p-6 md:p-8 card-shadow bg-white border border-outline-variant/40">
-                <h3 className="text-lg font-bold text-on-surface">Rincian Pembayaran</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-on-surface">Rincian Pembayaran</h3>
+                  <span className="px-2 py-0.5 text-[10px] font-bold text-outline bg-surface-container-high rounded-full">Contoh ilustrasi</span>
+                </div>
                 <div className="mt-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-on-surface-variant">Harga Sewa (1 Bulan)</span>
