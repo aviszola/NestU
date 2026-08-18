@@ -5,6 +5,7 @@ import Image from "next/image";
 import FavoriteButton from "@/components/FavoriteButton";
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/components/layout/TopNav";
+import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 
 export const dynamic = "force-dynamic";
@@ -145,6 +146,7 @@ export default async function FavoritesPage() {
         </main>
       </div>
 
+      <Footer />
       <BottomNav activePage="favorites" userRole="siswa" />
     </div>
   );

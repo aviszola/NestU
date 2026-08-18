@@ -61,10 +61,7 @@ export default function BookingPage({
     (async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
       setUser(user);
 
       const kosData = await getKosById(supabase, kosId);
@@ -264,7 +261,7 @@ export default function BookingPage({
                   <span className="material-symbols-outlined text-primary">info</span>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     Dengan mengajukan booking, Anda menyetujui{" "}
-                    <a className="text-primary font-bold hover:underline" href="#">
+                    <a className="text-primary font-bold hover:underline" href="/terms" target="_blank" rel="noopener noreferrer">
                       Syarat &amp; Ketentuan
                     </a>{" "}
                     yang berlaku. Pemilik akan merespons pengajuan Anda dalam maksimal 24 jam.

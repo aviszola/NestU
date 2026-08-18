@@ -31,27 +31,27 @@ const adminMenu: MenuItem[] = [
 ];
 
 const studentMenu: MenuItem[] = [
-  { label: "Search", icon: "search", href: "/kos", page: "search" },
-  { label: "Favorites", icon: "favorite", href: "/favorites", page: "favorites" },
-  { label: "My Bookings", icon: "receipt_long", href: "/bookings", page: "bookings" },
-  { label: "Profile", icon: "person", href: "/profile", page: "profile" },
+  { label: "Cari", icon: "search", href: "/kos", page: "search" },
+  { label: "Favorit", icon: "favorite", href: "/favorites", page: "favorites" },
+  { label: "Booking", icon: "receipt_long", href: "/bookings", page: "bookings" },
+  { label: "Profil", icon: "person", href: "/profile", page: "profile" },
 ];
 
 const ownerMenu: MenuItem[] = [
   { label: "Dashboard", icon: "dashboard", href: "/owner", page: "dashboard" },
   { label: "Kelola Properti", icon: "apartment", href: "/owner/kos", page: "properties" },
   { label: "Booking Masuk", icon: "receipt_long", href: "/owner/bookings", page: "bookings" },
-  { label: "Profile", icon: "person", href: "/owner/profile", page: "profile" },
+  { label: "Profil", icon: "person", href: "/owner/profile", page: "profile" },
 ];
 
 const ownerBottomItems: BottomItem[] = [
-  { label: "Settings", icon: "settings", href: "/owner/settings" },
-  { label: "Logout", icon: "logout", href: "/logout" },
+  { label: "Pengaturan", icon: "settings", href: "/owner/settings" },
+  { label: "Keluar", icon: "logout", href: "/logout" },
 ];
 
 const bottomItems: BottomItem[] = [
-  { label: "Settings", icon: "settings", href: "/settings" },
-  { label: "Logout", icon: "logout", href: "/logout" },
+  { label: "Pengaturan", icon: "settings", href: "/settings" },
+  { label: "Keluar", icon: "logout", href: "/logout" },
 ];
 
 export default function Sidebar({ activePage, userRole = "siswa", userName }: SidebarProps) {

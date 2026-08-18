@@ -117,10 +117,11 @@ export async function proxy(request: NextRequest) {
 
   const role = profile?.role;
 
-  // No profile or no role â†’ redirect login (never default to a role)
+  // No profile or no role â†' redirect login (never default to a role)
   if (!role) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.searchParams.set("redirect", pathname);
     return NextResponse.redirect(url);
   }
 

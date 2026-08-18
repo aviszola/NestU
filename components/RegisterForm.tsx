@@ -36,6 +36,13 @@ export default function RegisterForm({
   const inputCls =
     "w-full px-4 py-3 rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all bg-white text-sm text-on-surface placeholder-outline";
 
+  const PHONE_RE = /^62[1-9][0-9]{7,12}$/;
+
+  function normalizePhone(raw: string): string {
+    const digits = raw.replace(/[^0-9]/g, "");
+    return digits.startsWith("0") ? "62" + digits.slice(1) : digits;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -47,6 +54,11 @@ export default function RegisterForm({
       setError("Pilih Nama Sekolah / Universitas.");
       return;
     }
+    const normalizedPhone = normalizePhone(phone);
+    if (!PHONE_RE.test(normalizedPhone)) {
+      setError("Nomor WhatsApp tidak valid. Contoh: 081234567890.");
+      return;
+    }
     setLoading(true);
     try {
       const supabase = createClient();
@@ -56,7 +68,7 @@ export default function RegisterForm({
         options: {
           data: {
             full_name: name,
-            phone,
+            phone: normalizedPhone,
             role,
             school_name: role === "siswa" ? school : null,
           },

@@ -14,8 +14,6 @@ interface TopNavProps {
   userAvatar?: string;
   userName?: string;
   userRole?: "admin" | "siswa" | "pemilik";
-  showTabs?: boolean;
-  activeTab?: "overview" | "users" | "property";
   onMenuClick?: () => void;
   tabs?: TabItem[];
   showBackButton?: boolean;
@@ -26,18 +24,10 @@ interface TopNavProps {
   onSearchChange?: (val: string) => void;
 }
 
-const tabLabels: Record<string, string> = {
-  overview: "Overview",
-  users: "Users",
-  property: "Property",
-};
-
 export default function TopNav({
   userAvatar = "/images/avatar-placeholder.svg",
   userName,
   userRole = "siswa",
-  showTabs = false,
-  activeTab = "overview",
   onMenuClick,
   tabs,
   showBackButton = false,
@@ -106,23 +96,6 @@ export default function TopNav({
         </div>
       ) : (
       <div className="hidden md:flex items-center gap-6">
-        {showTabs &&
-          (["overview", "users", "property"] as const).map((tab) => {
-            const isActive = tab === activeTab;
-            return (
-              <a
-                key={tab}
-                href="#"
-                className={`text-sm font-medium transition-colors ${
-                  isActive
-                    ? "text-on-surface border-b-2 border-on-surface"
-                    : "text-outline hover:text-on-surface"
-                }`}
-              >
-                {tabLabels[tab]}
-              </a>
-            );
-          })}
         {tabs &&
           tabs.map((tab) => (
             <Link

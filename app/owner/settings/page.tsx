@@ -16,7 +16,7 @@ export default function OwnerSettingsPage() {
       const { createClient } = await import("@/lib/supabase/client");
       const sup = createClient();
       const { data: { user } } = await sup.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
       setLoaded(true);
     }
     check();
