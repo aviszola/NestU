@@ -11,19 +11,19 @@ export default function PublicNav() {
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/kos" className="flex flex-col items-center text-xs font-medium text-primary transition-colors">
             <span className="material-symbols-outlined text-2xl">search</span>
-            Search
+            Cari
           </Link>
           <Link href="/favorites" className="flex flex-col items-center text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-2xl">favorite</span>
-            Favorites
+            Favorit
           </Link>
           <Link href="/bookings" className="flex flex-col items-center text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-2xl">receipt_long</span>
-            My Bookings
+            Booking
           </Link>
           <Link href="/profile" className="flex flex-col items-center text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-2xl">person</span>
-            Profile
+            Profil
           </Link>
         </nav>
         <button className="md:hidden p-1" aria-label="Menu">

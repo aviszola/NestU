@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
+import Footer from "@/components/layout/Footer";
 
 const CHANNELS = [
   {
@@ -17,7 +18,7 @@ const CHANNELS = [
     title: "WhatsApp",
     desc: "Konsultasi cepat dengan tim NestU",
     note: "Respons dalam jam kerja (Seninâ€“Jumat, 09.00â€“17.00 WIB).",
-    href: "https://wa.me/",
+    href: "https://wa.me/6281234567890",
   },
   {
     icon: "location_on",
@@ -175,6 +176,7 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+          <Footer />
     </>
   );
 }

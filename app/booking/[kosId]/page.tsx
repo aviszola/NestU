@@ -8,6 +8,8 @@ import Link from "next/link";
 import Image from "next/image";
 import SubmitBookingButton from "@/components/SubmitBookingButton";
 import PublicNav from "@/components/layout/PublicNav";
+import Footer from "@/components/layout/Footer";
+import BottomNav from "@/components/layout/BottomNav";
 
 const FACILITY_ICONS: Record<string, string> = {
   wifi: "wifi",
@@ -328,80 +330,9 @@ export default function BookingPage({
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full py-stack-lg px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-3 gap-gutter bg-surface-container-highest mt-stack-lg">
-        <div>
-          <h3 className="font-title-lg text-title-lg font-bold text-primary mb-stack-sm">
-            NestU
-          </h3>
-          <p className="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
-            Platform pencarian hunian terpercaya untuk mahasiswa di seluruh Indonesia.
-            Nyaman, Aman, dan Transparan.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-stack-md">
-          <div className="flex flex-col gap-2">
-            <Link href="/about" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
-              About Us
-            </Link>
-            <Link href="/terms" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
-              Terms of Service
-            </Link>
-            <Link href="/privacy" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
-              Privacy Policy
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Link href="/support" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
-              Contact Support
-            </Link>
-            <Link href="/partner" className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary hover:underline">
-              Partner with Us
-            </Link>
-          </div>
-        </div>
-        <div className="text-on-surface-variant">
-          <p className="font-body-sm text-body-sm">
-            &copy; 2024 NestU. Academic Reliability &amp; Community Warmth.
-          </p>
-          <div className="flex gap-stack-md mt-stack-sm">
-            <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-              <span className="material-symbols-outlined text-[20px]">public</span>
-            </button>
-            <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-              <span className="material-symbols-outlined text-[20px]">group</span>
-            </button>
-            <button className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-              <span className="material-symbols-outlined text-[20px]">mail</span>
-            </button>
-          </div>
-        </div>
-      </footer>
+            <Footer />
 
-      {/* BottomNav Mobile */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-lg rounded-t-xl border-t border-outline-variant">
-        <Link href="/kos" className="flex flex-col items-center justify-center text-on-surface-variant">
-          <span className="material-symbols-outlined">search</span>
-          <span className="font-label-md text-label-md">Search</span>
-        </Link>
-        <Link href="/favorites" className="flex flex-col items-center justify-center text-on-surface-variant">
-          <span className="material-symbols-outlined">favorite</span>
-          <span className="font-label-md text-label-md">Favorites</span>
-        </Link>
-        <Link
-          href="/bookings"
-          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1"
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            receipt_long
-          </span>
-          <span className="font-label-md text-label-md">Bookings</span>
-        </Link>
-        <Link href="/profile" className="flex flex-col items-center justify-center text-on-surface-variant">
-          <span className="material-symbols-outlined">person</span>
-          <span className="font-label-md text-label-md">Profile</span>
-        </Link>
-      </nav>
+            <BottomNav activePage="bookings" userRole="siswa" />
     </>
   );
 }

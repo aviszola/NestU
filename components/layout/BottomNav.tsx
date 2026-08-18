@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 interface BottomNavProps {
-  activePage: "dashboard" | "search" | "favorites" | "bookings" | "profile" | "properties";
+  activePage: "search" | "favorites" | "bookings" | "profile";
   userRole?: "admin" | "siswa" | "pemilik";
 }
 
@@ -9,32 +9,21 @@ interface Tab {
   label: string;
   icon: string;
   href: string;
-  page: "dashboard" | "search" | "favorites" | "bookings" | "profile" | "properties";
+  page: "search" | "favorites" | "bookings" | "profile";
 }
 
-const adminTabs: Tab[] = [
-  { label: "Dashboard", icon: "dashboard", href: "/admin", page: "dashboard" },
-  { label: "Favorites", icon: "favorite", href: "/admin/favorites", page: "favorites" },
-  { label: "Bookings", icon: "receipt_long", href: "/admin/bookings", page: "bookings" },
-  { label: "Profile", icon: "person", href: "/admin/profile", page: "profile" },
-];
-
+// Satu-satunya bottom nav NestU — label Bahasa Indonesia konsisten di semua halaman
 const studentTabs: Tab[] = [
-  { label: "Search", icon: "search", href: "/student/search", page: "search" },
-  { label: "Favorites", icon: "favorite", href: "/student/favorites", page: "favorites" },
-  { label: "Bookings", icon: "receipt_long", href: "/student/bookings", page: "bookings" },
-  { label: "Profile", icon: "person", href: "/student/profile", page: "profile" },
-];
-
-const ownerTabs: Tab[] = [
-  { label: "Dashboard", icon: "dashboard", href: "/owner", page: "dashboard" },
-  { label: "Kelola", icon: "home_work", href: "/owner/properties", page: "properties" },
-  { label: "Favorit", icon: "favorite", href: "/owner/favorites", page: "favorites" },
-  { label: "Profil", icon: "person", href: "/owner/profile", page: "profile" },
+  { label: "Cari", icon: "search", href: "/kos", page: "search" },
+  { label: "Favorit", icon: "favorite", href: "/favorites", page: "favorites" },
+  { label: "Booking", icon: "receipt_long", href: "/bookings", page: "bookings" },
+  { label: "Profil", icon: "person", href: "/profile", page: "profile" },
 ];
 
 export default function BottomNav({ activePage, userRole = "siswa" }: BottomNavProps) {
-  const tabs = userRole === "admin" ? adminTabs : userRole === "pemilik" ? ownerTabs : studentTabs;
+  // Role selain siswa tidak pakai bottom nav mobile publik
+  if (userRole !== "siswa") return null;
+  const tabs = studentTabs;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 md:hidden bg-surface rounded-t-xl shadow-lg border-t border-outline-variant z-40 safe-area-bottom">

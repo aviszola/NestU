@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
+
 
 export default function OwnerProfilePage() {
   const router = useRouter();
@@ -127,8 +127,8 @@ export default function OwnerProfilePage() {
         </main>
       </div>
 
-      <Footer brandName="NestU" tagline="Academic Reliability & Community Warmth." showPartnerSection />
-      <BottomNav activePage="profile" userRole="pemilik" />
+      <Footer />
+
     </>
   );
 }

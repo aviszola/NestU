@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getRoleHome } from "@/lib/constants/routes";
+import RegisterForm from "@/components/RegisterForm";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,26 +22,6 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
-
-  // ── Register state ──
-  const [registerName, setRegisterName] = useState("");
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [registerPhone, setRegisterPhone] = useState("");
-  const [role, setRole] = useState<"siswa" | "pemilik">("siswa");
-  const [school, setSchool] = useState("");
-  const [agreeTerms, setAgreeTerms] = useState(false);
-  const [registerLoading, setRegisterLoading] = useState(false);
-  const [registerError, setRegisterError] = useState<string | null>(null);
-
-  const schools = [
-    "SMK Negeri 1 Jakarta",
-    "SMK Taruna Bhakti",
-    "Universitas Indonesia",
-    "Binus University",
-    "Lainnya...",
-  ];
 
   async function redirectByRole(userId: string) {
     const { data: profile } = await supabase
@@ -68,37 +49,6 @@ export default function LoginPage() {
       setLoginError(err.message || "Gagal masuk, silakan coba lagi.");
     } finally {
       setLoginLoading(false);
-    }
-  }
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    setRegisterError(null);
-    if (!agreeTerms) {
-      setRegisterError("Harap setujui Syarat & Ketentuan");
-      return;
-    }
-    setRegisterLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: registerEmail,
-        password: registerPassword,
-        options: {
-          data: {
-            full_name: registerName,
-            phone: registerPhone,
-            role,
-            school_name: role === "siswa" ? school : null,
-          },
-        },
-      });
-      if (error) throw error;
-      if (!data.user) throw new Error("Registrasi gagal");
-      router.push("/login?registered=true");
-    } catch (err: any) {
-      setRegisterError(err.message || "Terjadi kesalahan");
-    } finally {
-      setRegisterLoading(false);
     }
   }
 
@@ -235,7 +185,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-stack-md">
+            <form onSubmit={handleLogin} className="space-y-stack-sm">
               <div>
                 <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
                   Alamat Email
@@ -352,7 +302,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* ═══ REGISTER FORM ═══ */}
+          {/* ═══ REGISTER FORM — shared component ═══ */}
           <div
             className={`form-transition ${
               activeTab === "register" ? "visible-section" : "hidden-section"
@@ -366,181 +316,19 @@ export default function LoginPage() {
                 Bergabunglah dengan ekosistem NestU hari ini.
               </p>
             </div>
-
-            {/* Role Toggle */}
-            <div className="flex bg-surface-container-highest p-1 rounded-lg mb-stack-md">
-              {(["siswa", "pemilik"] as const).map((r) => (
-                <label key={r} className="flex-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="role"
-                    value={r}
-                    checked={role === r}
-                    onChange={() => setRole(r)}
-                    className="hidden peer"
-                  />
-                  <div
-                    className={`py-2 text-center font-label-md text-label-md rounded-md transition-all ${
-                      role === r
-                        ? "bg-white text-primary shadow-sm"
-                        : "text-on-surface-variant"
-                    }`}
-                  >
-                    {r === "siswa" ? "Siswa" : "Pemilik Kos"}
-                  </div>
-                </label>
-              ))}
-            </div>
-
-            {registerError && (
-              <div className="mb-4 p-3 rounded-lg bg-error-container/20 border border-error/20 text-xs text-error">
-                {registerError}
-              </div>
-            )}
-
-            <form onSubmit={handleRegister} className="space-y-stack-sm">
-              <div>
-                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
-                  Nama Lengkap
-                </label>
-                <input
-                  type="text"
-                  value={registerName}
-                  onChange={(e) => setRegisterName(e.target.value)}
-                  placeholder="Budi Santoso"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary/10 focus:border-primary bg-white text-sm text-on-surface placeholder-outline"
-                />
-              </div>
-
-              <div>
-                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
-                  placeholder="budi@student.com"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary/10 focus:border-primary bg-white text-sm text-on-surface placeholder-outline"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-stack-md">
-                <div>
-                  <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showRegisterPassword ? "text" : "password"}
-                      value={registerPassword}
-                      onChange={(e) => setRegisterPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full px-4 py-2.5 pr-10 rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary/10 focus:border-primary bg-white text-sm text-on-surface placeholder-outline"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowRegisterPassword(!showRegisterPassword)
-                      }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary"
-                    >
-                      <span className="material-symbols-outlined">
-                        {showRegisterPassword
-                          ? "visibility"
-                          : "visibility_off"}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
-                    Nomor WhatsApp
-                  </label>
-                  <input
-                    type="tel"
-                    value={registerPhone}
-                    onChange={(e) => setRegisterPhone(e.target.value)}
-                    placeholder="081234..."
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-outline-variant focus:ring-3 focus:ring-primary/10 focus:border-primary bg-white text-sm text-on-surface placeholder-outline"
-                  />
-                </div>
-              </div>
-
-              {/* School dropdown — only for siswa */}
-              {role === "siswa" && (
-                <div>
-                  <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
-                    Nama Sekolah / Universitas
-                  </label>
-                  <select
-                    value={school}
-                    onChange={(e) => setSchool(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg border border-outline-variant focus:ring-3 focus:ring-primary/10 focus:border-primary bg-white text-sm text-on-surface appearance-none"
-                  >
-                    <option value="" disabled>
-                      Pilih Institusi Pendidikan
-                    </option>
-                    {schools.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Terms */}
-              <div className="flex items-start space-x-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={agreeTerms}
-                  onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary"
-                />
-                <label
-                  htmlFor="terms"
-                  className="font-body-sm text-body-sm text-on-surface-variant"
-                >
-                  Saya menyetujui{" "}
-                  <a href="#" className="text-primary hover:underline">
-                    Syarat & Ketentuan
-                  </a>{" "}
-                  serta{" "}
-                  <a href="#" className="text-primary hover:underline">
-                    Kebijakan Privasi
-                  </a>
-                  .
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={registerLoading}
-                className="w-full py-3 mt-4 bg-primary text-white font-title-lg text-title-lg rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50"
-              >
-                {registerLoading
-                  ? "Memproses..."
-                  : "Daftar Sekarang"}
-              </button>
-            </form>
+            <RegisterForm />
           </div>
 
           {/* Footer Links */}
           <div className="mt-stack-lg text-center">
             <p className="font-body-sm text-body-sm text-on-surface-variant">
               Ada kendala?{" "}
-              <a
-                href="#"
+              <Link
+                href="/contact"
                 className="text-primary font-semibold hover:underline"
               >
                 Hubungi Support
-              </a>
+              </Link>
             </p>
             <p className="font-label-md text-label-md text-outline mt-4">
               &copy; 2024 NestU. Academic Reliability &

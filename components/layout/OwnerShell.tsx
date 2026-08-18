@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
+
 import type { ActivePage } from "@/components/layout/Sidebar";
 
 interface OwnerShellProps {
@@ -59,12 +59,7 @@ export default function OwnerShell({ children, activePage, userName }: OwnerShel
           {children}
         </main>
       </div>
-      <Footer
-        brandName="NestU"
-        tagline="Academic Reliability & Community Warmth."
-        showPartnerSection
-      />
-      <BottomNav activePage={activePage} userRole="pemilik" />
+      <Footer />
     </>
   );
 }

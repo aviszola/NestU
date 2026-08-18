@@ -40,10 +40,7 @@ export default async function MyBookingsPage() {
           <BookingsContent bookings={bookings ?? []} />
         </main>
 
-        <Footer
-          brandName="NestU"
-          tagline="Academic Reliability &amp; Community Warmth."
-        />
+        <Footer />
       </div>
 
       <BottomNav activePage="bookings" userRole="siswa" />
