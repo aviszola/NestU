@@ -146,14 +146,14 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Resources</h3>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="#">About Us</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="#">Terms of Service</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="#">Privacy Policy</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/about">About Us</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/terms">Terms of Service</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/privacy">Privacy Policy</Link>
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Support</h3>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="#">Contact Support</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="#">Partner with Us</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/contact">Contact Support</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/partner">Partner with Us</Link>
         </div>
       </footer>
     </div>

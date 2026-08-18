@@ -38,27 +38,9 @@ const STEPS = [
 
 const PAYMENT_METHODS = ["Bank Transfer", "E-Wallet", "Virtual Account"];
 
-const FOOTER_LINK_ROUTES: Record<string, string> = {
-  "Contact Support": "/contact",
-  "Syarat & Ketentuan": "/terms",
-  "Kebijakan Privasi": "/privacy",
-  "About Us": "/about",
-};
 
-const FOOTER_COLUMNS = [
-  {
-    title: "Pencarian",
-    links: ["Kos Dekat SMK", "Kos Dekat Universitas", "Kos Putri", "Kos Putra"],
-  },
-  {
-    title: "Bantuan",
-    links: ["Contact Support", "Pusat Bantuan", "Syarat & Ketentuan", "Kebijakan Privasi"],
-  },
-  {
-    title: "Perusahaan",
-    links: ["About Us", "Partner with Us", "Karir", "Blog"],
-  },
-];
+
+
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -96,7 +78,7 @@ export default async function HomePage() {
             </Link>
             <nav className="hidden md:flex items-center gap-8">
               <Link
-                href="/"
+                href="/kos"
                 className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200"
               >
                 Cari Kos

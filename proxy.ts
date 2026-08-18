@@ -1,4 +1,4 @@
-﻿import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /**
@@ -22,6 +22,7 @@ const PUBLIC_PATHS: string[] = [
   "/terms",
   "/privacy",
   "/contact",
+  "/partner",
 ];
 
 // Auth paths (accessible without auth, for auth flow)
