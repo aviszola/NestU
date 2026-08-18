@@ -219,59 +219,74 @@ export default function DetailKosPage() {
 
   return (
     <OwnerShell activePage="properties">
-      <div className="p-margin-mobile md:p-margin-desktop pb-32">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-lg gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="font-headline-lg text-headline-lg text-primary">
+      <div className="w-full px-margin-mobile md:px-margin-desktop py-stack-lg max-w-[1280px] pb-32">
+        {/* ── Header ringan (konsisten Tambah Kos) ── */}
+        <div className="mb-stack-lg">
+          <nav className="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md mb-3">
+            <Link href="/owner" className="hover:text-primary">Properti</Link>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            <Link href="/owner/kos" className="hover:text-primary">Kelola Properti</Link>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span className="text-primary font-bold line-clamp-1">{kos.name}</span>
+          </nav>
+
+          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/15 bg-primary-fixed px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                  <span className="material-symbols-outlined !text-sm">home_work</span>
+                  Detail Properti
+                </p>
+                {isVerified ? (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-label-md font-bold">
+                    <span
+                      className="material-symbols-outlined text-[14px]"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      verified
+                    </span>
+                    Terverifikasi
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-tertiary/10 text-tertiary text-label-md font-bold">
+                    <span className="material-symbols-outlined text-[14px]">pending</span>
+                    Menunggu
+                  </span>
+                )}
+              </div>
+              <h1 className="font-headline-lg text-headline-lg text-on-surface mt-2">
                 Detail Properti: {kos.name}
               </h1>
-              {isVerified ? (
-                <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-label-md font-bold flex items-center gap-1">
-                  <span
-                    className="material-symbols-outlined text-[14px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    verified
-                  </span>
-                  Terverifikasi
-                </span>
-              ) : (
-                <span className="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-label-md font-bold">
-                  Menunggu
-                </span>
-              )}
+              <p className="text-on-surface-variant font-body-md flex items-center gap-1 mt-1">
+                <span className="material-symbols-outlined text-[18px]">location_on</span>
+                {kos.address}
+              </p>
             </div>
-            <p className="text-on-surface-variant font-body-md flex items-center gap-1">
-              <span className="material-symbols-outlined text-[18px]">location_on</span>
-              {kos.address}
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Link
-              href={`/owner/kos/${id}/edit`}
-              className="px-6 py-2 border border-primary text-primary rounded-lg font-title-lg hover:bg-primary/5 transition-colors flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined">edit</span>
-              Edit Info Kos
-            </Link>
-            <button
-              onClick={() => setKosDeleteOpen(true)}
-              disabled={deleting}
-              className="px-6 py-2 border border-error text-error rounded-lg font-title-lg hover:bg-error/5 transition-colors flex items-center gap-2 disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined">delete</span>
-              {deleting ? "Menghapus..." : "Hapus Kos"}
-            </button>
+            <div className="flex gap-3">
+              <Link
+                href={`/owner/kos/${id}/edit`}
+                className="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary/5 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[20px]">edit</span>
+                Edit Info Kos
+              </Link>
+              <button
+                onClick={() => setKosDeleteOpen(true)}
+                disabled={deleting}
+                className="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-error text-error rounded-xl font-bold hover:bg-error/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="material-symbols-outlined text-[20px]">delete</span>
+                {deleting ? "Menghapus..." : "Hapus Kos"}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Bento Grid */}
+        {/* ── Bento Grid ── */}
         <div className="grid grid-cols-12 gap-gutter">
-          {/* Left: Photo + Description + Facilities */}
-          <div className="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl overflow-hidden card-shadow">
-            <div className="h-80 w-full">
+          {/* Kiri: Foto + Deskripsi + Fasilitas */}
+          <div className="col-span-12 lg:col-span-7 bg-white rounded-2xl overflow-hidden card-shadow border border-outline-variant">
+            <div className="h-80 w-full relative bg-surface-container-high">
               <img
                 className="w-full h-full object-cover"
                 src={fotoSrc}
@@ -282,8 +297,8 @@ export default function DetailKosPage() {
                 style={{ fontVariationSettings: "'FILL' 0" }}
               />
             </div>
-            <div className="p-stack-md">
-              <h3 className="font-title-lg text-title-lg mb-stack-sm">Deskripsi Properti</h3>
+            <div className="p-stack-lg">
+              <h3 className="font-title-lg text-title-lg text-on-surface mb-stack-sm">Deskripsi Properti</h3>
               <p className="text-on-surface-variant font-body-md leading-relaxed mb-stack-md">
                 {kos.description || "Belum ada deskripsi."}
               </p>
@@ -291,11 +306,11 @@ export default function DetailKosPage() {
               {facilities.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {facilities.map((f) => (
-                    <div key={f.id} className="flex flex-col items-center p-3 bg-surface rounded-lg">
-                      <div className="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center mb-2">
-                        <span className="material-symbols-outlined text-primary">{f.icon}</span>
+                    <div key={f.id} className="flex flex-col items-center p-3 bg-surface-container-low rounded-xl">
+                      <div className="w-10 h-10 bg-primary-fixed text-primary rounded-full flex items-center justify-center mb-2">
+                        <span className="material-symbols-outlined">{f.icon}</span>
                       </div>
-                      <span className="text-label-md text-on-surface">{f.name}</span>
+                      <span className="text-label-md text-on-surface text-center">{f.name}</span>
                     </div>
                   ))}
                 </div>
@@ -303,29 +318,37 @@ export default function DetailKosPage() {
             </div>
           </div>
 
-          {/* Right: Stats + Map */}
+          {/* Kanan: Stats + Lokasi */}
           <div className="col-span-12 lg:col-span-5 flex flex-col gap-gutter">
-            <div className="bg-primary p-stack-md rounded-xl card-shadow text-white">
-              <h3 className="font-title-lg text-title-lg mb-stack-md opacity-90">Ringkasan Kamar</h3>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <div className="text-[32px] font-bold">{totalRooms}</div>
-                  <div className="text-label-md opacity-80">Total Unit</div>
-                </div>
-                <div>
-                  <div className="text-[32px] font-bold">{terisi}</div>
-                  <div className="text-label-md opacity-80">Terisi</div>
-                </div>
-                <div>
-                  <div className="text-[32px] font-bold text-secondary-fixed">{tersedia}</div>
-                  <div className="text-label-md opacity-80">Tersedia</div>
+            <div className="bg-primary p-stack-lg rounded-2xl card-shadow text-white relative overflow-hidden">
+              {/* Grid pattern halus — konsisten hero */}
+              <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+                backgroundSize: "40px 40px",
+              }} />
+              <div className="relative">
+                <h3 className="font-title-lg text-title-lg mb-stack-md opacity-90">Ringkasan Kamar</h3>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <div className="text-[32px] font-bold">{totalRooms}</div>
+                    <div className="text-label-md opacity-80">Total Unit</div>
+                  </div>
+                  <div>
+                    <div className="text-[32px] font-bold">{terisi}</div>
+                    <div className="text-label-md opacity-80">Terisi</div>
+                  </div>
+                  <div>
+                    <div className="text-[32px] font-bold text-secondary-fixed">{tersedia}</div>
+                    <div className="text-label-md opacity-80">Tersedia</div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest rounded-xl overflow-hidden card-shadow h-full">
+            <div className="bg-white rounded-2xl overflow-hidden card-shadow border border-outline-variant h-full">
               <div className="p-stack-md flex items-center justify-between border-b border-outline-variant">
-                <h3 className="font-title-lg text-title-lg">Lokasi</h3>
+                <h3 className="font-title-lg text-title-lg text-on-surface">Lokasi</h3>
                 {kos.latitude && kos.longitude ? (
                   <a
                     href={`https://www.google.com/maps?q=${kos.latitude},${kos.longitude}`}
@@ -360,18 +383,18 @@ export default function DetailKosPage() {
             </div>
           </div>
 
-          {/* Room Management */}
-          <div className="col-span-12 bg-surface-container-lowest rounded-xl card-shadow overflow-hidden">
-            <div className="p-stack-md border-b border-outline-variant flex justify-between items-center bg-white">
+          {/* Daftar Kamar — tabel full width */}
+          <div className="col-span-12 bg-white rounded-2xl card-shadow border border-outline-variant overflow-hidden">
+            <div className="p-stack-lg border-b border-outline-variant flex flex-wrap justify-between items-center gap-3">
               <div>
-                <h2 className="font-headline-md text-headline-md text-primary">Daftar Kamar</h2>
+                <h2 className="font-headline-md text-headline-md text-on-surface">Daftar Kamar</h2>
                 <p className="text-on-surface-variant font-body-sm">Kelola status dan harga setiap unit kamar.</p>
               </div>
               <button
                 onClick={openAddModal}
-                className="px-6 py-2 bg-primary text-white rounded-lg font-title-lg hover:opacity-90 transition-all flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all"
               >
-                <span className="material-symbols-outlined">add</span>
+                <span className="material-symbols-outlined text-[20px]">add</span>
                 Tambah Kamar Baru
               </button>
             </div>
@@ -390,22 +413,24 @@ export default function DetailKosPage() {
                 <tbody className="divide-y divide-outline-variant">
                   {rooms.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-on-surface-variant">
-                        <span className="material-symbols-outlined text-4xl text-outline block mb-2">meeting_room</span>
-                        Belum ada kamar. Klik &quot;Tambah Kamar Baru&quot; untuk memulai.
+                      <td colSpan={5} className="px-6 py-14 text-center">
+                        <div className="max-w-sm mx-auto rounded-2xl border-2 border-dashed border-outline-variant p-8">
+                          <span className="material-symbols-outlined text-4xl text-outline block mb-2">meeting_room</span>
+                          <p className="text-on-surface-variant font-body-md">Belum ada kamar. Klik &quot;Tambah Kamar Baru&quot; untuk memulai.</p>
+                        </div>
                       </td>
                     </tr>
                   ) : (
                     rooms.map((room) => (
-                      <tr key={room.id} className="hover:bg-surface-container-lowest transition-colors group">
+                      <tr key={room.id} className="hover:bg-surface-container-low/60 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="font-title-lg text-primary">{room.room_number}</div>
-                          <div className="text-body-sm text-outline">
+                          <div className="text-body-sm text-on-surface-variant">
                             {room.description || (room.size_sqm ? `${room.size_sqm} m²` : "-")}
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="text-label-md bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded">
+                          <span className="text-label-md bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full">
                             {room.size_sqm ? (room.size_sqm >= 20 ? "Deluxe" : "Standard") : "-"}
                           </span>
                         </td>
@@ -416,7 +441,7 @@ export default function DetailKosPage() {
                           <div className="flex justify-center">
                             <button
                               onClick={() => handleToggleStatus(room)}
-                              className={`px-3 py-1 rounded-full text-label-md font-bold transition-colors ${
+                              className={`px-3 py-1 rounded-full text-label-md font-bold transition-colors cursor-pointer ${
                                 statusColors[room.status] || "bg-outline/10 text-outline"
                               }`}
                               title="Klik untuk ubah status"
@@ -429,7 +454,7 @@ export default function DetailKosPage() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openEditModal(room)}
-                              className="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-all"
+                              className="p-2 text-primary hover:bg-primary-fixed rounded-lg transition-all"
                               title="Edit kamar"
                             >
                               <span className="material-symbols-outlined">edit_note</span>
