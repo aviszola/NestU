@@ -1,4 +1,4 @@
-export interface Facility {
+﻿export interface Facility {
   id: string;
   name: string;
   icon: string | null;
@@ -9,15 +9,16 @@ export interface Kos {
   owner_id: string;
   name: string;
   address: string;
-  whatsapp_number: string;
+  whatsapp_number: string | null;
   latitude: number | null;
   longitude: number | null;
   description: string | null;
-  fasilitas: { id: string; name: string; icon: string | null }[]; // loaded via kos_facilities → facilities join
+  fasilitas: { id: string; name: string; icon: string | null }[]; // loaded via kos_facilities â†’ facilities join
   foto: string[];
   distance_to_school_km: number | null;
   verification_status: "verified" | "pending" | "rejected";
   is_active: boolean;
+  is_test?: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -1,17 +1,17 @@
-import { NextResponse, type NextRequest } from "next/server";
+﻿import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /**
- * RBAC Proxy — Role-Based Access Control
+ * RBAC Proxy â€” Role-Based Access Control
  *
- * - No auth + protected path → redirect /login
- * - Wrong role → redirect to role-appropriate home
- * - Missing profile → redirect /login (no default role)
+ * - No auth + protected path â†’ redirect /login
+ * - Wrong role â†’ redirect to role-appropriate home
+ * - Missing profile â†’ redirect /login (no default role)
  *
  * Role-path mapping:
- *   siswa → /dashboard, /bookings, /booking/*, /profile, /favorites, /kos/*
- *   pemilik → /owner/*
- *   admin → /admin/*
+ *   siswa â†’ /dashboard, /bookings, /booking/*, /profile, /favorites, /kos/*
+ *   pemilik â†’ /owner/*
+ *   admin â†’ /admin/*
  */
 
 // Paths accessible without auth
@@ -28,6 +28,7 @@ const PUBLIC_PATHS: string[] = [
 const AUTH_PATHS: string[] = [
   "/login",
   "/register",
+  "/forgot-password",
   "/auth", // Auth callback routes
 ];
 
@@ -71,7 +72,7 @@ export async function proxy(request: NextRequest) {
   // Skip internal and API routes
   if (isStaticOrApi(pathname)) return NextResponse.next();
 
-  // Public/auth paths — allow all
+  // Public/auth paths â€” allow all
   if (isPublicPath(pathname)) return NextResponse.next();
 
   const response = NextResponse.next();
@@ -98,7 +99,7 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected path + no user → redirect login
+  // Protected path + no user â†’ redirect login
   if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -115,7 +116,7 @@ export async function proxy(request: NextRequest) {
 
   const role = profile?.role;
 
-  // No profile or no role → redirect login (never default to a role)
+  // No profile or no role â†’ redirect login (never default to a role)
   if (!role) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

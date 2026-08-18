@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 
 const SECTIONS = [
@@ -77,7 +77,7 @@ export default function TermsPage() {
             Syarat &amp; Ketentuan
           </h1>
           <p className="text-body-sm text-on-surface-variant mb-10">
-            Terakhir diperbarui: {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}. Dokumen ini adalah kerangka umum dan dapat disesuaikan dengan kebutuhan hukum.
+            Terakhir diperbarui: {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}.
           </p>
 
           <div className="space-y-8">
@@ -101,7 +101,7 @@ export default function TermsPage() {
               href="/contact"
               className="text-body-sm font-semibold text-primary hover:underline"
             >
-              Ada pertanyaan tentang ketentuan ini? Hubungi kami →
+              Ada pertanyaan tentang ketentuan ini? Hubungi kami â†’
             </Link>
           </div>
         </div>

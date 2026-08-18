@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { formatWhatsAppNumber } from "@/lib/utils";
 import FavoriteButton from "@/components/FavoriteButton";
 import PublicNav from "@/components/layout/PublicNav";
 
@@ -154,7 +155,7 @@ export default async function DetailKosSiswaPage({
                 />
                 {/* intentional exception: WhatsApp brand color (#25D366) for universal recognition */}
                 <a
-                  href={`https://wa.me/${(kos.whatsapp_number ?? "").replace(/[^0-9]/g, "")}`}
+                  href={`https://wa.me/${formatWhatsAppNumber(kos.whatsapp_number)}`}
                   target="_blank"
                   className="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-medium text-white hover:brightness-110 transition-all"
                 >

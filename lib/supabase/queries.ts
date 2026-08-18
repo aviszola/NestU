@@ -1,8 +1,8 @@
-import type { Facility, Kos, Room } from "@/lib/types";
+﻿import type { Facility, Kos, Room } from "@/lib/types";
 
 const STORAGE_BUCKET = "kos-foto";
 
-// ─── Kos CRUD ────────────────────────────────────────────
+// â”€â”€â”€ Kos CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getVerifiedKosList(
   client: any,
@@ -12,6 +12,7 @@ export async function getVerifiedKosList(
     .from("kos")
     .select("*, kos_facilities(facility_id, facility:facility_id(name))")
     .eq("verification_status", "verified")
+    .eq("is_test", false)
     .order("created_at", { ascending: false })
     .limit(4);
 
@@ -63,7 +64,8 @@ export async function getKosList(
       count: "exact",
     })
     .eq("verification_status", "verified")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .eq("is_test", false);
 
   // Search
   if (options.search) {
@@ -72,14 +74,14 @@ export async function getKosList(
     );
   }
 
-  // Harga — filtered via cheapest room in subquery workaround
+  // Harga â€” filtered via cheapest room in subquery workaround
   if (options.minPrice) query = query.gte("price", options.minPrice);
   if (options.maxPrice) query = query.lte("price", options.maxPrice);
 
   // Tipe
   if (options.type) query = query.eq("type", options.type);
 
-  // Fasilitas — filter via junction table
+  // Fasilitas â€” filter via junction table
   if (options.facilities?.length) {
     query = query.filter(
       "kos_facilities.facility_id",
@@ -221,7 +223,7 @@ export async function deleteKos(client: any, id: string): Promise<void> {
   if (error) throw error;
 }
 
-// ─── Rooms CRUD ──────────────────────────────────────────
+// â”€â”€â”€ Rooms CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getRoomsByKosId(
   client: any,
@@ -281,7 +283,7 @@ export async function deleteRoom(client: any, id: string): Promise<void> {
   if (error) throw error;
 }
 
-// ─── Storage (foto) ──────────────────────────────────────
+// â”€â”€â”€ Storage (foto) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function uploadFoto(
   client: any,
@@ -314,7 +316,7 @@ export async function deleteFoto(
   if (error) throw error;
 }
 
-// ─── Bookings ─────────────────────────────────────────────
+// â”€â”€â”€ Bookings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface Booking {
   id: string;
@@ -435,8 +437,8 @@ export async function updateBookingStatus(
 
   // Stale-data guard: cek status terbaru sebelum PATCH.
   // Cegah aksi ke data yang sudah berubah (mis. sudah di-approve/dibatalkan
-  // oleh owner lain / sesi lama) — hindari PATCH diam-diam 400 dari RLS.
-  // Transisi valid: pending → approved/cancelled; approved → completed.
+  // oleh owner lain / sesi lama) â€” hindari PATCH diam-diam 400 dari RLS.
+  // Transisi valid: pending â†’ approved/cancelled; approved â†’ completed.
   const validFrom: Record<string, string[]> = {
     approved: ["pending"],
     cancelled: ["pending", "approved"],
@@ -484,6 +486,7 @@ export async function getFeaturedKos(
     .select("*, kos_facilities(facility_id, facility:facility_id(name))")
     .eq("verification_status", "verified")
     .eq("is_active", true)
+    .eq("is_test", false)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -495,7 +498,8 @@ export async function getTotalKosCount(client: any): Promise<number> {
     .from("kos")
     .select("*", { count: "exact", head: true })
     .eq("verification_status", "verified")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .eq("is_test", false);
   if (error) throw error;
   return count ?? 0;
 }
@@ -704,7 +708,7 @@ export async function getAdminBookingStats(client: any): Promise<{ pending: numb
   };
 }
 
-// ─── Notifications ────────────────────────────────────────
+// â”€â”€â”€ Notifications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getNotifications(
   client: any,
@@ -757,7 +761,7 @@ export async function markAllNotificationsRead(
   if (error) throw error;
 }
 
-// ─── Payments (Manual Transfer MVP) ──────────────────────
+// â”€â”€â”€ Payments (Manual Transfer MVP) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getBankAccounts(
   client: any,
@@ -825,7 +829,7 @@ export async function confirmPayment(
   if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
 
   // Verifikasi eksplisit: user adalah owner kos dari booking ini ATAU admin
-  // (bukan hanya andalkan RLS — cegah PATCH diam-diam 400 saat sesi berubah)
+  // (bukan hanya andalkan RLS â€” cegah PATCH diam-diam 400 saat sesi berubah)
   const { data: profile } = await client
     .from("profiles")
     .select("role")
