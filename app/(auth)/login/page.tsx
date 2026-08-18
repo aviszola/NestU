@@ -16,6 +16,7 @@ function LoginContent() {
   const supabase = createClient();
 
   const redirectTarget = searchParams.get("redirect");
+  const oauthError = searchParams.get("error");
   const justRegistered = searchParams.get("registered") === "true";
 
   // Toggle Login/Register
@@ -195,6 +196,14 @@ function LoginContent() {
               </p>
             </div>
 
+            {oauthError && (
+              <div className="mb-4 p-3 rounded-lg bg-error-container/20 border border-error/20 text-xs text-error">
+                {oauthError === "auth_missing_code"
+                  ? "Kode otorisasi tidak ditemukan. Silakan coba lagi."
+                  : "Gagal menyelesaikan login OAuth. Silakan coba lagi atau gunakan email."}
+              </div>
+            )}
+
             {loginError && (
               <div className="mb-4 p-3 rounded-lg bg-error-container/20 border border-error/20 text-xs text-error">
                 {loginError}
@@ -282,7 +291,9 @@ function LoginContent() {
               </button>
             </form>
 
-            {/* Social Login */}
+            {/* Social Login - disembunyikan sampai OAuth provider di-enable di Supabase Dashboard.
+                Aktifkan: set NEXT_PUBLIC_ENABLE_OAUTH=true di .env.local / Vercel. */}
+            {process.env.NEXT_PUBLIC_ENABLE_OAUTH === "true" && (
             <div className="mt-stack-lg">
               <div className="relative flex items-center mb-stack-md">
                 <div className="flex-grow border-t border-outline-variant" />
@@ -316,6 +327,7 @@ function LoginContent() {
                 </button>
               </div>
             </div>
+            )}
           </div>
 
           {/* ═══ REGISTER FORM — shared component ═══ */}
