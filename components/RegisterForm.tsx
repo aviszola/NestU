@@ -64,8 +64,11 @@ export default function RegisterForm({
       });
       if (error) throw error;
       if (!data.user) throw new Error("Registrasi gagal");
-      onSuccess?.();
-      router.push("/login?registered=true");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/login?registered=true");
+      }
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan saat mendaftar.");
     } finally {

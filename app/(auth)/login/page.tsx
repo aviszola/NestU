@@ -1,16 +1,22 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getRoleHome } from "@/lib/constants/routes";
 import RegisterForm from "@/components/RegisterForm";
 
-export default function LoginPage() {
+/** Inner component — pakai useSearchParams, wajib dibungkus Suspense. */
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  const redirectTarget = searchParams.get("redirect");
+  const justRegistered = searchParams.get("registered") === "true";
 
   // Toggle Login/Register
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
@@ -29,7 +35,8 @@ export default function LoginPage() {
       .select("role")
       .eq("id", userId)
       .single();
-    router.push(getRoleHome(profile?.role));
+    const target = redirectTarget || getRoleHome(profile?.role);
+    router.push(target);
   }
 
   async function handleLogin(e: React.FormEvent) {
@@ -170,6 +177,15 @@ export default function LoginPage() {
               activeTab === "login" ? "visible-section" : "hidden-section"
             }`}
           >
+            {(redirectTarget || justRegistered) && (
+              <div className="mb-4 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary px-4 py-3 text-sm font-medium flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px]">info</span>
+                {justRegistered
+                  ? "Akun berhasil dibuat! Silakan cek email untuk verifikasi, lalu masuk."
+                  : "Silakan login terlebih dahulu untuk mengakses halaman ini."}
+              </div>
+            )}
+
             <div className="mb-stack-lg text-center md:text-left">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
                 Selamat Datang Kembali
@@ -316,7 +332,7 @@ export default function LoginPage() {
                 Bergabunglah dengan ekosistem NestU hari ini.
               </p>
             </div>
-            <RegisterForm />
+            <RegisterForm onSuccess={() => setActiveTab("login")} />
           </div>
 
           {/* Footer Links */}
@@ -338,5 +354,13 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -87,26 +87,44 @@ export default function ContactPage() {
 
           {/* Channel kontak */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-10">
-            {CHANNELS.map((c) => (
-              <a
-                key={c.title}
-                href={c.href}
-                target={c.href.startsWith("http") ? "_blank" : undefined}
-                rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 hover:shadow-lg transition-shadow block"
-              >
-                <div className="w-11 h-11 bg-primary-container rounded-full flex items-center justify-center mb-3">
-                  <span className="material-symbols-outlined text-on-primary-container">
-                    {c.icon}
-                  </span>
+            {CHANNELS.map((c) =>
+              c.href ? (
+                <a
+                  key={c.title}
+                  href={c.href}
+                  target={c.href.startsWith("http") ? "_blank" : undefined}
+                  rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 hover:shadow-lg transition-shadow block"
+                >
+                  <div className="w-11 h-11 bg-primary-container rounded-full flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined text-on-primary-container">
+                      {c.icon}
+                    </span>
+                  </div>
+                  <h3 className="font-title-lg text-title-lg font-bold text-on-surface mb-1">
+                    {c.title}
+                  </h3>
+                  <p className="text-body-sm text-on-surface font-semibold">{c.desc}</p>
+                  <p className="text-[11px] text-on-surface-variant mt-2 leading-relaxed">{c.note}</p>
+                </a>
+              ) : (
+                <div
+                  key={c.title}
+                  className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 block"
+                >
+                  <div className="w-11 h-11 bg-primary-container rounded-full flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined text-on-primary-container">
+                      {c.icon}
+                    </span>
+                  </div>
+                  <h3 className="font-title-lg text-title-lg font-bold text-on-surface mb-1">
+                    {c.title}
+                  </h3>
+                  <p className="text-body-sm text-on-surface font-semibold">{c.desc}</p>
+                  <p className="text-[11px] text-on-surface-variant mt-2 leading-relaxed">{c.note}</p>
                 </div>
-                <h3 className="font-title-lg text-title-lg font-bold text-on-surface mb-1">
-                  {c.title}
-                </h3>
-                <p className="text-body-sm text-on-surface font-semibold">{c.desc}</p>
-                <p className="text-[11px] text-on-surface-variant mt-2 leading-relaxed">{c.note}</p>
-              </a>
-            ))}
+              )
+            )}
           </div>
 
           {/* Form kontak */}
