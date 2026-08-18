@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import NotifBell from "@/components/layout/NotifBell";
+import Footer from "@/components/layout/Footer";
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
       const { createClient } = await import("@/lib/supabase/client");
       const sup = createClient();
       const { data: { user } } = await sup.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
       const { data: profile } = await sup
         .from("profiles")
         .select("role")
@@ -137,25 +138,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
         })}
       </nav>
 
-      {/* Footer */}
-      <footer className="w-full py-stack-lg px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-3 gap-gutter bg-surface-container-highest border-t border-outline-variant">
-        <div>
-          <span className="font-title-lg text-title-lg font-bold text-primary mb-4 block">NestU</span>
-          <p className="text-body-sm text-on-surface-variant mb-4">Academic Reliability & Community Warmth for the modern student housing market.</p>
-          <p className="text-body-sm text-on-surface-variant">&copy; {new Date().getFullYear()} NestU.</p>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Resources</h3>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/about">Tentang Kami</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/terms">Syarat & Ketentuan</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/privacy">Kebijakan Privasi</Link>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Support</h3>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/contact">Bantuan</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/partner">Kemitraan</Link>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

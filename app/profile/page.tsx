@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { updateProfile, changePassword, logout } from "@/lib/supabase/actions";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
+import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 
 export default function ProfilePage() {
@@ -40,7 +41,7 @@ export default function ProfilePage() {
     (async () => {
       const sup = createClient();
       const { data: { user } } = await sup.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
 
       setEmail(user.email ?? "");
 
@@ -50,7 +51,7 @@ export default function ProfilePage() {
         .eq("id", user.id)
         .single();
 
-      if (!profile) { router.replace("/login"); return; }
+      if (!profile) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
 
       setFullName(profile.full_name ?? "");
       setPhone(profile.phone ?? "");
@@ -375,6 +376,7 @@ export default function ProfilePage() {
         </main>
       </div>
 
+      <Footer />
       <BottomNav activePage="profile" userRole="siswa" />
     </div>
   );

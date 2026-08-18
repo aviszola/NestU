@@ -6,6 +6,7 @@ import { formatWhatsAppNumber } from "@/lib/utils";
 import FavoriteButton from "@/components/FavoriteButton";
 import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
+import BottomNav from "@/components/layout/BottomNav";
 
 const FACILITY_ICONS: Record<string, string> = {
   wifi: "wifi",
@@ -246,6 +247,7 @@ export default async function DetailKosSiswaPage({
         )}
       </main>
       <Footer />
+      {isSiswa && <BottomNav activePage="search" userRole="siswa" />}
     </div>
   );
 }

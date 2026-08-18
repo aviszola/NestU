@@ -14,7 +14,7 @@ export default function AdminKosDetailPage() {
     async function load() {
       const sup = (await import("@/lib/supabase/client")).createClient();
       const { data: { user } } = await sup.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
       const { data: profile } = await sup.from("profiles").select("role").eq("id", user.id).single();
       if (profile?.role !== "admin") { router.replace("/dashboard"); return; }
       // Data loaded via the list page — just render detail view

@@ -36,7 +36,7 @@ export default function AdminKosVerificationPage() {
     try {
       const sup = (await import("@/lib/supabase/client")).createClient();
       const { data: { user } } = await sup.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
 
       const { data: profile } = await sup
         .from("profiles")
