@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       p_midtrans_status: transactionStatus,
       p_payment_status: paymentStatus,
       p_webhook_secret: WEBHOOK_SECRET,
+      p_gross_amount: grossAmount ? Number(grossAmount) : null,
     });
 
     if (error) {
