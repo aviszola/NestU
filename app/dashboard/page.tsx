@@ -7,6 +7,7 @@ import {
 } from "@/lib/supabase/queries";
 import KosCard from "@/components/KosCard";
 import ScrollReveal from "@/components/ScrollReveal";
+import { MiniStats, ChartPanel } from "@/components/DashboardHero";
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/components/layout/TopNav";
 import BottomNav from "@/components/layout/BottomNav";
@@ -76,9 +77,6 @@ export default async function DashboardPage() {
     return 0;
   };
 
-  // Chart dekoratif (bukan data asli — diberi label jujur)
-  const CHART_POINTS = [38, 52, 46, 68, 60, 84, 74, 96, 88, 108, 118, 132];
-
   return (
     <div className="min-h-screen bg-surface">
       <Sidebar activePage="search" userRole="siswa" userName={profile.full_name} />
@@ -132,84 +130,16 @@ export default async function DashboardPage() {
                     </div>
                   </form>
 
-                  {/* Mini stats inline — data nyata */}
-                  <div className="flex flex-wrap gap-6 mt-2">
-                    <div>
-                      <p className="text-2xl font-extrabold tracking-tight text-white">{totalVerifiedKos}</p>
-                      <p className="text-xs text-white/60">Kos terverifikasi</p>
-                    </div>
-                    <div>
-                      <p className="text-2xl font-extrabold tracking-tight text-secondary-fixed">{totalBooking}</p>
-                      <p className="text-xs text-white/60">Booking aktif</p>
-                    </div>
-                  </div>
+                  {/* Mini stats inline — data nyata (count-up client) */}
+                  <MiniStats
+                    totalVerifiedKos={totalVerifiedKos}
+                    totalBooking={totalBooking}
+                  />
                 </ScrollReveal>
 
-                {/* Right: chart panel + hero number overlay */}
+                {/* Right: chart panel + hero number overlay (tooltip & hover client) */}
                 <ScrollReveal className="relative">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-white/5 border border-white/10 p-6 md:p-8">
-                    {/* Label jujur: visual dekoratif, bukan data asli */}
-                    <div className="absolute left-6 md:left-8 top-6 md:top-8 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg text-secondary-fixed">insights</span>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
-                        Tren pencarian kos
-                      </span>
-                    </div>
-
-                    {/* Chart SVG — dekoratif jujur */}
-                    <svg
-                      viewBox="0 0 200 100"
-                      preserveAspectRatio="none"
-                      className="absolute inset-x-4 bottom-8 h-[calc(100%-5rem)] w-[calc(100%-2rem)]"
-                      aria-hidden="true"
-                    >
-                      <defs>
-                        <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#00236f" stopOpacity="0.35" />
-                          <stop offset="100%" stopColor="#00236f" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-                      {CHART_POINTS.map((v, i) => (
-                        <line
-                          key={i}
-                          x1={(i * 200) / (CHART_POINTS.length - 1)}
-                          y1={100 - v}
-                          x2={(i * 200) / (CHART_POINTS.length - 1)}
-                          y2={96}
-                          stroke="#006c49"
-                          strokeOpacity="0.5"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                        />
-                      ))}
-                      <path
-                        d={CHART_POINTS
-                          .map((v, i) => `${i === 0 ? "M" : "L"}${(i * 200) / (CHART_POINTS.length - 1)},${100 - v}`)
-                          .join(" ")}
-                        fill="none"
-                        stroke="#00236f"
-                        strokeWidth="2.5"
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d={`${CHART_POINTS
-                          .map((v, i) => `${i === 0 ? "M" : "L"}${(i * 200) / (CHART_POINTS.length - 1)},${100 - v}`)
-                          .join(" ")} L200,100 L0,100 Z`}
-                        fill="url(#chartFill)"
-                      />
-                    </svg>
-
-                    {/* Hero angka overlay */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                      <p className="text-6xl md:text-7xl font-extrabold tracking-tight text-white drop-shadow-sm">
-                        {totalBooking}
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-white/70">
-                        Booking aktif kamu
-                      </p>
-                    </div>
-                  </div>
+                  <ChartPanel totalBooking={totalBooking} />
                 </ScrollReveal>
               </div>
             </div>
