@@ -27,17 +27,19 @@ export default function BottomNav({ activePage, userRole = "siswa" }: BottomNavP
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 md:hidden bg-surface rounded-t-xl shadow-lg border-t border-outline-variant z-40 safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-stretch justify-around px-2 py-1.5">
         {tabs.map((tab) => {
           const isActive = tab.page === activePage;
           return (
             <Link
               key={tab.label}
               href={tab.href}
-              className={`flex flex-col items-center gap-0.5 transition-all ${
+              aria-label={tab.label}
+              aria-current={isActive ? "page" : undefined}
+              className={`flex flex-col items-center justify-center gap-0.5 min-h-[52px] min-w-[68px] rounded-full px-3 transition-all ${
                 isActive
-                  ? "bg-primary-container text-on-primary-container rounded-full px-4 py-1"
-                  : "text-on-surface-variant hover:text-on-surface px-3 py-1.5"
+                  ? "bg-primary-container text-on-primary-container"
+                  : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
               <span className="material-symbols-outlined text-xl">{tab.icon}</span>

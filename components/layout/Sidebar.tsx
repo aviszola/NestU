@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 
-export type ActivePage = "dashboard" | "search" | "favorites" | "bookings" | "profile" | "properties";
+export type ActivePage = "dashboard" | "search" | "favorites" | "bookings" | "profile" | "properties" | "settings";
 
 interface SidebarProps {
   activePage: ActivePage;

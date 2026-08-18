@@ -142,18 +142,18 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
         <div>
           <span className="font-title-lg text-title-lg font-bold text-primary mb-4 block">NestU</span>
           <p className="text-body-sm text-on-surface-variant mb-4">Academic Reliability & Community Warmth for the modern student housing market.</p>
-          <p className="text-body-sm text-on-surface-variant">© 2024 NestU.</p>
+          <p className="text-body-sm text-on-surface-variant">&copy; {new Date().getFullYear()} NestU.</p>
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Resources</h3>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/about">About Us</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/terms">Terms of Service</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/privacy">Privacy Policy</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/about">Tentang Kami</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/terms">Syarat & Ketentuan</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/privacy">Kebijakan Privasi</Link>
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="font-label-md text-label-md text-primary font-bold uppercase mb-2">Support</h3>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/contact">Contact Support</Link>
-          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/partner">Partner with Us</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/contact">Bantuan</Link>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors text-body-sm hover:underline decoration-primary" href="/partner">Kemitraan</Link>
         </div>
       </footer>
     </div>
