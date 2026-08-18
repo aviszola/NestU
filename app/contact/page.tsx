@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -9,14 +9,14 @@ const CHANNELS = [
     icon: "mail",
     title: "Email",
     desc: "hello@netsu.id",
-    note: "Perlu dicatat: alamat email ini mungkin belum aktif — tim akan mengaktifkannya segera.",
+    note: "Kami membalas dalam 1×24 jam kerja.",
     href: "mailto:hello@netsu.id",
   },
   {
     icon: "chat",
     title: "WhatsApp",
     desc: "Konsultasi cepat dengan tim NestU",
-    note: "Respons dalam jam kerja (Senin–Jumat, 09.00–17.00 WIB).",
+    note: "Respons dalam jam kerja (Seninâ€“Jumat, 09.00â€“17.00 WIB).",
     href: "https://wa.me/",
   },
   {
@@ -34,7 +34,7 @@ export default function ContactPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Form generik — kirim via mailto (tanpa backend). Backend form bisa ditambahkan nanti.
+    // Kirim via mailto — tanpa backend, cukup buka aplikasi email user.
     const subject = encodeURIComponent(`[NestU] Pesan dari ${form.name}`);
     const body = encodeURIComponent(`${form.message}\n\n---\nDari: ${form.name} <${form.email}>`);
     window.location.href = `mailto:hello@netsu.id?subject=${subject}&body=${body}`;
@@ -114,12 +114,12 @@ export default function ContactPage() {
               Kirim Pesan
             </h2>
             <p className="text-body-sm text-on-surface-variant mb-6">
-              Form ini membuka aplikasi email kamu (mailto). Jika ingin kirim langsung dari platform, backend form perlu ditambahkan.
+              Tim kami akan membalas pesan kamu melalui email.
             </p>
             {sent && (
               <div className="mb-6 rounded-lg bg-secondary/10 text-secondary px-4 py-3 text-sm font-medium flex items-center gap-2">
                 <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                Aplikasi email akan terbuka — selesaikan pengiriman di sana.
+                Aplikasi email akan terbuka â€” selesaikan pengiriman di sana.
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-5">

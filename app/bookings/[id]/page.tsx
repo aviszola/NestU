@@ -15,6 +15,7 @@ import { Modal } from "@/components/ui/modal";
 import { toastSuccess, toastError, toastInfo, toastLoading, toastDismiss } from "@/lib/toast";
 import { getSnapScriptUrl } from "@/lib/midtrans";
 import { BOOKING_STATUS, getStatusKey } from "@/lib/bookingStatus";
+import { formatWhatsAppNumber } from "@/lib/utils";
 
 interface BookingDetail {
   id: string;
@@ -387,7 +388,7 @@ export default function BookingDetailPage() {
                           Nomor rekening belum diatur oleh pemilik kos. Hubungi{" "}
                           {kos?.whatsapp_number ? (
                             <a
-                              href={`https://wa.me/${kos.whatsapp_number.replace(/[^0-9]/g, "")}`}
+                              href={`https://wa.me/${formatWhatsAppNumber(kos.whatsapp_number)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-primary font-bold"

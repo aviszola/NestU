@@ -70,7 +70,7 @@ export default function EditKosPage() {
         setFacilities(allFacilities);
         setName(kos.name);
         setAddress(kos.address);
-        setWhatsappNumber(kos.whatsapp_number);
+        setWhatsappNumber(kos.whatsapp_number ?? "");
         setDescription(kos.description ?? "");
         setLatitude(kos.latitude);
         setLongitude(kos.longitude);
@@ -80,7 +80,7 @@ export default function EditKosPage() {
         originalRef.current = {
           name: kos.name,
           address: kos.address,
-          whatsapp_number: kos.whatsapp_number,
+          whatsapp_number: kos.whatsapp_number ?? "",
           description: kos.description ?? "",
           latitude: kos.latitude,
           longitude: kos.longitude,

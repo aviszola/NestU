@@ -28,3 +28,21 @@ export function toReadableError(err: any): string {
   }
   return msg || "Terjadi kesalahan";
 }
+
+/**
+ * Format nomor WA lokal (08xxx) jadi format internasional (628xxx) untuk URL wa.me.
+ * wa.me butuh kode negara TANPA angka 0 di depan.
+ * - "081234567890" → "6281234567890"
+ * - "6281234567890" → "6281234567890" (sudah internasional)
+ * - "+62 812-3456-7890" → "6281234567890"
+ * - null/""/non-digit → "" (link tidak dibuat)
+ */
+export function formatWhatsAppNumber(phone: string | null | undefined): string {
+  if (!phone) return "";
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("0")) return "62" + digits.slice(1);
+  if (digits.startsWith("62")) return digits;
+  if (digits.startsWith("8")) return "62" + digits;
+  return ""; // format tak dikenal (mis. dimulai kode negara lain)
+}
