@@ -345,6 +345,55 @@ export async function getUserBookings(
   return data ?? [];
 }
 
+/**
+ * Rental siswa: booking lunas (approved/completed) milik user,
+ * join kos + fasilitas + owner. Dipakai halaman /rental.
+ */
+export async function getMyRentals(
+  client: any,
+  userId: string
+): Promise<any[]> {
+  const { data, error } = await client
+    .from("bookings")
+    .select(
+      "*, rooms:room_id(room_number, price_per_month, kos:kos_id(id, name, address, whatsapp_number, foto, owner_id, kos_facilities(facility_id, facility:facility_id(name, icon))))"
+    )
+    .eq("student_id", userId)
+    .eq("payment_status", "lunas")
+    .in("status", ["approved", "completed"])
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
+  const rows = data ?? [];
+  if (rows.length === 0) return [];
+
+  // Nama pemilik kos (profiles join via kos.owner_id)
+  const ownerIds = [...new Set(rows.map((b: any) => b.rooms?.kos?.owner_id).filter(Boolean))];
+  const { data: profiles } = await client
+    .from("profiles")
+    .select("id, full_name")
+    .in("id", ownerIds);
+  const ownerMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p.full_name]));
+
+  return rows.map((b: any) => {
+    const kos = b.rooms?.kos ?? {};
+    const { kos_facilities, ...restKos } = kos;
+    return {
+      ...b,
+      kos_name: restKos.name ?? "Kos",
+      kos_address: restKos.address ?? null,
+      kos_whatsapp: restKos.whatsapp_number ?? null,
+      kos_foto: Array.isArray(restKos.foto) ? restKos.foto : [],
+      owner_name: ownerMap[restKos.owner_id] ?? "Pemilik Kos",
+      fasilitas: (kos_facilities ?? []).map((kf: any) => ({
+        id: kf.facility_id,
+        name: kf.facility?.name ?? kf.facility_id,
+        icon: kf.facility?.icon ?? null,
+      })),
+    };
+  });
+}
+
 export async function getActiveBookings(
   client: any,
   userId: string,

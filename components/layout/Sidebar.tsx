@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import Logo from "@/components/ui/Logo";
 
-export type ActivePage = "dashboard" | "search" | "favorites" | "bookings" | "profile" | "properties" | "settings";
+export type ActivePage = "dashboard" | "search" | "favorites" | "bookings" | "rental" | "profile" | "properties" | "settings" | "reports";
 
 interface SidebarProps {
   activePage: ActivePage;
@@ -34,6 +35,7 @@ const studentMenu: MenuItem[] = [
   { label: "Cari", icon: "search", href: "/kos", page: "search" },
   { label: "Favorit", icon: "favorite", href: "/favorites", page: "favorites" },
   { label: "Booking", icon: "receipt_long", href: "/bookings", page: "bookings" },
+  { label: "Kamar Saya", icon: "home_work", href: "/rental", page: "rental" },
   { label: "Profil", icon: "person", href: "/profile", page: "profile" },
 ];
 
@@ -41,6 +43,7 @@ const ownerMenu: MenuItem[] = [
   { label: "Dashboard", icon: "dashboard", href: "/owner", page: "dashboard" },
   { label: "Kelola Properti", icon: "apartment", href: "/owner/kos", page: "properties" },
   { label: "Booking Masuk", icon: "receipt_long", href: "/owner/bookings", page: "bookings" },
+  { label: "Laporan", icon: "report_problem", href: "/owner/reports", page: "reports" },
   { label: "Profil", icon: "person", href: "/owner/profile", page: "profile" },
 ];
 
@@ -57,6 +60,27 @@ const bottomItems: BottomItem[] = [
 export default function Sidebar({ activePage, userRole = "siswa", userName }: SidebarProps) {
   const topMenu = userRole === "admin" ? adminMenu : userRole === "pemilik" ? ownerMenu : studentMenu;
   const bottom = userRole === "pemilik" ? ownerBottomItems : bottomItems;
+
+  // Badge jumlah laporan status 'baru' utk owner — pola refund badge AdminShell
+  const [newReportCount, setNewReportCount] = useState(0);
+  useEffect(() => {
+    if (userRole !== "pemilik") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const sup = createClient();
+        const { count } = await sup
+          .from("maintenance_reports")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "baru");
+        if (!cancelled) setNewReportCount(count ?? 0);
+      } catch {
+        // ignore — badge opsional
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [userRole]);
 
   return (
     <aside className="hidden md:flex md:flex-col md:w-64 md:fixed md:inset-y-0 bg-surface-container-low border-r border-outline-variant z-30">
@@ -88,6 +112,11 @@ export default function Sidebar({ activePage, userRole = "siswa", userName }: Si
             >
               <span className="material-symbols-outlined text-lg">{item.icon}</span>
               <span>{item.label}</span>
+              {item.page === "reports" && newReportCount > 0 && (
+                <span className="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-error text-white text-[11px] font-bold">
+                  {newReportCount > 9 ? "9+" : newReportCount}
+                </span>
+              )}
             </Link>
           );
         })}
