@@ -17,6 +17,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import OwnerShell from "@/components/layout/OwnerShell";
+import { facilityIcon } from "@/components/KosCard";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), {
   ssr: false,
@@ -327,7 +328,7 @@ export default function CreateKosPage() {
                             : "bg-surface-container-high text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary"
                         }`}>
                           <span className="material-symbols-outlined">
-                            {f.icon && FACILITY_ICONS[f.icon] ? FACILITY_ICONS[f.icon] : f.icon || "check"}
+                            {facilityIcon(f)}
                           </span>
                         </div>
                         <span className={`font-label-md text-label-md text-center ${

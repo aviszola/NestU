@@ -11,28 +11,7 @@ import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 
-const FACILITY_ICONS: Record<string, string> = {
-  wifi: "wifi",
-  ac: "ac_unit",
-  "kamar mandi": "bathroom",
-  bathroom: "bathroom",
-  dapur: "kitchen",
-  kitchen: "kitchen",
-  listrik: "bolt",
-  keamanan: "shield",
-  security: "shield",
-  parkir: "local_parking",
-  parking: "local_parking",
-  tv: "tv",
-  lemari: "checklist",
-  meja: "table_restaurant",
-  kasur: "bed",
-};
-
-function getIcon(name: string, dbIcon?: string | null) {
-  if (dbIcon) return dbIcon;
-  return FACILITY_ICONS[name.toLowerCase()] ?? "check";
-}
+import { facilityIcon } from "@/components/KosCard";
 
 export default function BookingPage({
   params,
@@ -181,7 +160,7 @@ export default function BookingPage({
                           key={f.id || i}
                           className="flex items-center gap-1 px-3 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md text-label-md"
                         >
-                          <span className="material-symbols-outlined text-[16px]">{getIcon(f.name, f.icon)}</span>
+                          <span className="material-symbols-outlined text-[16px]">{facilityIcon(f)}</span>
                           {f.name}
                         </div>
                       ))}

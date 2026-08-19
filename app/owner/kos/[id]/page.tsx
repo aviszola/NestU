@@ -18,6 +18,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toastSuccess, toastError } from "@/lib/toast";
+import { facilityIcon } from "@/components/KosCard";
 
 function formatPrice(n: number): string {
   return new Intl.NumberFormat("id-ID", {
@@ -308,7 +309,7 @@ export default function DetailKosPage() {
                   {facilities.map((f) => (
                     <div key={f.id} className="flex flex-col items-center p-3 bg-surface-container-low rounded-xl">
                       <div className="w-10 h-10 bg-primary-fixed text-primary rounded-full flex items-center justify-center mb-2">
-                        <span className="material-symbols-outlined">{f.icon}</span>
+                        <span className="material-symbols-outlined">{facilityIcon(f)}</span>
                       </div>
                       <span className="text-label-md text-on-surface text-center">{f.name}</span>
                     </div>
