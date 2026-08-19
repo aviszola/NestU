@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -81,6 +81,9 @@ export default function BookingDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
+  // Guard sinkron anti double-invoke: state async (re-render telat), ref langsung kebaca.
+  const payingRef = useRef(false);
+  const popupOpenRef = useRef(false);
 
   async function load() {
     const supabase = createClient();
@@ -155,6 +158,9 @@ export default function BookingDetailPage() {
   }
 
   async function handlePayNow() {
+    // Guard sinkron: cegah double-click / re-invoke saat popup masih terbuka
+    if (payingRef.current || popupOpenRef.current) return;
+    payingRef.current = true;
     setPaying(true);
     const toastId = toastLoading("Membuat transaksi pembayaran...");
     try {
@@ -180,28 +186,49 @@ export default function BookingDetailPage() {
           document.head.appendChild(script);
         });
       }
+      // Guard kedua: popup kebuka saat script load (misal klik lain)
+      if (popupOpenRef.current) {
+        payingRef.current = false;
+        setPaying(false);
+        return;
+      }
+      popupOpenRef.current = true;
       snapWin.snap!.pay(data.token, {
         onSuccess: () => {
+          popupOpenRef.current = false;
+          payingRef.current = false;
+          setPaying(false);
           toastSuccess("Pembayaran berhasil! Menunggu konfirmasi sistem.");
           load();
         },
         onPending: () => {
+          popupOpenRef.current = false;
+          payingRef.current = false;
+          setPaying(false);
           toastInfo("Pembayaran menunggu diselesaikan.");
           load();
         },
         onError: () => {
+          popupOpenRef.current = false;
+          payingRef.current = false;
+          setPaying(false);
           toastError("Pembayaran gagal. Coba lagi.");
           load();
         },
         onClose: () => {
+          popupOpenRef.current = false;
+          payingRef.current = false;
+          setPaying(false);
           toastInfo("Popup pembayaran ditutup. Pembayaran bisa dilanjutkan kapan saja.");
           load();
         },
       });
+      // CATATAN: setPaying(false) TIDAK di finally — popup masih terbuka,
+      // tombol harus tetap disabled sampai onClose/onSuccess/onError reset.
     } catch (e: any) {
       toastDismiss(toastId);
       toastError(e.message || "Gagal membuat transaksi pembayaran");
-    } finally {
+      payingRef.current = false;
       setPaying(false);
     }
   }
