@@ -2,26 +2,55 @@ import Image from "next/image";
 import Link from "next/link";
 import FavoriteButton from "./FavoriteButton";
 
-const FACILITY_ICONS: Record<string, string> = {
+// Mapping nama fasilitas (ter-normalisasi) -> ikon Material Symbols.
+// Cek terakhir: tabel `facilities` menyimpan ikon EMOJI (bukan Material Symbols) -
+// emoji ditolak di sini supaya semua kartu pakai Material Symbols konsisten.
+export const FACILITY_ICONS: Record<string, string> = {
   wifi: "wifi",
   ac: "ac_unit",
   "kamar mandi": "bathroom",
+  "kamar mandi dalam": "bathroom",
+  "kamar mandi luar": "bathroom",
   bathroom: "bathroom",
   dapur: "kitchen",
+  "dapur umum": "kitchen",
+  "dapur pribadi": "kitchen",
   kitchen: "kitchen",
+  kulkas: "kitchen",
   listrik: "bolt",
   keamanan: "shield",
+  "keamanan 24 jam": "shield",
   security: "shield",
   parkir: "local_parking",
+  "parkir motor": "moped",
+  "parkir mobil": "local_parking",
   parking: "local_parking",
   tv: "tv",
-  lemari: "checklist",
+  lemari: "checkroom",
   meja: "table_restaurant",
   kasur: "bed",
+  air: "water_drop",
+  laundry: "local_laundry_service",
+  "ruang tamu": "living",
+  "akses 24 jam": "schedule",
 };
 
+// Normalisasi: lowercase, hilangkan spasi berlebih, tanda hubung/garing bawah -> spasi.
+function normalizeFacility(name: string): string {
+  return name.toLowerCase().trim().replace(/[-_]/g, " ").replace(/\s+/g, " ");
+}
+
+// Emoji (ikon lama di tabel facilities) dianggap "tidak ada" -> fallback ke mapping nama.
+const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
+
+export function facilityIcon(f: { name?: string; icon?: string | null }): string {
+  if (f.icon && !EMOJI_RE.test(f.icon)) return f.icon;
+  const hit = FACILITY_ICONS[normalizeFacility(f.name ?? "")];
+  return hit ?? "check";
+}
+
 function getIcon(name: string) {
-  return FACILITY_ICONS[name.toLowerCase()] ?? "check";
+  return FACILITY_ICONS[normalizeFacility(name)] ?? "check";
 }
 
 export default function KosCard({
@@ -55,7 +84,7 @@ export default function KosCard({
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-surface-container-high via-surface-container to-surface-container-lowest relative overflow-hidden">
-            {/* Grid pattern halus — kesan "belum difoto" yang disengaja */}
+            {/* Grid pattern halus - kesan "belum difoto" yang disengaja */}
             <div
               className="absolute inset-0 opacity-[0.35]"
               style={{
@@ -125,7 +154,7 @@ export default function KosCard({
                 className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full text-on-surface-variant"
               >
                 <span className="material-symbols-outlined text-[16px]">
-                  {f.icon || getIcon(f.name)}
+                  {facilityIcon(f)}
                 </span>
                 {f.name}
               </span>

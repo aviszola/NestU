@@ -8,6 +8,7 @@ import { ValidationError, validateRequiredText, validatePhone, validateOptionalT
 import type { Kos, Facility } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { facilityIcon } from "@/components/KosCard";
 import dynamic from "next/dynamic";
 import OwnerShell from "@/components/layout/OwnerShell";
 import Image from "next/image";
@@ -278,7 +279,7 @@ export default function EditKosPage() {
                     : "border-outline-variant text-on-surface-variant hover:bg-surface-container"
                 }`}
               >
-                {f.icon ?? ""} {f.name}
+                <span className="material-symbols-outlined text-sm">{facilityIcon(f)}</span> {f.name}
               </button>
             ))}
           </div>

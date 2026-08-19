@@ -8,27 +8,7 @@ import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 
-const FACILITY_ICONS: Record<string, string> = {
-  wifi: "wifi",
-  ac: "ac_unit",
-  "kamar mandi": "bathroom",
-  bathroom: "bathroom",
-  dapur: "kitchen",
-  kitchen: "kitchen",
-  listrik: "bolt",
-  keamanan: "shield",
-  security: "shield",
-  parkir: "local_parking",
-  parking: "local_parking",
-  tv: "tv",
-  lemari: "checklist",
-  meja: "table_restaurant",
-  kasur: "bed",
-};
-
-function getIcon(name: string) {
-  return FACILITY_ICONS[name.toLowerCase()] ?? "check";
-}
+import { facilityIcon } from "@/components/KosCard";
 
 export const dynamic = "force-dynamic";
 
@@ -194,7 +174,7 @@ export default async function DetailKosSiswaPage({
                       className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-xs text-on-surface-variant"
                     >
                       <span className="material-symbols-outlined text-[16px] text-primary">
-                        {getIcon(f.name)}
+                        {facilityIcon(f)}
                       </span>
                       {f.name}
                     </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { facilityIcon } from "@/components/KosCard";
 import { useState } from "react";
 
 export default function FilterSidebar({
@@ -113,7 +114,7 @@ export default function FilterSidebar({
                     className="rounded border-gray-300 text-primary focus:ring-primary"
                   />
                   <span className="material-symbols-outlined text-sm">
-                    {fac.icon || "check"}
+                    {facilityIcon(fac)}
                   </span>
                   {fac.name}
                 </label>
