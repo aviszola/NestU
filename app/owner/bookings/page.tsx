@@ -56,6 +56,8 @@ export default function OwnerBookingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<any | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   async function loadAllBookings() {
     try {
@@ -97,7 +99,7 @@ export default function OwnerBookingsPage() {
         const studentIds = [...new Set(bookings.map((b: any) => b.student_id))];
         const { data: profiles } = await supabase
           .from("profiles_public")
-          .select("id, full_name")
+          .select("id, full_name, school_name, phone")
           .in("id", studentIds);
         const profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
         const enriched = (bookings as any[]).map((b: any) => ({
@@ -120,11 +122,20 @@ export default function OwnerBookingsPage() {
   }, []);
 
   async function handleStatus(id: string, status: "approved" | "cancelled" | "completed") {
+    if (status === "cancelled") {
+      setRejectTarget({ id, label: "booking" });
+      setRejectReason("");
+      return;
+    }
+    await doStatusUpdate(id, status);
+  }
+
+  async function doStatusUpdate(id: string, status: "approved" | "cancelled" | "completed", reason?: string) {
     setActionLoading(id);
     setError(null);
     try {
       const supabase = createClient();
-      await updateBookingStatus(supabase, id, status);
+      await updateBookingStatus(supabase, id, status, { rejectionReason: reason ?? null });
       toastSuccess("Status booking diperbarui.");
       loadAllBookings();
     } catch (err: any) {
@@ -310,6 +321,7 @@ export default function OwnerBookingsPage() {
                 b.payment_method !== "midtrans" &&
                 b.payment_method !== "snap" &&
                 !!b.payment_method;
+              const isPaid = b.payment_status === "lunas";
 
               return (
                 <div
@@ -329,6 +341,18 @@ export default function OwnerBookingsPage() {
                         </span>
                       </div>
                       <p className="text-body-sm text-on-surface-variant flex flex-wrap items-center gap-x-2">
+                        {b.student?.school_name && (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="material-symbols-outlined !text-[14px]">school</span>
+                            {b.student.school_name}
+                          </span>
+                        )}
+                        {b.student?.phone && (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="material-symbols-outlined !text-[14px]">call</span>
+                            <a href={`https://wa.me/${b.student.phone}`} className="hover:underline" target="_blank" rel="noopener noreferrer">{b.student.phone}</a>
+                          </span>
+                        )}
                         <span className="inline-flex items-center gap-1">
                           <span className="material-symbols-outlined !text-[14px]">meeting_room</span>
                           Kamar {b.rooms?.room_number}
@@ -388,14 +412,21 @@ export default function OwnerBookingsPage() {
 
                       {isApproved && !isWaitingConfirm && (
                         <>
-                          <button
-                            onClick={() => handleStatus(b.id, "completed")}
-                            disabled={actionLoading === b.id}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <span className="material-symbols-outlined !text-[18px]">task_alt</span>
-                            {actionLoading === b.id ? "Memproses..." : "Tandai Selesai"}
-                          </button>
+                          {isPaid ? (
+                            <button
+                              onClick={() => handleStatus(b.id, "completed")}
+                              disabled={actionLoading === b.id}
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <span className="material-symbols-outlined !text-[18px]">task_alt</span>
+                              {actionLoading === b.id ? "Memproses..." : "Tandai Selesai"}
+                            </button>
+                          ) : (
+                            <span className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface-variant text-sm font-bold">
+                              <span className="material-symbols-outlined !text-[18px]">lock</span>
+                              Menunggu pembayaran siswa
+                            </span>
+                          )}
                           <button
                             onClick={() => handleStatus(b.id, "cancelled")}
                             disabled={actionLoading === b.id}
@@ -444,6 +475,45 @@ export default function OwnerBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Modal alasan tolak */}
+      {rejectTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setRejectTarget(null)}>
+          <div className="bg-white rounded-2xl card-shadow p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-title-lg text-title-lg text-on-surface font-bold mb-1">Tolak Booking?</h3>
+            <p className="text-body-sm text-on-surface-variant mb-4">
+              Beri alasan agar siswa tahu kenapa ditolak (opsional).
+            </p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              maxLength={500}
+              rows={4}
+              placeholder="Contoh: kamar sudah terisi, harga kurang sesuai..."
+              className="w-full rounded-lg border border-outline-variant px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => {
+                  const id = rejectTarget.id;
+                  setRejectTarget(null);
+                  doStatusUpdate(id, "cancelled", rejectReason);
+                }}
+                disabled={actionLoading === rejectTarget.id}
+                className="flex-1 py-2.5 bg-error text-white rounded-xl font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
+              >
+                {actionLoading === rejectTarget.id ? "Memproses..." : "Tolak Booking"}
+              </button>
+              <button
+                onClick={() => setRejectTarget(null)}
+                className="flex-1 py-2.5 border border-outline-variant text-on-surface-variant rounded-xl font-bold text-sm hover:bg-surface-container-low transition"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </OwnerShell>
   );
 }

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { getKosById, updateKos, uploadFoto, getFacilities, setKosFacilities } from "@/lib/supabase/queries";
+import { ValidationError, validateRequiredText, validatePhone, validateOptionalText, validateEmojiLimit } from "@/lib/validation";
 import type { Kos, Facility } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -121,21 +122,34 @@ export default function EditKosPage() {
       const supabase = createClient();
       const orig = originalRef.current;
 
+      // VALIDASI SERVER-SIDE (sanitasi sebelum update)
+      let cleanName: string, cleanAddress: string, cleanWa: string, cleanDesc: string | null;
+      try {
+        cleanName = validateRequiredText(name, "Nama Kos", 100);
+        cleanAddress = validateRequiredText(address, "Alamat", 300);
+        cleanWa = validatePhone(whatsappNumber);
+        cleanDesc = validateOptionalText(description, "Deskripsi", 2000);
+        validateEmojiLimit(cleanName + (cleanDesc ?? ""), "Nama/Deskripsi");
+      } catch (e) {
+        if (e instanceof ValidationError) { setError(e.message); setSaving(false); return; }
+        throw e;
+      }
+
       const patch: Record<string, any> = {};
       if (orig) {
-        if (name !== orig.name) patch.name = name;
-        if (address !== orig.address) patch.address = address;
-        if (whatsappNumber !== orig.whatsapp_number) patch.whatsapp_number = whatsappNumber;
-        const desc = description || null;
+        if (name !== orig.name) patch.name = cleanName;
+        if (address !== orig.address) patch.address = cleanAddress;
+        if (whatsappNumber !== orig.whatsapp_number) patch.whatsapp_number = cleanWa;
+        const desc = cleanDesc;
         if (desc !== orig.description) patch.description = desc;
         if (latitude !== orig.latitude) patch.latitude = latitude;
         if (longitude !== orig.longitude) patch.longitude = longitude;
       } else {
         // No snapshot — send all
-        patch.name = name;
-        patch.address = address;
-        patch.whatsapp_number = whatsappNumber;
-        patch.description = description || null;
+        patch.name = cleanName;
+        patch.address = cleanAddress;
+        patch.whatsapp_number = cleanWa;
+        patch.description = cleanDesc;
         patch.latitude = latitude;
         patch.longitude = longitude;
       }

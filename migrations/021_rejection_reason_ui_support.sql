@@ -1,0 +1,17 @@
+-- ============================================================
+-- Migration: 021_rejection_reason_ui_support
+-- Date: 2026-08-19
+-- Catatan: kolom rejection_reason sudah ada (migration 002).
+-- Migration ini tidak mengubah schema — dokumentasi saja untuk
+-- UI alasan tolak yang baru (modal di owner bookings).
+--
+-- Yang sudah diverifikasi:
+--   - bookings.rejection_reason TEXT (002)
+--   - bookings.decided_by UUID, decided_at TIMESTAMPTZ (002)
+--   - Trigger notify_booking_status (007) sudah pakai
+--     rejection_reason di pesan notif ke siswa
+--
+-- Migration ini hanya placeholder untuk state consistency;
+-- tidak ada DDL baru.
+-- ============================================================
+SELECT 1;

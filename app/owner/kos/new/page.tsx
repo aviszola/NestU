@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { createKos, uploadFoto, getFacilities, insertKosFacilities } from "@/lib/supabase/queries";
+import {
+  ValidationError,
+  validateRequiredText,
+  validatePhone,
+  validateOptionalText,
+  validateEmojiLimit,
+} from "@/lib/validation";
 import type { Facility } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -145,14 +152,31 @@ export default function CreateKosPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Harus login");
 
+      // ── VALIDASI SERVER-SIDE (bukan cuma HTML required) ──
+      let cleanName: string, cleanAddress: string, cleanWa: string, cleanDesc: string | null;
+      try {
+        cleanName = validateRequiredText(name, "Nama Kos", 100);
+        cleanAddress = validateRequiredText(address, "Alamat", 300);
+        cleanWa = validatePhone(whatsappNumber);
+        cleanDesc = validateOptionalText(description, "Deskripsi", 2000);
+        validateEmojiLimit(cleanName + (cleanDesc ?? ""), "Nama/Deskripsi");
+      } catch (e) {
+        if (e instanceof ValidationError) {
+          setError(e.message);
+          setLoading(false);
+          return;
+        }
+        throw e;
+      }
+
       const kos = await createKos(supabase, {
         owner_id: user.id,
-        name,
-        address,
-        whatsapp_number: whatsappNumber,
+        name: cleanName,
+        address: cleanAddress,
+        whatsapp_number: cleanWa,
         latitude,
         longitude,
-        description: description || null,
+        description: cleanDesc,
       });
 
       const realIds = selectedFacilityIds.filter((id) => !id.startsWith("placeholder_"));

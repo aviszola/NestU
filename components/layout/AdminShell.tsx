@@ -9,7 +9,7 @@ import Footer from "@/components/layout/Footer";
 
 interface AdminShellProps {
   children: React.ReactNode;
-  activePage: "dashboard" | "verification" | "bookings" | "users";
+  activePage: "dashboard" | "verification" | "bookings" | "users" | "refunds";
 }
 
 export default function AdminShell({ children, activePage }: AdminShellProps) {
@@ -45,8 +45,27 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
     { label: "Dashboard", icon: "dashboard", href: "/admin", page: "dashboard" as const },
     { label: "Verifikasi Kos", icon: "verified_user", href: "/admin/kos", page: "verification" as const },
     { label: "Bookings", icon: "receipt_long", href: "/admin/bookings", page: "bookings" as const },
+    { label: "Refund", icon: "payments", href: "/admin/refunds", page: "refunds" as const },
     { label: "Kelola User", icon: "group", href: "/admin/users", page: "users" as const },
   ];
+
+  // Badge jumlah refund pending — fetch saat mount
+  const [refundCount, setRefundCount] = useState(0);
+  useEffect(() => {
+    (async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const sup = createClient();
+        const { count } = await sup
+          .from("bookings")
+          .select("*", { count: "exact", head: true })
+          .eq("refund_status", "pending");
+        setRefundCount(count ?? 0);
+      } catch {
+        // ignore — badge opsional
+      }
+    })();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
@@ -97,6 +116,11 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
                 >
                   <span className="material-symbols-outlined">{item.icon}</span>
                   <span className="font-label-md text-label-md">{item.label}</span>
+                  {item.page === "refunds" && refundCount > 0 && (
+                    <span className="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-error text-white text-[11px] font-bold">
+                      {refundCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

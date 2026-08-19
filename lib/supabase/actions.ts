@@ -1,8 +1,9 @@
-﻿"use server";
+"use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { ValidationError, validateRequiredText, validateOptionalText, validatePhone } from "@/lib/validation";
 
 export async function logout() {
   const supabase = await createClient();
@@ -106,10 +107,25 @@ export async function updateProfile(opts: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Unauthorized" };
 
+  // VALIDASI SERVER-SIDE (sebelum update)
+  let cleanName: string, cleanPhone: string, cleanSchool: string | undefined;
+  try {
+    cleanName = validateRequiredText(opts.fullName, "Nama Lengkap", 100);
+    cleanPhone = validatePhone(opts.phone);
+    cleanSchool = opts.schoolName !== undefined
+      ? (validateOptionalText(opts.schoolName, "Sekolah", 100) ?? undefined)
+      : undefined;
+  } catch (e) {
+    if (e instanceof ValidationError) return { error: e.message };
+    throw e;
+  }
+
   const updates: Record<string, any> = {
-    full_name: opts.fullName,
-    phone: opts.phone,
+    full_name: cleanName,
+    phone: cleanPhone,
   };
+  if (opts.avatarUrl !== undefined) updates.avatar_url = opts.avatarUrl;
+  if (opts.schoolName !== undefined) updates.school_name = cleanSchool;
   if (opts.avatarUrl !== undefined) updates.avatar_url = opts.avatarUrl;
   if (opts.schoolName !== undefined) updates.school_name = opts.schoolName;
 
@@ -169,7 +185,8 @@ export async function submitBooking(formData: FormData) {
     const duration = parseInt(formData.get("duration") as string);
     const notes = formData.get("notes") as string;
 
-    if (!kosId || !roomId || !startDate || !duration) {
+    // VALIDASI SERVER-SIDE
+    if (!kosId || !roomId || !startDate || !duration || isNaN(duration) || duration < 1 || duration > 24) {
       console.error("[submitBooking] Missing required fields:", { kosId: !!kosId, roomId: !!roomId, startDate: !!startDate, duration: !!duration });
       return { 
         success: false, 
@@ -213,6 +230,22 @@ export async function submitBooking(formData: FormData) {
     const adminFee = 5000;
     const finalTotal = monthlyTotal + serviceFee + adminFee;
 
+    // Sanitasi notes — buang tag HTML + batas panjang
+    let cleanNotes: string | null = null;
+    try { cleanNotes = validateOptionalText(notes, "Catatan", 500); } catch (e: any) { return { success: false, error: e.message }; }
+
+    // RACE CONDITION GUARD: cek kamar belum punya booking aktif (pending/approved)
+    const { data: activeBooking, error: activeErr } = await supabase
+      .from("bookings")
+      .select("id")
+      .eq("room_id", roomId)
+      .in("status", ["pending", "approved"])
+      .maybeSingle();
+    if (activeErr) return { success: false, error: "Gagal cek ketersediaan kamar: " };
+    if (activeBooking) {
+      return { success: false, error: "Kamar ini sudah memiliki booking aktif. Silakan pilih kamar lain." };
+    }
+
     // Data untuk insert
     const insertData = {
       student_id: user.id,
@@ -221,7 +254,7 @@ export async function submitBooking(formData: FormData) {
       duration_months: duration,
       total_amount: finalTotal,
       base_monthly_price: basePrice,
-      notes: notes || null,
+      notes: cleanNotes,
       status: "pending",
     };
     
@@ -242,7 +275,7 @@ export async function submitBooking(formData: FormData) {
           student_id: user.id,
           room_id: roomId,
           move_in_date: startDate,
-          notes: notes || null,
+          notes: cleanNotes,
           status: "pending",
         };
         
