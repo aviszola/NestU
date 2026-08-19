@@ -885,6 +885,73 @@ export async function confirmPayment(
     .update({
       payment_status: "lunas",
       paid_at: new Date().toISOString(),
+      payment_confirmed_at: new Date().toISOString(),
+      payment_confirmed_by: user.id,
+    })
+    .eq("id", bookingId);
+  if (error) throw error;
+}
+
+/**
+ * Tolak bukti transfer — booking TETAP approved, payment_status
+ * kembali ke 'belum_bayar' supaya siswa bisa upload ulang.
+ * Hanya owner kos terkait / admin.
+ */
+export async function rejectPaymentProof(
+  client: any,
+  bookingId: string,
+  reason?: string | null
+): Promise<void> {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+
+  // Verifikasi eksplisit: user adalah owner kos dari booking ini ATAU admin
+  const { data: profile } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
+  const { data: booking } = await client
+    .from("bookings")
+    .select("id, room_id, status, payment_status")
+    .eq("id", bookingId)
+    .single();
+  if (!booking) throw new Error("Booking tidak ditemukan.");
+
+  // Guard state: hanya dari menunggu_konfirmasi, booking harus approved.
+  if (booking.status !== "approved") {
+    throw new Error("Booking tidak dalam status approved — tidak bisa menolak bukti.");
+  }
+  if (booking.payment_status !== "menunggu_konfirmasi") {
+    throw new Error("Booking tidak menunggu konfirmasi — tidak ada bukti untuk ditolak.");
+  }
+
+  const { data: room } = await client
+    .from("rooms")
+    .select("kos_id")
+    .eq("id", booking.room_id)
+    .single();
+  if (!room) throw new Error("Kamar tidak ditemukan.");
+
+  const { data: kos } = await client
+    .from("kos")
+    .select("owner_id")
+    .eq("id", room.kos_id)
+    .single();
+  if (!kos || (kos.owner_id !== user.id && !isAdmin)) {
+    throw new Error("Anda tidak memiliki izin untuk menolak bukti booking ini.");
+  }
+
+  const { error } = await client
+    .from("bookings")
+    .update({
+      payment_status: "belum_bayar",
+      // Bukti lama dibiarkan sebagai audit trail; notif via trigger DB.
+      rejection_reason: reason?.trim() ? reason.trim().slice(0, 500) : null,
+      payment_confirmed_at: new Date().toISOString(),
+      payment_confirmed_by: user.id,
     })
     .eq("id", bookingId);
   if (error) throw error;

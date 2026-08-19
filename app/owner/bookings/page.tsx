@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { updateBookingStatus, confirmPayment } from "@/lib/supabase/queries";
+import { updateBookingStatus, confirmPayment, rejectPaymentProof, getSignedProofUrl } from "@/lib/supabase/queries";
 import { useEffect, useState } from "react";
 import OwnerShell from "@/components/layout/OwnerShell";
 import { toastSuccess, toastError } from "@/lib/toast";
@@ -56,8 +56,11 @@ export default function OwnerBookingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [rejectTarget, setRejectTarget] = useState<any | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<{ id: string; mode: "booking" | "proof" } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [proofTarget, setProofTarget] = useState<any | null>(null);
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
+  const [proofLoading, setProofLoading] = useState(false);
 
   async function loadAllBookings() {
     try {
@@ -123,7 +126,7 @@ export default function OwnerBookingsPage() {
 
   async function handleStatus(id: string, status: "approved" | "cancelled" | "completed") {
     if (status === "cancelled") {
-      setRejectTarget({ id, label: "booking" });
+      setRejectTarget({ id, mode: "booking" });
       setRejectReason("");
       return;
     }
@@ -159,6 +162,41 @@ export default function OwnerBookingsPage() {
       toastError("Gagal konfirmasi pembayaran: " + toReadableError(err));
     } finally {
       setActionLoading(null);
+    }
+  }
+
+  async function handleRejectProof(id: string) {
+    setActionLoading(id);
+    setError(null);
+    try {
+      const supabase = createClient();
+      await rejectPaymentProof(supabase, id, rejectReason);
+      toastSuccess("Bukti ditolak. Status kembali ke Belum Bayar.");
+      setRejectTarget(null);
+      setRejectReason("");
+      loadAllBookings();
+    } catch (err: any) {
+      setError(toReadableError(err));
+      toastError("Gagal menolak bukti: " + toReadableError(err));
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function openProofView(b: any) {
+    setProofTarget(b);
+    setProofUrl(null);
+    setProofLoading(true);
+    try {
+      const supabase = createClient();
+      const url = await getSignedProofUrl(supabase, b.payment_proof_path, 3600);
+      if (!url) throw new Error("Bukti tidak ditemukan");
+      setProofUrl(url);
+    } catch (err: any) {
+      toastError("Gagal memuat bukti: " + toReadableError(err));
+      setProofTarget(null);
+    } finally {
+      setProofLoading(false);
     }
   }
 
@@ -317,10 +355,6 @@ export default function OwnerBookingsPage() {
               const isApproved = b.status === "approved";
               const isWaitingConfirm =
                 b.payment_status === "menunggu_konfirmasi";
-              const isManual =
-                b.payment_method !== "midtrans" &&
-                b.payment_method !== "snap" &&
-                !!b.payment_method;
               const isPaid = b.payment_status === "lunas";
 
               return (
@@ -440,16 +474,35 @@ export default function OwnerBookingsPage() {
 
                       {isApproved && isWaitingConfirm && (
                         <>
-                          {isManual && (
+                          {b.payment_proof_path && (
                             <button
-                              onClick={() => handleConfirmPayment(b.id)}
+                              onClick={() => openProofView(b)}
                               disabled={actionLoading === b.id}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-container-high text-on-surface rounded-xl font-bold text-sm hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <span className="material-symbols-outlined !text-[18px]">verified</span>
-                              {actionLoading === b.id ? "Memproses..." : "Konfirmasi Pembayaran"}
+                              <span className="material-symbols-outlined !text-[18px]">image</span>
+                              Lihat Bukti
                             </button>
                           )}
+                          <button
+                            onClick={() => handleConfirmPayment(b.id)}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">verified</span>
+                            {actionLoading === b.id ? "Memproses..." : "Konfirmasi Pembayaran"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRejectTarget({ id: b.id, mode: "proof" });
+                              setRejectReason("");
+                            }}
+                            disabled={actionLoading === b.id}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-error/60 text-error rounded-xl font-bold text-sm hover:bg-error/5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined !text-[18px]">block</span>
+                            Tolak Bukti
+                          </button>
                           <button
                             onClick={() => handleStatus(b.id, "cancelled")}
                             disabled={actionLoading === b.id}
@@ -476,33 +529,49 @@ export default function OwnerBookingsPage() {
         )}
       </div>
 
-      {/* Modal alasan tolak */}
+      {/* Modal alasan tolak (booking / bukti transfer) */}
       {rejectTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setRejectTarget(null)}>
           <div className="bg-white rounded-2xl card-shadow p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-title-lg text-title-lg text-on-surface font-bold mb-1">Tolak Booking?</h3>
+            <h3 className="font-title-lg text-title-lg text-on-surface font-bold mb-1">
+              {rejectTarget.mode === "proof" ? "Tolak Bukti Transfer?" : "Tolak Booking?"}
+            </h3>
             <p className="text-body-sm text-on-surface-variant mb-4">
-              Beri alasan agar siswa tahu kenapa ditolak (opsional).
+              {rejectTarget.mode === "proof"
+                ? "Bukti tidak valid? Beri alasan agar siswa tahu harus perbaiki apa. Booking tetap aktif — siswa bisa unggah ulang bukti."
+                : "Beri alasan agar siswa tahu kenapa ditolak (opsional)."}
             </p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               maxLength={500}
               rows={4}
-              placeholder="Contoh: kamar sudah terisi, harga kurang sesuai..."
+              placeholder={
+                rejectTarget.mode === "proof"
+                  ? "Contoh: nominal tidak sesuai, bukti buram, nama pengirim tidak sama..."
+                  : "Contoh: kamar sudah terisi, harga kurang sesuai..."
+              }
               className="w-full rounded-lg border border-outline-variant px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => {
-                  const id = rejectTarget.id;
+                  const t = rejectTarget;
                   setRejectTarget(null);
-                  doStatusUpdate(id, "cancelled", rejectReason);
+                  if (t.mode === "proof") {
+                    handleRejectProof(t.id);
+                  } else {
+                    doStatusUpdate(t.id, "cancelled", rejectReason);
+                  }
                 }}
                 disabled={actionLoading === rejectTarget.id}
                 className="flex-1 py-2.5 bg-error text-white rounded-xl font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
               >
-                {actionLoading === rejectTarget.id ? "Memproses..." : "Tolak Booking"}
+                {actionLoading === rejectTarget.id
+                  ? "Memproses..."
+                  : rejectTarget.mode === "proof"
+                    ? "Tolak Bukti"
+                    : "Tolak Booking"}
               </button>
               <button
                 onClick={() => setRejectTarget(null)}
@@ -511,6 +580,50 @@ export default function OwnerBookingsPage() {
                 Batal
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox bukti transfer */}
+      {proofTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70" onClick={() => setProofTarget(null)}>
+          <div className="bg-white rounded-2xl card-shadow max-w-3xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-outline-variant">
+              <div className="min-w-0">
+                <h3 className="font-title-lg text-title-lg text-on-surface font-bold truncate">Bukti Transfer</h3>
+                <p className="text-body-sm text-on-surface-variant truncate">
+                  {proofTarget.student?.full_name ?? "Siswa"} — Kamar {proofTarget.rooms?.room_number}, {proofTarget.rooms?.kos?.name}
+                </p>
+              </div>
+              <button
+                onClick={() => setProofTarget(null)}
+                className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors"
+                aria-label="Tutup"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-4 bg-surface-container-low flex-1 overflow-auto flex items-center justify-center min-h-[300px]">
+              {proofLoading ? (
+                <p className="text-on-surface-variant text-sm">Memuat bukti...</p>
+              ) : proofUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={proofUrl}
+                  alt="Bukti transfer"
+                  className="max-w-full max-h-[65vh] rounded-lg object-contain"
+                />
+              ) : (
+                <p className="text-on-surface-variant text-sm">Bukti tidak dapat dimuat.</p>
+              )}
+            </div>
+            {proofTarget.payment_note && (
+              <div className="px-5 py-3 border-t border-outline-variant">
+                <p className="text-body-sm text-on-surface-variant">
+                  <span className="font-bold text-on-surface">Catatan siswa:</span> {proofTarget.payment_note}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
