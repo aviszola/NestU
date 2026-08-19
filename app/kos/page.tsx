@@ -225,6 +225,12 @@ export default async function KosPage({
                 <p className="text-gray-400 mt-2">
                   Coba ubah kata kunci atau filter pencarian Anda.
                 </p>
+                <Link
+                  href="/kos"
+                  className="mt-5 inline-flex px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Lihat Semua Kos
+                </Link>
               </div>
             )}
 

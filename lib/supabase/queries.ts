@@ -1,4 +1,4 @@
-﻿import type { Facility, Kos, Room } from "@/lib/types";
+import type { Facility, Kos, Room } from "@/lib/types";
 
 const STORAGE_BUCKET = "kos-foto";
 
@@ -414,7 +414,8 @@ export async function getKosBookings(
 export async function updateBookingStatus(
   client: any,
   id: string,
-  status: "approved" | "cancelled" | "completed"
+  status: "approved" | "cancelled" | "completed",
+  options?: { rejectionReason?: string | null }
 ): Promise<Booking | null> {
   const { data: { user } } = await client.auth.getUser();
   if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
@@ -430,7 +431,7 @@ export async function updateBookingStatus(
 
   const { data: booking } = await client
     .from("bookings")
-    .select("id, room_id, status")
+    .select("id, room_id, status, payment_status")
     .eq("id", id)
     .maybeSingle();
   if (!booking) throw new Error("Booking tidak ditemukan.");
@@ -451,6 +452,12 @@ export async function updateBookingStatus(
     );
   }
 
+  // Validasi bisnis: booking hanya boleh ditandai selesai kalau sudah lunas.
+  // (UI sudah disable, tapi ini guard server-side — UI bisa dilewati.)
+  if (status === "completed" && booking.payment_status !== "lunas") {
+    throw new Error("Booking belum lunas, tidak bisa ditandai selesai.");
+  }
+
   const { data: room } = await client
     .from("rooms")
     .select("kos_id")
@@ -467,9 +474,22 @@ export async function updateBookingStatus(
     throw new Error("Anda tidak memiliki izin untuk mengubah status booking ini.");
   }
 
+  const patch: Record<string, any> = { status };
+
+  // Simpan alasan tolak + decided_by/at saat approve/reject
+  if (status === "cancelled" || status === "approved") {
+    patch.decided_by = user.id;
+    patch.decided_at = new Date().toISOString();
+    if (status === "cancelled") {
+      patch.rejection_reason = options?.rejectionReason?.trim()
+        ? options.rejectionReason.trim().slice(0, 500)
+        : null;
+    }
+  }
+
   const { data, error } = await client
     .from("bookings")
-    .update({ status })
+    .update(patch)
     .eq("id", id)
     .select()
     .maybeSingle();
@@ -868,4 +888,89 @@ export async function confirmPayment(
     })
     .eq("id", bookingId);
   if (error) throw error;
+}
+
+// ─── Refunds (admin manual) ───
+
+export async function getRefunds(
+  client: any,
+  status: "pending" | "processed"
+): Promise<any[]> {
+  const { data, error } = await client
+    .from("bookings")
+    .select("*, rooms:room_id(id, room_number, price_per_month, kos:kos_id(id, name))")
+    .eq("refund_status", status)
+    .order("updated_at", { ascending: true })
+    .limit(100);
+  if (error) throw error;
+
+  // Enrich student info via profiles_public
+  const rows = data ?? [];
+  const studentIds = [...new Set(rows.map((b: any) => b.student_id))];
+  if (studentIds.length > 0) {
+    const { data: profiles } = await client
+      .from("profiles_public")
+      .select("id, full_name, phone")
+      .in("id", studentIds);
+    const profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
+    return rows.map((b: any) => ({ ...b, student: profileMap[b.student_id] ?? null }));
+  }
+  return rows;
+}
+
+export async function getRefundCount(
+  client: any
+): Promise<number> {
+  const { count, error } = await client
+    .from("bookings")
+    .select("*", { count: "exact", head: true })
+    .eq("refund_status", "pending");
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export async function markRefundProcessed(
+  client: any,
+  bookingId: string
+): Promise<void> {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+
+  const { data: profile } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (profile?.role !== "admin") {
+    throw new Error("Hanya admin yang bisa memproses refund.");
+  }
+
+  const { error } = await client
+    .from("bookings")
+    .update({
+      refund_status: "processed",
+      refund_processed_at: new Date().toISOString(),
+      refund_processed_by: user.id,
+    })
+    .eq("id", bookingId)
+    .eq("refund_status", "pending");
+  if (error) throw error;
+
+  // Notifikasi ke siswa
+  const { data: booking } = await client
+    .from("bookings")
+    .select("student_id")
+    .eq("id", bookingId)
+    .maybeSingle();
+  if (booking) {
+    const { error: notifErr } = await client
+      .from("notifications")
+      .insert({
+        user_id: booking.student_id,
+        title: "Refund selesai",
+        message: "Dana refund untuk booking Anda telah dikembalikan. Terima kasih atas kesabarannya.",
+        link: "/bookings/" + bookingId,
+      });
+    if (notifErr) console.error("[refund] Gagal kirim notif:", notifErr.message);
+  }
 }

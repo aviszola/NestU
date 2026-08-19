@@ -1,0 +1,22 @@
+-- ============================================================
+-- Migration: 024_add_booking_status_completed.sql
+-- Date: 2026-08-19
+-- Purpose: Enum booking_status TIDAK punya value 'completed'
+--   (verified: insert status='completed' → "invalid input value
+--   for enum booking_status: completed"). Kode pakai 'completed'
+--   untuk "Tandai Selesai" — tambahkan value.
+--
+-- Audit nilai enum saat ini (dari data riil):
+--   pending, approved, cancelled, rejected
+--   (rejected ADA di enum tapi TIDAK dipakai kode — gap terpisah)
+--
+-- Keputusan: pilih 'completed' (konsisten dengan nilai enum lain
+--   yang semuanya bahasa Inggris: pending/approved/cancelled).
+--   Bukan 'selesai'/'done' — akan bikin inkonsistensi penamaan.
+--
+-- CATATAN PostgreSQL: ALTER TYPE ... ADD VALUE TIDAK bisa
+--   dijalankan dalam transaksi yang sama dengan penggunaan enum
+--   tsb. Migration ini hanya 1 statement — aman.
+-- ============================================================
+
+ALTER TYPE booking_status ADD VALUE IF NOT EXISTS 'completed';
