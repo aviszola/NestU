@@ -35,7 +35,7 @@ const AUTH_PATHS: string[] = [
 
 // Allowed paths per role
 const ROLE_ALLOWED: Record<string, RegExp[]> = {
-  siswa: [/^\/dashboard(?:\/|$)/, /^\/bookings(?:\/|$)/, /^\/booking(?:\/|$)/, /^\/profile(?:\/|$)/, /^\/settings(?:\/|$)/, /^\/favorites(?:\/|$)/, /^\/kos(?:\/|$)/, /^\/logout(?:\/|$)/, /^\/$/],
+  siswa: [/^\/dashboard(?:\/|$)/, /^\/bookings(?:\/|$)/, /^\/booking(?:\/|$)/, /^\/rental(?:\/|$)/, /^\/profile(?:\/|$)/, /^\/settings(?:\/|$)/, /^\/favorites(?:\/|$)/, /^\/kos(?:\/|$)/, /^\/logout(?:\/|$)/, /^\/$/],
   pemilik: [/^\/owner(?:\/|$)/, /^\/logout(?:\/|$)/],
   admin: [/^\/admin(?:\/|$)/, /^\/logout(?:\/|$)/],
 };
