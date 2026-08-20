@@ -169,10 +169,10 @@ export default function AdminKosVerificationPage() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-surface-container-low border-b border-outline-variant/30">
-                      <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider">Property</th>
-                      <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider">Owner Details</th>
+                      <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider">Properti</th>
+                      <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider">Detail Pemilik</th>
                       <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider text-right">Actions</th>
+                      <th className="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider text-right">Aksi</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/20">
@@ -205,7 +205,7 @@ export default function AdminKosVerificationPage() {
                             </div>
                             <div>
                               <p className="font-body-md text-body-md text-on-surface font-semibold">{kos.owner?.full_name ?? "—"}</p>
-                              <p className="text-body-sm text-outline">Property Owner</p>
+                              <p className="text-body-sm text-outline">Pemilik Kos</p>
                             </div>
                           </div>
                         </td>
@@ -242,7 +242,7 @@ export default function AdminKosVerificationPage() {
               </div>
               <div className="p-6 bg-surface-container-low border-t border-outline-variant/30 flex justify-between items-center">
                 <p className="text-body-sm text-outline">
-                  Showing 1 to {kosList.length} of {stats.pending} pending verifications
+                  Menampilkan 1 sampai {kosList.length} dari {stats.pending} verifikasi tertunda
                 </p>
               </div>
             </>
