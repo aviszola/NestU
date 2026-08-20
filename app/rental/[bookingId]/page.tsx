@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import { formatWhatsAppNumber } from "@/lib/utils";
 import { MAINT_STATUS, categoryLabel, categoryIcon } from "@/lib/maintenance";
+import { facilityIcon } from "@/lib/facilities";
 import SafeImage from "@/components/ui/SafeImage";
 
 export const dynamic = "force-dynamic";
@@ -327,9 +328,9 @@ export default async function RentalDetailPage({
                     key={f.id}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium"
                   >
-                    {f.icon && (
+                    {facilityIcon(f) && (
                       <span className="material-symbols-outlined !text-[16px] text-primary">
-                        {f.icon}
+                        {facilityIcon(f)}
                       </span>
                     )}
                     {f.name}

@@ -56,9 +56,17 @@ if (!myKos) {
   const { data: nk, error: nkErr } = await pemilik.from("kos").insert({
     name: myKosName, address: "Jl. Test Maint 1", owner_id: pemilikId,
     whatsapp_number: "081234567890", verification_status: "verified", is_active: true,
+    is_test: true, // PENTING: jangan pernah bocor ke listing publik
   }).select();
   if (nkErr) { console.log(`❌ Buat kos test gagal (owner): ${nkErr.message}`); process.exit(1); }
   myKos = nk[0];
+} else if (!existingKos[0].is_test) {
+  // Kos lama yg tertinggal dengan is_test=false — coba tandai, supaya
+  // tidak menampilkan data test di listing publik.
+  const { error: fixErr } = await admin.from("kos").update({ is_test: true }).eq("id", existingKos[0].id);
+  console.log(fixErr
+    ? `  ⚠️ Kos lama dipakai ulang dgn is_test=false — GAGAL ditandai: ${fixErr.message}`
+    : `  Kos lama dipakai ulang — ditandai is_test=true (perbaikan audit)`);
 }
 const { data: myRooms } = await admin.from("rooms").select("id").eq("kos_id", myKos.id);
 let myRoom = myRooms?.[0] ?? null;
@@ -335,8 +343,18 @@ try {
 } catch (e) { console.log(`  ⚠️ Gagal hapus booking test: ${e.message}`); }
 try {
   if (myRoom?.room_number === "MAINT_T") await admin.from("rooms").delete().eq("id", myRoom.id);
-  if (myKos?.name === "KOS_MAINT_TEST") await admin.from("kos").delete().eq("id", myKos.id);
-  console.log("  ✅ Room & kos test dihapus");
+  if (myKos?.name === "KOS_MAINT_TEST") {
+    const { error: delKosErr } = await admin.from("kos").delete().eq("id", myKos.id);
+    if (delKosErr) {
+      // RLS/constraint menghalangi hapus — minimal pastikan tidak bocor:
+      const { error: hideKosErr } = await admin.from("kos").update({ is_test: true, is_active: false }).eq("id", myKos.id);
+      console.log(hideKosErr
+        ? `  ⚠️ Gagal hapus kos test (${delKosErr.message}) & gagal tandai: ${hideKosErr.message}`
+        : `  ⚠️ Gagal hapus kos test (${delKosErr.message}) — ditandai is_test=true + is_active=false`);
+    } else {
+      console.log("  ✅ Room & kos test dihapus");
+    }
+  }
 } catch (e) { console.log(`  ⚠️ Gagal hapus room/kos: ${e.message}`); }
 
 // ─── SUMMARY ───

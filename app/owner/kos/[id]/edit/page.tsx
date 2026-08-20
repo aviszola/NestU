@@ -8,7 +8,7 @@ import { ValidationError, validateRequiredText, validatePhone, validateOptionalT
 import type { Kos, Facility } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { facilityIcon } from "@/components/KosCard";
+import { facilityIcon } from "@/lib/facilities";
 import dynamic from "next/dynamic";
 import OwnerShell from "@/components/layout/OwnerShell";
 import Image from "next/image";

@@ -11,7 +11,7 @@ import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 
-import { facilityIcon } from "@/components/KosCard";
+import { facilityIcon } from "@/lib/facilities";
 
 export default function BookingPage({
   params,

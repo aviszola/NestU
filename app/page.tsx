@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getFeaturedKos, getTotalKosCount } from "@/lib/supabase/queries";
+import { getFeaturedKos, getTotalKosCount, getKosMinPrices } from "@/lib/supabase/queries";
 import ScrollReveal from "@/components/ScrollReveal";
 import KosCard from "@/components/KosCard";
 import Footer from "@/components/layout/Footer";
@@ -41,7 +41,6 @@ const PAYMENT_METHODS = ["Bank Transfer", "E-Wallet", "Virtual Account"];
 
 
 
-
 export default async function HomePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -58,6 +57,7 @@ export default async function HomePage() {
 
   const kosList = await getFeaturedKos(supabase, 3);
   const totalKos = await getTotalKosCount(supabase);
+  const minPrices = await getKosMinPrices(supabase, kosList.map((kos) => kos.id));
 
   const dashboardLink = profile?.role === "siswa"
     ? "/dashboard"
@@ -225,7 +225,7 @@ export default async function HomePage() {
             {kosList.length > 0 ? (
               kosList.map((kos, i) => (
                 <ScrollReveal key={kos.id} style={{ transitionDelay: `${i * 0.1}s` }}>
-                  <KosCard kos={{ ...kos, isFavorited: false }} showFavorite={false} />
+                  <KosCard kos={{ ...kos, isFavorited: false }} showFavorite={false} minPrice={minPrices[kos.id]} />
                 </ScrollReveal>
               ))
             ) : (
