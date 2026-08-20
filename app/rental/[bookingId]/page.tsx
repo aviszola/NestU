@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import { formatWhatsAppNumber } from "@/lib/utils";
 import { MAINT_STATUS, categoryLabel, categoryIcon } from "@/lib/maintenance";
+import SafeImage from "@/components/ui/SafeImage";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,18 @@ function formatPrice(n: number | null | undefined): string {
   }).format(n ?? 0);
 }
 
+interface MaintenanceReport {
+  id: string;
+  category: string;
+  priority: string;
+  description: string;
+  photo_url: string | null;
+  status: string;
+  owner_response: string | null;
+  created_at: string;
+  resolved_at: string | null;
+}
+
 export default async function RentalDetailPage({
   params,
   searchParams,
@@ -36,6 +49,10 @@ export default async function RentalDetailPage({
   searchParams: Promise<{ report?: string }>;
 }) {
   const { bookingId } = await params;
+  // Id bukan UUID → tidak mungkin booking valid → 404, bukan query DB yang error.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookingId)) {
+    notFound();
+  }
   const sp = await searchParams;
   const reportJustSent = sp.report === "success";
   const supabase = await createClient();
@@ -48,6 +65,17 @@ export default async function RentalDetailPage({
     .eq("id", user.id)
     .single();
 
+  // Cek kepemilikan TANPA filter aktif — bedakan "booking tidak ada"
+  // (404) vs "booking milik user tapi tidak aktif lagi" (pesan jelas).
+  const { data: ownBooking } = await supabase
+    .from("bookings")
+    .select("status, payment_status")
+    .eq("id", bookingId)
+    .eq("student_id", user.id)
+    .maybeSingle();
+
+  if (!ownBooking) notFound();
+
   const { data: booking } = await supabase
     .from("bookings")
     .select(
@@ -59,10 +87,61 @@ export default async function RentalDetailPage({
     .in("status", ["approved", "completed"])
     .maybeSingle();
 
-  if (!booking) notFound();
+  if (!booking) {
+    // Booking milik user tapi tidak lolos filter aktif (lunas + approved/completed).
+    // Mis. pembayaran expired / dibatalkan / masih pending → pesan jelas, bukan 404 mentah.
+    const info =
+      ownBooking.status === "cancelled"
+        ? { icon: "cancel", title: "Booking dibatalkan", desc: "Booking ini telah dibatalkan dan tidak lagi aktif." }
+        : ownBooking.payment_status === "expired"
+          ? { icon: "event_busy", title: "Masa sewa telah berakhir", desc: "Masa sewa booking ini sudah berakhir. Silakan kembali ke Kamar Saya untuk melihat booking aktif." }
+          : ownBooking.status === "pending"
+            ? { icon: "hourglass_empty", title: "Menunggu persetujuan", desc: "Booking ini masih menunggu persetujuan pemilik kos." }
+            : { icon: "event_busy", title: "Booking tidak aktif", desc: "Booking ini sudah tidak aktif saat ini." };
+
+    return (
+      <div className="min-h-screen bg-background">
+        <Sidebar
+          activePage="rental"
+          userRole="siswa"
+          userName={profile?.full_name ?? undefined}
+        />
+        <div className="md:pl-64 flex flex-col min-h-screen">
+          <TopNav
+            userRole="siswa"
+            userName={profile?.full_name ?? undefined}
+          />
+          <main className="flex-1 px-margin-mobile md:px-margin-desktop pt-stack-lg pb-32 lg:pb-stack-lg">
+            <div className="max-w-md mx-auto text-center py-16">
+              <div className="mx-auto w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-stack-md">
+                <span className="material-symbols-outlined text-3xl text-on-surface-variant">
+                  {info.icon}
+                </span>
+              </div>
+              <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">
+                {info.title}
+              </h1>
+              <p className="text-body-md text-on-surface-variant mb-stack-lg">
+                {info.desc}
+              </p>
+              <Link
+                href="/rental"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined !text-[18px]">arrow_back</span>
+                Kembali ke Kamar Saya
+              </Link>
+            </div>
+          </main>
+          <Footer />
+        </div>
+        <BottomNav activePage="profile" userRole="siswa" />
+      </div>
+    );
+  }
 
   const kos = booking.rooms?.kos ?? {};
-  const fasilitas = (kos.kos_facilities ?? []).map((kf: any) => ({
+  const fasilitas = (kos.kos_facilities ?? []).map((kf: { facility_id: string; facility?: { name?: string | null; icon?: string | null } | null }) => ({
     id: kf.facility_id,
     name: kf.facility?.name ?? kf.facility_id,
     icon: kf.facility?.icon ?? null,
@@ -98,12 +177,27 @@ export default async function RentalDetailPage({
   const waNumber = formatWhatsAppNumber(kos.whatsapp_number);
 
   // ── Riwayat laporan masalah untuk booking ini ──
-  const { data: reports } = await supabase
-    .from("maintenance_reports")
-    .select("id, category, priority, description, photo_url, status, owner_response, created_at, resolved_at")
-    .eq("booking_id", bookingId)
-    .order("created_at", { ascending: false })
-    .limit(20);
+  // Query opsional: kalau gagal (mis. tabel belum ada / error sementara),
+  // tampilkan pesan jelas, JANGAN crash seluruh halaman (500).
+  let reports: MaintenanceReport[] | null = null;
+  let reportsError = false;
+  try {
+    const { data, error } = await supabase
+      .from("maintenance_reports")
+      .select("id, category, priority, description, photo_url, status, owner_response, created_at, resolved_at")
+      .eq("booking_id", bookingId)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (error) {
+      console.error("[rental-detail] gagal memuat riwayat laporan:", error);
+      reportsError = true;
+    } else {
+      reports = data ?? [];
+    }
+  } catch (err) {
+    console.error("[rental-detail] gagal memuat riwayat laporan:", err);
+    reportsError = true;
+  }
 
 
   return (
@@ -165,14 +259,10 @@ export default async function RentalDetailPage({
                   key={i}
                   className="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-high"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <SafeImage
                     src={f}
                     alt={`Foto ${kos.name ?? "Kos"} ${i + 1}`}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
                   />
                 </div>
               ))}
@@ -232,7 +322,7 @@ export default async function RentalDetailPage({
             </h2>
             {fasilitas.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {fasilitas.map((f: any) => (
+                {fasilitas.map((f: { id: string; name: string; icon: string | null }) => (
                   <span
                     key={f.id}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium"
@@ -327,7 +417,14 @@ export default async function RentalDetailPage({
               </div>
             )}
 
-            {(reports ?? []).length === 0 ? (
+            {reportsError ? (
+              <div className="rounded-2xl border-2 border-dashed border-error/30 p-8 text-center">
+                <span className="material-symbols-outlined text-4xl text-error block mb-2">error</span>
+                <p className="text-body-md text-on-surface-variant">
+                  Riwayat laporan tidak dapat dimuat saat ini. Silakan muat ulang halaman.
+                </p>
+              </div>
+            ) : (reports ?? []).length === 0 ? (
               <div className="rounded-2xl border-2 border-dashed border-outline-variant p-8 text-center">
                 <span className="material-symbols-outlined text-4xl text-outline block mb-2">fact_check</span>
                 <p className="text-body-md text-on-surface-variant">
@@ -336,7 +433,7 @@ export default async function RentalDetailPage({
               </div>
             ) : (
               <div className="space-y-4">
-                {(reports ?? []).map((r: any) => {
+                {(reports ?? []).map((r) => {
                   const st = MAINT_STATUS[r.status] ?? MAINT_STATUS.baru;
                   return (
                     <div
@@ -369,12 +466,10 @@ export default async function RentalDetailPage({
 
                       {r.photo_url && (
                         <div className="mb-2">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <SafeImage
                             src={r.photo_url}
                             alt="Foto laporan"
                             className="w-full sm:w-64 aspect-[4/3] object-cover rounded-lg border border-outline-variant"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                           />
                         </div>
                       )}
