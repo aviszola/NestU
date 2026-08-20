@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import OwnerShell from "@/components/layout/OwnerShell";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -28,7 +29,7 @@ export default async function OwnerKosListPage() {
   // Fetch all kos milik owner
   const { data: kosListRaw } = await supabase
     .from("kos")
-    .select("id, name, address, verification_status, created_at")
+    .select("id, name, address, verification_status, created_at, foto")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -207,31 +208,41 @@ export default async function OwnerKosListPage() {
                   <div className="group bg-white rounded-2xl overflow-hidden border border-outline-variant card-shadow hover:card-shadow-hover transition-all h-full flex flex-col sm:flex-row">
                     {/* Foto — 40% kiri, placeholder SAMA dgn KosCard.tsx */}
                     <div className="relative w-full sm:w-2/5 min-h-40 bg-surface-container-high overflow-hidden flex-shrink-0">
-                      <div className="absolute inset-0">
-                        {isVerified ? (
-                          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-surface-container-high via-surface-container to-surface-container-lowest relative overflow-hidden">
-                            <div
-                              className="absolute inset-0 opacity-[0.35]"
-                              style={{
-                                backgroundImage:
-                                  "linear-gradient(rgba(0,35,111,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0,35,111,0.12) 1px, transparent 1px)",
-                                backgroundSize: "28px 28px",
-                              }}
-                            />
-                            <span className="material-symbols-outlined text-3xl text-primary/30 relative">photo_camera</span>
-                            <span className="text-[11px] font-medium text-on-surface-variant/70 relative">
-                              Foto belum tersedia
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-tertiary/10 via-surface-container to-surface-container-lowest relative overflow-hidden">
-                            <span className="material-symbols-outlined text-3xl text-tertiary/40 relative">pending_actions</span>
-                            <span className="text-[11px] font-medium text-on-surface-variant/70 relative">
-                              Menunggu Verifikasi
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      {kos.foto?.[0] ? (
+                        <Image
+                          src={kos.foto[0]}
+                          alt={kos.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 768px) 100vw, 40vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0">
+                          {isVerified ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-surface-container-high via-surface-container to-surface-container-lowest relative overflow-hidden">
+                              <div
+                                className="absolute inset-0 opacity-[0.35]"
+                                style={{
+                                  backgroundImage:
+                                    "linear-gradient(rgba(0,35,111,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0,35,111,0.12) 1px, transparent 1px)",
+                                  backgroundSize: "28px 28px",
+                                }}
+                              />
+                              <span className="material-symbols-outlined text-3xl text-primary/30 relative">photo_camera</span>
+                              <span className="text-[11px] font-medium text-on-surface-variant/70 relative">
+                                Foto belum tersedia
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-tertiary/10 via-surface-container to-surface-container-lowest relative overflow-hidden">
+                              <span className="material-symbols-outlined text-3xl text-tertiary/40 relative">pending_actions</span>
+                              <span className="text-[11px] font-medium text-on-surface-variant/70 relative">
+                                Menunggu Verifikasi
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       {/* Badge status di atas foto */}
                       <div className="absolute top-3 left-3 z-10">
                         {isVerified ? (
