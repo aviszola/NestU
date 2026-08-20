@@ -195,6 +195,15 @@ export async function submitBooking(formData: FormData) {
       };
     }
 
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (startDate < todayStr) {
+      return {
+        success: false,
+        error: "Tanggal masuk tidak boleh di masa lalu",
+        code: "INVALID_DATE"
+      };
+    }
+
     // Get room price
     const { data: room, error: roomError } = await supabase
       .from("rooms")

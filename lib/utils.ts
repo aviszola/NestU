@@ -46,3 +46,31 @@ export function formatWhatsAppNumber(phone: string | null | undefined): string {
   if (digits.startsWith("8")) return "62" + digits;
   return ""; // format tak dikenal (mis. dimulai kode negara lain)
 }
+
+/** Petakan error Supabase Auth SDK ke Bahasa Indonesia yang ramah & sopan. */
+export function mapAuthError(err: any): string {
+  if (!err) return "Gagal memproses otentikasi. Silakan coba lagi.";
+  const msg = (typeof err === "string" ? err : err.message || err.error_description || "").toLowerCase();
+  const status = err?.status || 0;
+
+  if (msg.includes("invalid login credentials") || msg.includes("invalid_credentials") || msg.includes("invalid password") || msg.includes("user not found")) {
+    return "Email atau password salah. Silakan periksa kembali.";
+  }
+  if (msg.includes("email not confirmed")) {
+    return "Email Anda belum dikonfirmasi. Silakan periksa inbox email Anda.";
+  }
+  if (msg.includes("user already registered") || msg.includes("already registered") || msg.includes("email address already in use")) {
+    return "Email ini sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.";
+  }
+  if (msg.includes("password should be at least")) {
+    return "Password minimal 6 karakter.";
+  }
+  if (msg.includes("rate limit") || msg.includes("too many requests") || status === 429) {
+    return "Terlalu banyak percobaan. Silakan tunggu beberapa saat lagi.";
+  }
+  if (msg.includes("fetch failed") || msg.includes("networkerror") || msg.includes("failed to fetch") || msg.includes("timeout")) {
+    return "Koneksi internet bermasalah. Silakan periksa koneksi Anda dan coba lagi.";
+  }
+
+  return "Gagal memproses otentikasi. Silakan coba beberapa saat lagi.";
+}

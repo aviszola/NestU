@@ -66,6 +66,15 @@ export default function ProfilePage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("File avatar harus berupa gambar, maksimal 2MB");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setError("File avatar harus berupa gambar, maksimal 2MB");
+      return;
+    }
+    setError(null);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   }

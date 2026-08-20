@@ -32,14 +32,17 @@ const CHANNELS = [
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitting(true);
     // Kirim via mailto — tanpa backend, cukup buka aplikasi email user.
     const subject = encodeURIComponent(`[NestU] Pesan dari ${form.name}`);
     const body = encodeURIComponent(`${form.message}\n\n---\nDari: ${form.name} <${form.email}>`);
     window.location.href = `mailto:hello@netsu.id?subject=${subject}&body=${body}`;
     setSent(true);
+    setTimeout(() => setSubmitting(false), 2000);
   }
 
   return (
@@ -186,9 +189,10 @@ export default function ContactPage() {
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200"
+                disabled={submitting}
+                className="px-6 py-3 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Kirim Pesan
+                {submitting ? "Membuka Email..." : "Kirim Pesan"}
               </button>
             </form>
           </div>

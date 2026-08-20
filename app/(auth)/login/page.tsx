@@ -43,6 +43,18 @@ function LoginContent() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoginError(null);
+
+    // Client-side validation: format email & password length
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!EMAIL_RE.test(loginEmail)) {
+      setLoginError("Format alamat email tidak valid.");
+      return;
+    }
+    if (loginPassword.length < 6) {
+      setLoginError("Password minimal 6 karakter.");
+      return;
+    }
+
     setLoginLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -54,7 +66,8 @@ function LoginContent() {
       await redirectByRole(data.user.id);
       router.refresh();
     } catch (err: any) {
-      setLoginError(err.message || "Gagal masuk, silakan coba lagi.");
+      const { mapAuthError } = await import("@/lib/utils");
+      setLoginError(mapAuthError(err));
     } finally {
       setLoginLoading(false);
     }
