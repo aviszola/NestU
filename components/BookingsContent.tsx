@@ -28,9 +28,9 @@ interface Props {
 }
 
 const tabs: { key: FilterTab; label: string }[] = [
-  { key: "all", label: "All Bookings" },
-  { key: "active", label: "Active" },
-  { key: "history", label: "History" },
+  { key: "all", label: "Semua Booking" },
+  { key: "active", label: "Aktif" },
+  { key: "history", label: "Riwayat" },
 ];
 
 function formatBookingId(id: string): string {
@@ -38,7 +38,7 @@ function formatBookingId(id: string): string {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  return new Date(dateStr).toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -60,10 +60,10 @@ export default function BookingsContent({ bookings }: Props) {
       {/* Page Header */}
       <div className="mb-stack-lg">
         <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">
-          Booking History
+          Riwayat Booking
         </h1>
         <p className="font-body-md text-body-md text-on-surface-variant">
-          Review your past stays and manage your upcoming reservations.
+          Tinjau masa inap Anda sebelumnya dan kelola reservasi Anda berikutnya.
         </p>
       </div>
 
@@ -134,9 +134,26 @@ export default function BookingsContent({ bookings }: Props) {
                         "/images/property-placeholder.jpg";
                     }}
                   />
-                  <div className="absolute top-4 right-4">
+                </div>
+
+                {/* Body */}
+                <div className="p-stack-md flex flex-col flex-grow">
+                  <h3 className="font-title-lg text-title-lg text-primary mb-1">
+                    {b.rooms?.kos?.name ?? "Kos"}
+                  </h3>
+                  <div className="flex items-center gap-2 text-on-surface-variant mb-2">
+                    <span className="material-symbols-outlined text-sm">
+                      bed
+                    </span>
+                    <span className="font-body-sm text-body-sm">
+                      {b.rooms?.room_number ?? "Kamar Standar"}
+                    </span>
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className="mb-stack-md flex">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur-md ${cfg.className}`}
+                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${cfg.className}`}
                     >
                       {cfg.icon && (
                         <span
@@ -149,26 +166,11 @@ export default function BookingsContent({ bookings }: Props) {
                       {cfg.label}
                     </span>
                   </div>
-                </div>
-
-                {/* Body */}
-                <div className="p-stack-md flex flex-col flex-grow">
-                  <h3 className="font-title-lg text-title-lg text-primary mb-1">
-                    {b.rooms?.kos?.name ?? "Kos"}
-                  </h3>
-                  <div className="flex items-center gap-2 text-on-surface-variant mb-stack-sm">
-                    <span className="material-symbols-outlined text-sm">
-                      bed
-                    </span>
-                    <span className="font-body-sm text-body-sm">
-                      {b.rooms?.room_number ?? "Standard Room"}
-                    </span>
-                  </div>
 
                   <div className="grid grid-cols-2 gap-4 mb-stack-md bg-surface-container-low p-3 rounded-lg">
                     <div>
                       <p className="font-label-md text-[10px] uppercase text-outline mb-1">
-                        Check-in
+                        TANGGAL MASUK
                       </p>
                       <p className="font-body-md text-body-md font-semibold">
                         {b.move_in_date
@@ -178,7 +180,7 @@ export default function BookingsContent({ bookings }: Props) {
                     </div>
                     <div>
                       <p className="font-label-md text-[10px] uppercase text-outline mb-1">
-                        Booking ID
+                        ID BOOKING
                       </p>
                       <p className="font-body-md text-body-md font-semibold">
                         {formatBookingId(b.id)}
@@ -194,14 +196,14 @@ export default function BookingsContent({ bookings }: Props) {
                       )}
                       <span className="text-body-sm font-normal text-on-surface-variant">
                         {" "}
-                        / mo
+                        / bln
                       </span>
                     </span>
                     <Link
                       href={`/bookings/${b.id}`}
                       className="bg-primary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-2"
                     >
-                      Details
+                      Detail
                       <span className="material-symbols-outlined text-sm">
                         arrow_forward_ios
                       </span>
@@ -218,12 +220,10 @@ export default function BookingsContent({ bookings }: Props) {
       <section className="mt-stack-lg p-stack-lg rounded-2xl bg-primary relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
         <div className="relative z-10 flex-1">
           <h2 className="font-headline-lg text-headline-lg text-white mb-4">
-            Need help with your booking?
+            Butuh bantuan dengan booking Anda?
           </h2>
           <p className="font-body-lg text-body-lg text-white/80 max-w-xl">
-            Our support team is available 24/7 to assist with payment
-            issues, property disputes, or move-in logistics. We&apos;re
-            here to ensure your student living experience is seamless.
+            Tim dukungan kami tersedia 24/7 untuk membantu masalah pembayaran, perselisihan properti, atau logistik masuk. Kami di sini untuk memastikan pengalaman tinggal Anda lancar.
           </p>
         </div>
         <div className="relative z-10">
@@ -231,7 +231,7 @@ export default function BookingsContent({ bookings }: Props) {
             href="/support"
             className="inline-block bg-white text-primary px-8 py-4 rounded-xl font-bold font-title-lg text-title-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all"
           >
-            Contact Support
+            Hubungi Dukungan
           </Link>
         </div>
       </section>
