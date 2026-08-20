@@ -28,7 +28,7 @@ export default async function OwnerDashboardPage() {
 
   const { data: kosList } = await supabase
     .from("kos")
-    .select("id, name, address, verification_status")
+    .select("id, name, address, verification_status, foto")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -161,15 +161,21 @@ export default async function OwnerDashboardPage() {
                         >
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative">
-                                <Image
-                                  src={(k as any).foto?.[0] || "/images/property-placeholder.jpg"}
-                                  alt={k.name}
-                                  fill
-                                  unoptimized
-                                  sizes="40px"
-                                  className="object-cover"
-                                />
+                              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative bg-surface-container-high flex items-center justify-center">
+                                {k.foto?.[0] ? (
+                                  <Image
+                                    src={k.foto[0]}
+                                    alt={k.name}
+                                    fill
+                                    unoptimized
+                                    sizes="40px"
+                                    className="object-cover"
+                                  />
+                                ) : (
+                                  <span className="material-symbols-outlined text-xl text-outline">
+                                    home
+                                  </span>
+                                )}
                               </div>
                               <div>
                                 <p className="font-medium text-on-surface">
