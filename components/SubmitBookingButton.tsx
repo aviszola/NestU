@@ -18,6 +18,13 @@ export default function SubmitBookingButton({ kosId, roomId }: { kosId: string; 
         setError("Silakan pilih tanggal pindah");
         return;
       }
+
+      const todayStr = new Date().toISOString().split("T")[0];
+      if (startDate < todayStr) {
+        setError("Tanggal masuk tidak boleh di masa lalu");
+        return;
+      }
+
       if (!duration) {
         setError("Silakan pilih durasi sewa");
         return;

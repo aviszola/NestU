@@ -162,6 +162,9 @@ export async function createKos(
     description: string | null;
   }
 ): Promise<Kos> {
+  if (values.latitude === null || values.longitude === null) {
+    throw new Error("Silakan tentukan lokasi kos di peta");
+  }
   const { data, error } = await client
     .from("kos")
     .insert(values)
@@ -248,6 +251,21 @@ export async function createRoom(
     description: string | null;
   }
 ): Promise<Room> {
+  if (!values.price_per_month || values.price_per_month <= 0) {
+    throw new Error("Harga kamar harus lebih dari Rp 0");
+  }
+
+  // Cek duplikat nomor kamar dalam kos yang sama
+  const { data: dup } = await client
+    .from("rooms")
+    .select("id")
+    .eq("kos_id", values.kos_id)
+    .ilike("room_number", values.room_number.trim())
+    .maybeSingle();
+  if (dup) {
+    throw new Error("Nomor kamar ini sudah digunakan, gunakan nomor lain");
+  }
+
   const { data, error } = await client
     .from("rooms")
     .insert(values)
@@ -268,6 +286,9 @@ export async function updateRoom(
     status: "tersedia" | "terisi" | "dipesan";
   }>
 ): Promise<Room> {
+  if (values.price_per_month !== undefined && (values.price_per_month <= 0 || isNaN(values.price_per_month))) {
+    throw new Error("Harga kamar harus lebih dari Rp 0");
+  }
   const { data, error } = await client
     .from("rooms")
     .update(values)

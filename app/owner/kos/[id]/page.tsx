@@ -121,6 +121,11 @@ export default function DetailKosPage() {
 
   async function handleRoomSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const priceNum = Number(rmPrice);
+    if (!rmPrice || isNaN(priceNum) || priceNum <= 0) {
+      toastError("Harga kamar harus lebih dari Rp 0");
+      return;
+    }
     setRmSaving(true);
     try {
       const supabase = createClient();

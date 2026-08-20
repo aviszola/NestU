@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
-
+import { updateProfile } from "@/lib/supabase/actions";
 
 export default function OwnerProfilePage() {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function OwnerProfilePage() {
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -42,19 +43,22 @@ export default function OwnerProfilePage() {
     e.preventDefault();
     setSaving(true);
     setMsg("");
-    try {
-      const { createClient } = await import("@/lib/supabase/client");
-      const sup = createClient();
-      const { error } = await sup
-        .from("profiles")
-        .update({ full_name: profile.full_name, phone: profile.phone, updated_at: new Date().toISOString() })
-        .eq("id", userId);
-      if (error) throw error;
-      setMsg("Profil berhasil disimpan!");
-    } catch (err: any) {
-      setMsg(err.message || "Gagal menyimpan profil.");
-    }
+    setIsError(false);
+
+    const result = await updateProfile({
+      fullName: profile.full_name,
+      phone: profile.phone,
+    });
+
     setSaving(false);
+    if (result.error) {
+      setIsError(true);
+      setMsg(result.error);
+      return;
+    }
+
+    setIsError(false);
+    setMsg("Profil berhasil disimpan!");
   }
 
   if (!loaded) return null;
@@ -110,7 +114,7 @@ export default function OwnerProfilePage() {
 
             {msg && (
               <div className={`p-3 rounded-lg text-sm font-medium ${
-                msg.includes("berhasil") ? "bg-secondary/10 text-secondary" : "bg-error/10 text-error"
+                isError ? "bg-error/10 text-error" : "bg-secondary/10 text-secondary"
               }`}>
                 {msg}
               </div>
@@ -128,7 +132,6 @@ export default function OwnerProfilePage() {
       </div>
 
       <Footer />
-
     </>
   );
 }

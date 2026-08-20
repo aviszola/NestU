@@ -85,6 +85,7 @@ export default function BookingPage({
     return `${months} bulan × Rp ${basePrice.toLocaleString("id-ID")} = Rp ${monthlyTotal.toLocaleString("id-ID")}`;
   };
 
+  const todayStr = new Date().toISOString().split("T")[0];
   const total = calculateTotal(parseInt(duration));
   const monthlyPriceTotal = total - serviceFee - adminFee;
   const facilities = kos?.fasilitas || [];
@@ -190,6 +191,7 @@ export default function BookingPage({
                         id="start_date"
                         name="start_date"
                         type="date"
+                        min={todayStr}
                         required
                       />
                       <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none">
@@ -279,8 +281,39 @@ export default function BookingPage({
                     <span className="text-primary font-bold">Rp {total.toLocaleString("id-ID")}</span>
                   </div>
                 </div>
-                {kos && room && (
-                  <SubmitBookingButton kosId={kos?.id || ""} roomId={room?.id || ""} />
+                {kos && (
+                  room ? (
+                    <SubmitBookingButton kosId={kos.id} roomId={room.id} />
+                  ) : (
+                    <div className="p-4 rounded-xl bg-error/10 border border-error/20 text-error space-y-3">
+                      <div className="flex items-start gap-2">
+                        <span className="material-symbols-outlined shrink-0 text-xl">error</span>
+                        <p className="font-body-sm text-body-sm font-medium">
+                          Kamar pada kos ini sudah tidak tersedia saat ini. Silakan cari kos lain atau hubungi pemilik.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <Link
+                          href="/kos"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-error text-white font-bold text-xs rounded-lg hover:brightness-110 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-sm">search</span>
+                          Cari Kos Lain
+                        </Link>
+                        {kos.whatsapp_number && (
+                          <a
+                            href={`https://wa.me/${kos.whatsapp_number.replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 border border-error/40 text-error font-bold text-xs rounded-lg hover:bg-error/5 transition-all"
+                          >
+                            <span className="material-symbols-outlined text-sm">chat</span>
+                            Hubungi Pemilik
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )
                 )}
                 <p className="text-center font-label-md text-label-md text-outline mt-3">
                   Setelah diajukan, pemilik kos akan meninjau permintaan Anda. Anda akan diminta membayar setelah booking disetujui.

@@ -130,6 +130,16 @@ export default function BookingDetailPage() {
       toastError("Pilih file bukti transfer terlebih dahulu");
       return;
     }
+    const isImage = proofFile.type.startsWith("image/");
+    const isPdf = proofFile.type === "application/pdf";
+    if (!isImage && !isPdf) {
+      toastError("File harus berupa gambar atau PDF, maksimal 5MB");
+      return;
+    }
+    if (proofFile.size > 5 * 1024 * 1024) {
+      toastError("File harus berupa gambar atau PDF, maksimal 5MB");
+      return;
+    }
     setSubmitting(true);
     const toastId = toastLoading("Mengunggah bukti transfer...");
     try {

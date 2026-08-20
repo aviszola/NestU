@@ -1,5 +1,7 @@
 "use client";
 
+import { Modal } from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { updateBookingStatus, confirmPayment, rejectPaymentProof, getSignedProofUrl } from "@/lib/supabase/queries";
 import { useEffect, useState } from "react";
@@ -124,7 +126,17 @@ export default function OwnerBookingsPage() {
     loadAllBookings();
   }, []);
 
-  async function handleStatus(id: string, status: "approved" | "cancelled" | "completed") {
+  const [approveConfirmTarget, setApproveConfirmTarget] = useState<{ id: string; kosName?: string; roomNumber?: string } | null>(null);
+
+  async function handleStatus(id: string, status: "approved" | "cancelled" | "completed", bookingInfo?: any) {
+    if (status === "approved") {
+      setApproveConfirmTarget({
+        id,
+        kosName: bookingInfo?.rooms?.kos?.name,
+        roomNumber: bookingInfo?.rooms?.room_number,
+      });
+      return;
+    }
     if (status === "cancelled") {
       setRejectTarget({ id, mode: "booking" });
       setRejectReason("");
@@ -134,6 +146,10 @@ export default function OwnerBookingsPage() {
   }
 
   async function doStatusUpdate(id: string, status: "approved" | "cancelled" | "completed", reason?: string) {
+    if (status === "cancelled" && (!reason || reason.trim().length < 10)) {
+        toastError("Alasan penolakan minimal 10 karakter");
+        return;
+    }
     setActionLoading(id);
     setError(null);
     try {
@@ -426,7 +442,7 @@ export default function OwnerBookingsPage() {
                       {isPending && (
                         <>
                           <button
-                            onClick={() => handleStatus(b.id, "approved")}
+                            onClick={() => handleStatus(b.id, "approved", b)}
                             disabled={actionLoading === b.id}
                             className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -538,8 +554,8 @@ export default function OwnerBookingsPage() {
             </h3>
             <p className="text-body-sm text-on-surface-variant mb-4">
               {rejectTarget.mode === "proof"
-                ? "Bukti tidak valid? Beri alasan agar siswa tahu harus perbaiki apa. Booking tetap aktif — siswa bisa unggah ulang bukti."
-                : "Beri alasan agar siswa tahu kenapa ditolak (opsional)."}
+                ? "Bukti tidak valid? Beri alasan agar siswa tahu harus perbaiki apa (minimal 10 karakter)."
+                : "Beri alasan agar siswa tahu kenapa ditolak (minimal 10 karakter)."}
             </p>
             <textarea
               value={rejectReason}
@@ -553,10 +569,17 @@ export default function OwnerBookingsPage() {
               }
               className="w-full rounded-lg border border-outline-variant px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
+            {rejectReason.trim().length > 0 && rejectReason.trim().length < 10 && (
+              <p className="text-xs text-error mt-1">Alasan penolakan minimal 10 karakter.</p>
+            )}
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => {
                   const t = rejectTarget;
+                  if (rejectReason.trim().length < 10) {
+                    toastError("Alasan penolakan wajib diisi (minimal 10 karakter)");
+                    return;
+                  }
                   setRejectTarget(null);
                   if (t.mode === "proof") {
                     handleRejectProof(t.id);
@@ -564,8 +587,8 @@ export default function OwnerBookingsPage() {
                     doStatusUpdate(t.id, "cancelled", rejectReason);
                   }
                 }}
-                disabled={actionLoading === rejectTarget.id}
-                className="flex-1 py-2.5 bg-error text-white rounded-xl font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
+                disabled={actionLoading === rejectTarget.id || rejectReason.trim().length < 10}
+                className="flex-1 py-2.5 bg-error text-white rounded-xl font-bold text-sm hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {actionLoading === rejectTarget.id
                   ? "Memproses..."
@@ -583,6 +606,47 @@ export default function OwnerBookingsPage() {
           </div>
         </div>
       )}
+
+      {/* Modal Konfirmasi Approve Booking */}
+      <Modal
+        open={!!approveConfirmTarget}
+        onClose={() => setApproveConfirmTarget(null)}
+        title="Konfirmasi Setujui Booking"
+      >
+        <div className="p-4 space-y-5">
+          <p className="text-on-surface-variant font-body-md">
+            Yakin ingin menyetujui booking ini
+            {approveConfirmTarget?.roomNumber ? (
+              <> untuk <span className="font-bold text-on-surface">Kamar {approveConfirmTarget.roomNumber}</span></>
+            ) : null}
+            {approveConfirmTarget?.kosName ? (
+              <> di <span className="font-bold text-on-surface">{approveConfirmTarget.kosName}</span></>
+            ) : null}?
+          </p>
+          <div className="flex gap-3 justify-end pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setApproveConfirmTarget(null)}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={actionLoading === approveConfirmTarget?.id}
+              onClick={async () => {
+                if (!approveConfirmTarget) return;
+                const targetId = approveConfirmTarget.id;
+                setApproveConfirmTarget(null);
+                await doStatusUpdate(targetId, "approved");
+              }}
+            >
+              {actionLoading === approveConfirmTarget?.id ? "Memproses..." : "Setujui Booking"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Lightbox bukti transfer */}
       {proofTarget && (

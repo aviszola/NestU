@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -132,6 +132,18 @@ export default function CreateKosPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Harus login");
+
+      // VALIDASI CLIENT-SIDE: MapPicker & Foto
+      if (latitude === null || longitude === null) {
+        setError("Silakan tentukan lokasi kos di peta");
+        setLoading(false);
+        return;
+      }
+      if (fotoFiles.length < 1) {
+        setError("Unggah minimal 1 foto kos");
+        setLoading(false);
+        return;
+      }
 
       // â”€â”€ VALIDASI SERVER-SIDE (bukan cuma HTML required) â”€â”€
       let cleanName: string, cleanAddress: string, cleanWa: string, cleanDesc: string | null;

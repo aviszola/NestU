@@ -82,7 +82,8 @@ export default function RegisterForm({
         router.push("/login?registered=true");
       }
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan saat mendaftar.");
+      const { mapAuthError } = await import("@/lib/utils");
+      setError(mapAuthError(err));
     } finally {
       setLoading(false);
     }
