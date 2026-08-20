@@ -562,7 +562,26 @@ export async function getFeaturedKos(
   return (data ?? []).map(mapKosRow);
 }
 
-export async function getTotalKosCount(client: any): Promise<number> {
+
+/** Harga kamar termurah per kos (hanya kamar tersedia). Dipakai kartu kos. */
+export async function getKosMinPrices(
+  client: any,
+  kosIds: string[]
+): Promise<Record<string, number>> {
+  const map: Record<string, number> = {};
+  if (kosIds.length === 0) return map;
+  const { data, error } = await client
+    .from("rooms")
+    .select("kos_id, price_per_month")
+    .in("kos_id", kosIds)
+    .eq("status", "tersedia")
+    .order("price_per_month", { ascending: true });
+  if (error) throw error;
+  for (const r of data ?? []) {
+    if (map[r.kos_id] === undefined) map[r.kos_id] = r.price_per_month;
+  }
+  return map;
+}export async function getTotalKosCount(client: any): Promise<number> {
   const { count, error } = await client
     .from("kos")
     .select("*", { count: "exact", head: true })
@@ -1006,6 +1025,44 @@ export async function rejectPaymentProof(
   if (error) throw error;
 }
 
+// ─── Admin override status booking (darurat) ───
+
+export async function adminOverrideBookingStatus(
+  client: any,
+  bookingId: string,
+  newStatus: "pending" | "approved" | "rejected" | "cancelled" | "completed",
+  reason: string
+): Promise<void> {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) throw new Error("Sesi tidak valid. Silakan login ulang.");
+  const { data: profile } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (profile?.role !== "admin") {
+    throw new Error("Hanya admin yang bisa melakukan override status booking.");
+  }
+  const { error } = await client.rpc("admin_override_booking_status", {
+    p_booking_id: bookingId,
+    p_new_status: newStatus,
+    p_reason: reason,
+  });
+  if (error) throw error;
+}
+
+export async function getAdminActionLogs(
+  client: any,
+  limit = 50
+): Promise<any[]> {
+  const { data, error } = await client
+    .from("admin_action_log")
+    .select("*, admin:admin_id(id, full_name), booking:booking_id(id)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
 // ─── Refunds (admin manual) ───
 
 export async function getRefunds(

@@ -1,57 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import FavoriteButton from "./FavoriteButton";
+import { FACILITY_ICONS, facilityIcon } from "@/lib/facilities";
 
-// Mapping nama fasilitas (ter-normalisasi) -> ikon Material Symbols.
-// Cek terakhir: tabel `facilities` menyimpan ikon EMOJI (bukan Material Symbols) -
-// emoji ditolak di sini supaya semua kartu pakai Material Symbols konsisten.
-export const FACILITY_ICONS: Record<string, string> = {
-  wifi: "wifi",
-  ac: "ac_unit",
-  "kamar mandi": "bathroom",
-  "kamar mandi dalam": "bathroom",
-  "kamar mandi luar": "bathroom",
-  bathroom: "bathroom",
-  dapur: "kitchen",
-  "dapur umum": "kitchen",
-  "dapur pribadi": "kitchen",
-  kitchen: "kitchen",
-  kulkas: "kitchen",
-  listrik: "bolt",
-  keamanan: "shield",
-  "keamanan 24 jam": "shield",
-  security: "shield",
-  parkir: "local_parking",
-  "parkir motor": "moped",
-  "parkir mobil": "local_parking",
-  parking: "local_parking",
-  tv: "tv",
-  lemari: "checkroom",
-  meja: "table_restaurant",
-  kasur: "bed",
-  air: "water_drop",
-  laundry: "local_laundry_service",
-  "ruang tamu": "living",
-  "akses 24 jam": "schedule",
-};
-
-// Normalisasi: lowercase, hilangkan spasi berlebih, tanda hubung/garing bawah -> spasi.
-function normalizeFacility(name: string): string {
-  return name.toLowerCase().trim().replace(/[-_]/g, " ").replace(/\s+/g, " ");
-}
-
-// Emoji (ikon lama di tabel facilities) dianggap "tidak ada" -> fallback ke mapping nama.
-const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
-
-export function facilityIcon(f: { name?: string; icon?: string | null }): string {
-  if (f.icon && !EMOJI_RE.test(f.icon)) return f.icon;
-  const hit = FACILITY_ICONS[normalizeFacility(f.name ?? "")];
-  return hit ?? "check";
-}
-
-function getIcon(name: string) {
-  return FACILITY_ICONS[normalizeFacility(name)] ?? "check";
-}
+export { FACILITY_ICONS, facilityIcon };
 
 export default function KosCard({
   kos,

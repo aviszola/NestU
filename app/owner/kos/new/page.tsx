@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -17,7 +17,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import OwnerShell from "@/components/layout/OwnerShell";
-import { facilityIcon } from "@/components/KosCard";
+import { facilityIcon } from "@/lib/facilities";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), {
   ssr: false,
@@ -27,26 +27,6 @@ const MapPicker = dynamic(() => import("@/components/MapPicker"), {
     </div>
   ),
 });
-
-const FACILITY_ICONS: Record<string, string> = {
-  ac_unit: "ac_unit",
-  wifi: "wifi",
-  shower: "shower",
-  dapur: "cooking",
-  parkir_motor: "moped",
-  parkir_mobil: "local_parking",
-  lemari: "checkroom",
-  kasur: "bed",
-  meja: "desk",
-  tv: "tv",
-  kulkas: "kitchen",
-  listrik: "bolt",
-  air: "water_drop",
-  keamanan: "security",
-  laundry: "local_laundry_service",
-  ruang_tamu: "living",
-  akses_24jam: "schedule",
-};
 
 const FACILITY_DEFAULTS: { name: string; icon: string }[] = [
   { name: "AC", icon: "ac_unit" },
@@ -67,7 +47,7 @@ const FACILITY_DEFAULTS: { name: string; icon: string }[] = [
   { name: "Akses 24 Jam", icon: "schedule" },
 ];
 
-// ── Input styling konsisten (token project) ──
+// â”€â”€ Input styling konsisten (token project) â”€â”€
 const inputCls =
   "w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all outline-none";
 
@@ -153,7 +133,7 @@ export default function CreateKosPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Harus login");
 
-      // ── VALIDASI SERVER-SIDE (bukan cuma HTML required) ──
+      // â”€â”€ VALIDASI SERVER-SIDE (bukan cuma HTML required) â”€â”€
       let cleanName: string, cleanAddress: string, cleanWa: string, cleanDesc: string | null;
       try {
         cleanName = validateRequiredText(name, "Nama Kos", 100);
@@ -205,7 +185,7 @@ export default function CreateKosPage() {
   return (
     <OwnerShell activePage="properties">
       <main className="w-full px-margin-mobile md:px-margin-desktop py-stack-lg max-w-[1280px]">
-        {/* ── Header ringan (form butuh ruang baca, bukan panel gelap) ── */}
+        {/* â”€â”€ Header ringan (form butuh ruang baca, bukan panel gelap) â”€â”€ */}
         <div className="mb-stack-lg">
           <nav className="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md mb-3">
             <Link href="/owner" className="hover:text-primary">Properti</Link>
@@ -378,7 +358,7 @@ export default function CreateKosPage() {
                 )}
               </div>
 
-              {/* 4. DESKRIPSI (label tanpa * — tidak required) */}
+              {/* 4. DESKRIPSI (label tanpa * â€” tidak required) */}
               <div className={cardCls}>
                 {sectionTitle("description", "Deskripsi Properti", "Ceritakan keunggulan properti Anda")}
                 <div className="space-y-1 mt-stack-md">
@@ -402,7 +382,7 @@ export default function CreateKosPage() {
                 </div>
               </div>
 
-              {/* ── STICKY SUBMIT BAR ── */}
+              {/* â”€â”€ STICKY SUBMIT BAR â”€â”€ */}
               <div className="sticky bottom-4 z-10">
                 <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-outline-variant card-shadow p-4 flex flex-col sm:flex-row items-center gap-stack-md justify-end">
                   {error && (

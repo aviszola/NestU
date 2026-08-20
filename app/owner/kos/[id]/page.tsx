@@ -18,7 +18,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toastSuccess, toastError } from "@/lib/toast";
-import { facilityIcon } from "@/components/KosCard";
+import { facilityIcon } from "@/lib/facilities";
 
 function formatPrice(n: number): string {
   return new Intl.NumberFormat("id-ID", {

@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
-import { facilityIcon } from "@/components/KosCard";
+import { facilityIcon } from "@/lib/facilities";
 import { useState } from "react";
 
 export default function FilterSidebar({
