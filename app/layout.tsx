@@ -35,6 +35,9 @@ export const viewport: Viewport = {
   themeColor: "#00236F",
 };
 
+import { Suspense } from "react";
+import RouteProgressBar from "@/components/RouteProgressBar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -53,7 +56,13 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
         />
       </head>
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}<Toaster position="top-right" richColors={false} /></body>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <Suspense fallback={null}>
+          <RouteProgressBar />
+        </Suspense>
+        {children}
+        <Toaster position="top-right" richColors={false} />
+      </body>
     </html>
   );
 }
