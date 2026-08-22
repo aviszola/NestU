@@ -99,7 +99,7 @@ export default function RegisterForm({
       )}
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-outline mb-1.5">
           Nama Lengkap
         </label>
         <input
@@ -113,7 +113,7 @@ export default function RegisterForm({
       </div>
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-outline mb-1.5">
           Email
         </label>
         <input
@@ -127,7 +127,7 @@ export default function RegisterForm({
       </div>
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-outline mb-1.5">
           Password
         </label>
         <div className="relative">
@@ -154,7 +154,7 @@ export default function RegisterForm({
       </div>
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-outline mb-1.5">
           Nomor WhatsApp
         </label>
         <input
@@ -170,7 +170,7 @@ export default function RegisterForm({
       {/* Sekolah/Universitas — hanya untuk siswa */}
       {role === "siswa" && (
         <div>
-          <label className="block font-label-md text-label-md text-on-surface-variant mb-1">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-outline mb-1.5">
             Nama Sekolah / Universitas
           </label>
           <select
@@ -178,9 +178,7 @@ export default function RegisterForm({
             onChange={(e) => setSchool(e.target.value)}
             className={`${inputCls} appearance-none`}
           >
-            <option value="" disabled>
-              Pilih Institusi Pendidikan
-            </option>
+            <option value="">Pilih sekolah/universitas</option>
             {SCHOOLS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -191,7 +189,7 @@ export default function RegisterForm({
       )}
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface-variant mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-outline mb-2">
           Daftar sebagai
         </label>
         <div className="flex gap-3">
@@ -223,14 +221,14 @@ export default function RegisterForm({
         />
         <label
           htmlFor="terms"
-          className="font-body-sm text-body-sm text-on-surface-variant"
+          className="text-xs font-normal text-on-surface-variant leading-normal"
         >
           Saya menyetujui{" "}
           <a
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="text-primary font-semibold hover:underline"
           >
             Syarat &amp; Ketentuan
           </a>{" "}
@@ -239,7 +237,7 @@ export default function RegisterForm({
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="text-primary font-semibold hover:underline"
           >
             Kebijakan Privasi
           </a>
@@ -250,7 +248,7 @@ export default function RegisterForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-primary text-white font-title-lg text-title-lg rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50"
+        className="w-full py-3.5 bg-primary text-on-primary font-bold text-sm rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50"
       >
         {loading ? "Memproses..." : "Daftar Sekarang"}
       </button>

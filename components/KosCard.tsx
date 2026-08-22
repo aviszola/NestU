@@ -89,8 +89,8 @@ export default function KosCard({
         </div>
 
         {showDistance && kos.distance_to_school_km != null && (
-          <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm text-gray-400">
+          <p className="text-xs md:text-sm text-on-surface-variant mt-1 flex items-center gap-1 font-normal">
+            <span className="material-symbols-outlined text-sm text-outline">
               location_on
             </span>
             {kos.distance_to_school_km.toFixed(1)} km dari sekolah
@@ -99,20 +99,20 @@ export default function KosCard({
 
         {/* Fasilitas */}
         {facilities.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-3">
+          <div className="flex flex-wrap gap-1.5 mt-3">
             {facilities.slice(0, 3).map((f: any, i: number) => (
               <span
                 key={f.id || i}
-                className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full text-on-surface-variant"
+                className="flex items-center gap-1 text-xs font-medium bg-surface-container-low px-2 py-1 rounded-md text-on-surface-variant"
               >
-                <span className="material-symbols-outlined text-[16px]">
+                <span className="material-symbols-outlined text-[15px] text-primary">
                   {facilityIcon(f)}
                 </span>
                 {f.name}
               </span>
             ))}
             {facilities.length > 3 && (
-              <span className="text-xs text-outline">
+              <span className="text-xs font-medium text-outline self-center">
                 +{facilities.length - 3}
               </span>
             )}
@@ -120,17 +120,18 @@ export default function KosCard({
         )}
 
         {/* Harga & Detail */}
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-          <span className="text-primary font-bold text-sm">
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-outline-variant/30">
+          <span className="text-primary font-bold text-sm md:text-base">
             {price != null
               ? `Rp${price.toLocaleString("id-ID")}/bln`
               : "Harga belum tersedia"}
           </span>
           <Link
             href={`/kos/${kos.id}`}
-            className="text-sm font-semibold text-primary hover:underline"
+            className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-0.5"
           >
             Detail
+            <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>
       </div>

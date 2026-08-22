@@ -219,7 +219,7 @@ export default async function RentalDetailPage({
           {/* Back */}
           <Link
             href="/rental"
-            className="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-stack-md font-label-md"
+            className="inline-flex items-center gap-1.5 text-outline hover:text-primary transition-colors mb-4 text-[11px] font-semibold uppercase tracking-wider"
           >
             <span className="material-symbols-outlined text-sm">arrow_back</span>
             KEMBALI KE KAMAR SAYA
@@ -229,16 +229,16 @@ export default async function RentalDetailPage({
           <div className="bg-surface-container-lowest rounded-xl card-shadow p-stack-md mb-gutter">
             <div className="flex justify-between items-start gap-4">
               <div>
-                <h1 className="font-headline-lg text-headline-lg text-primary mb-1">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight mb-1">
                   {kos.name ?? "Kos"}
                 </h1>
-                <p className="text-on-surface-variant font-body-md flex items-center gap-1">
-                  <span className="material-symbols-outlined !text-[16px]">location_on</span>
+                <p className="text-on-surface-variant text-sm font-normal flex items-center gap-1">
+                  <span className="material-symbols-outlined !text-[16px] text-outline">location_on</span>
                   {kos.address ?? "Alamat tidak tersedia"}
                 </p>
               </div>
               <span
-                className={`inline-flex items-center gap-1 shrink-0 rounded-full px-3 py-1 text-xs font-bold ${
+                className={`inline-flex items-center gap-1 shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${
                   isExpired
                     ? "bg-surface-variant text-on-surface-variant"
                     : "bg-secondary/10 text-secondary"
@@ -272,31 +272,31 @@ export default async function RentalDetailPage({
 
           {/* Info sewa */}
           <div className="bg-surface-container-lowest rounded-xl card-shadow p-stack-md mb-gutter">
-            <h2 className="font-headline-md text-headline-md text-primary mb-stack-md">
+            <h2 className="text-lg font-bold text-on-surface tracking-tight mb-stack-md">
               Detail Sewa
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="font-label-md text-[10px] uppercase text-outline mb-1">Nomor Kamar</p>
-                <p className="font-body-md font-semibold text-on-surface">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">Nomor Kamar</p>
+                <p className="text-sm font-semibold text-on-surface">
                   {booking.rooms?.room_number ?? "-"}
                 </p>
               </div>
               <div>
-                <p className="font-label-md text-[10px] uppercase text-outline mb-1">Tanggal Masuk</p>
-                <p className="font-body-md font-semibold text-on-surface">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">Tanggal Masuk</p>
+                <p className="text-sm font-semibold text-on-surface">
                   {formatDate(booking.move_in_date)}
                 </p>
               </div>
               <div>
-                <p className="font-label-md text-[10px] uppercase text-outline mb-1">Durasi</p>
-                <p className="font-body-md font-semibold text-on-surface">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">Durasi</p>
+                <p className="text-sm font-semibold text-on-surface">
                   {booking.duration_months || 1} bulan
                 </p>
               </div>
               <div>
-                <p className="font-label-md text-[10px] uppercase text-outline mb-1">Tanggal Berakhir</p>
-                <p className="font-body-md font-semibold text-on-surface">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">Tanggal Berakhir</p>
+                <p className="text-sm font-semibold text-on-surface">
                   {endDate ? formatDate(endDate.toISOString()) : "-"}
                 </p>
               </div>

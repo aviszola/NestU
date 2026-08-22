@@ -38,9 +38,6 @@ const STEPS = [
 
 const PAYMENT_METHODS = ["Bank Transfer", "E-Wallet", "Virtual Account"];
 
-
-
-
 export default async function HomePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -155,8 +152,8 @@ export default async function HomePage() {
               <br />
               Impianmu
             </h1>
-            <p className="mt-4 text-base md:text-lg text-white/80 max-w-lg leading-relaxed">
-              Hunian aman dan nyaman untuk mendukung prestasi mu.
+            <p className="mt-4 text-base md:text-lg font-normal text-white/85 max-w-lg leading-relaxed">
+              Hunian aman dan nyaman untuk mendukung prestasimu.
             </p>
             <form
               action="/kos"
@@ -168,7 +165,7 @@ export default async function HomePage() {
                 type="text"
                 name="search"
                 placeholder="Cari kos berdasarkan lokasi atau sekolah..."
-                className="flex-1 px-4 py-3.5 text-sm text-on-surface bg-transparent border-none outline-none focus:ring-0"
+                className="flex-1 px-4 py-3.5 text-sm font-normal text-on-surface bg-transparent border-none outline-none focus:ring-0"
               />
               <button
                 type="submit"
@@ -195,8 +192,8 @@ export default async function HomePage() {
                 <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-4">
                   <span className="material-symbols-outlined text-primary text-2xl">{item.icon}</span>
                 </div>
-                <h3 className="text-lg font-bold text-on-surface">{item.title}</h3>
-                <p className="mt-2 text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg font-bold text-on-surface leading-snug">{item.title}</h3>
+                <p className="mt-2 text-sm font-normal text-on-surface-variant leading-relaxed">{item.desc}</p>
               </ScrollReveal>
             ))}
           </div>
@@ -208,8 +205,8 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface">Kos di Sekitar Kamu</h2>
-              <p className="mt-1 text-sm text-on-surface-variant">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">Kos di Sekitar Kamu</h2>
+              <p className="mt-1 text-sm font-normal text-on-surface-variant leading-relaxed">
                 Menampilkan {totalKos} kos tersedia
               </p>
             </div>
@@ -229,7 +226,7 @@ export default async function HomePage() {
                 </ScrollReveal>
               ))
             ) : (
-              <p className="col-span-3 text-center text-sm text-on-surface-variant py-12">
+              <p className="col-span-3 text-center text-sm font-normal text-on-surface-variant py-12">
                 Belum ada kos tersedia saat ini.
               </p>
             )}
@@ -250,8 +247,8 @@ export default async function HomePage() {
       <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface">Mudahnya Booking</h2>
-            <p className="mt-2 text-sm text-on-surface-variant">Proses transparan untuk keamanan bersama.</p>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">Mudahnya Booking</h2>
+            <p className="mt-2 text-sm font-normal text-on-surface-variant leading-relaxed">Proses transparan untuk keamanan bersama.</p>
           </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6 relative">
             {STEPS.map((step, i) => (
@@ -263,14 +260,14 @@ export default async function HomePage() {
                 <div className="flex justify-center">
                   <div className="step-number">{step.num}</div>
                 </div>
-                <h3 className="mt-4 text-base font-bold text-on-surface">{step.title}</h3>
-                <p className="mt-1 text-sm text-on-surface-variant leading-relaxed">{step.desc}</p>
+                <h3 className="mt-4 text-base font-bold text-on-surface leading-snug">{step.title}</h3>
+                <p className="mt-1 text-sm font-normal text-on-surface-variant leading-relaxed">{step.desc}</p>
               </ScrollReveal>
             ))}
           </div>
           <ScrollReveal className="mt-10 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/50 flex items-start gap-3 max-w-3xl mx-auto">
             <span className="material-symbols-outlined text-primary text-xl mt-0.5 shrink-0">info</span>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
+            <p className="text-sm font-normal text-on-surface-variant leading-relaxed">
               Pembayaran hanya dilakukan setelah booking disetujui oleh pemilik kos. Dana Anda akan ditahan oleh sistem NestU untuk menjamin keamanan hingga proses check-in selesai.
             </p>
           </ScrollReveal>
@@ -282,10 +279,10 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <ScrollReveal>
-              <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">
                 Pembayaran yang Jujur &amp; Transparan
               </h2>
-              <p className="mt-4 text-sm text-on-surface-variant leading-relaxed">
+              <p className="mt-4 text-sm font-normal text-on-surface-variant leading-relaxed">
                 Tidak ada biaya tersembunyi. Semua rincian biaya ditampilkan secara jelas sebelum Anda melakukan transaksi. Kami bekerja sama dengan institusi perbankan resmi untuk menjamin keamanan dana Anda.
               </p>
               <div className="mt-6 space-y-3">
@@ -302,22 +299,22 @@ export default async function HomePage() {
             <ScrollReveal style={{ transitionDelay: "0.15s" }}>
               <div className="rounded-2xl p-6 md:p-8 card-shadow bg-white border border-outline-variant/40">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-on-surface">Rincian Pembayaran</h3>
-                  <span className="px-2 py-0.5 text-[10px] font-bold text-outline bg-surface-container-high rounded-full">Contoh ilustrasi</span>
+                  <h3 className="text-lg font-bold text-on-surface leading-snug">Rincian Pembayaran</h3>
+                  <span className="px-2.5 py-0.5 text-[10px] font-semibold text-outline uppercase tracking-wider bg-surface-container-high rounded-full">Contoh ilustrasi</span>
                 </div>
                 <div className="mt-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-on-surface-variant">Harga Sewa (1 Bulan)</span>
+                    <span className="text-sm font-normal text-on-surface-variant">Harga Sewa (1 Bulan)</span>
                     <span className="text-sm font-bold text-on-surface">Rp 1.850.000</span>
                   </div>
                   <div className="border-t border-outline-variant/50" />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-on-surface-variant">Biaya Layanan</span>
+                    <span className="text-sm font-normal text-on-surface-variant">Biaya Layanan</span>
                     <span className="text-sm font-bold text-on-surface">Rp 25.000</span>
                   </div>
                   <div className="border-t border-outline-variant/50" />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-on-surface-variant">Biaya Admin</span>
+                    <span className="text-sm font-normal text-on-surface-variant">Biaya Admin</span>
                     <span className="text-sm font-bold text-on-surface">Rp 5.000</span>
                   </div>
                   <div className="border-t border-outline-variant/50" />
@@ -329,7 +326,7 @@ export default async function HomePage() {
                 <button className="mt-6 w-full py-3.5 bg-primary text-on-primary text-sm font-bold rounded-full hover:bg-[#001a55] transition-all duration-200">
                   Ajukan Booking Sekarang
                 </button>
-                <p className="mt-3 text-xs text-on-surface-variant text-center leading-relaxed">
+                <p className="mt-3 text-xs font-normal text-on-surface-variant text-center leading-relaxed">
                   Dengan mengklik tombol di atas, Anda menyetujui Syarat &amp; Ketentuan Layanan NestU.
                 </p>
               </div>

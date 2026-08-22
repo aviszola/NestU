@@ -109,23 +109,23 @@ export default async function DetailKosSiswaPage({
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
-                  <h1 className="text-xl md:text-2xl font-bold text-on-surface truncate">
+                  <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight truncate">
                     {kos.name}
                   </h1>
                   {isVerified && (
-                    <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 bg-secondary/10 text-secondary text-[10px] font-semibold rounded-full">
+                    <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 bg-secondary/10 text-secondary text-[11px] font-semibold rounded-full uppercase tracking-wider">
                       <span className="material-symbols-outlined text-xs">verified</span>
                       Terverifikasi
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-outline flex items-center gap-1">
-                  <span className="material-symbols-outlined text-base">location_on</span>
+                <p className="text-sm font-normal text-on-surface-variant flex items-center gap-1">
+                  <span className="material-symbols-outlined text-base text-outline">location_on</span>
                   {kos.address}
                 </p>
                 {ownerName && (
-                  <p className="text-sm text-on-surface-variant mt-1">
-                    Pemilik: {ownerName}
+                  <p className="text-sm font-normal text-on-surface-variant mt-1">
+                    Pemilik: <span className="font-semibold text-on-surface">{ownerName}</span>
                   </p>
                 )}
               </div>
@@ -139,7 +139,7 @@ export default async function DetailKosSiswaPage({
                 <a
                   href={`https://wa.me/${formatWhatsAppNumber(kos.whatsapp_number)}`}
                   target="_blank"
-                  className="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-medium text-white hover:brightness-110 transition-all"
+                  className="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-bold text-white hover:brightness-110 transition-all shadow-sm"
                 >
                   Hubungi WA
                 </a>
@@ -148,13 +148,13 @@ export default async function DetailKosSiswaPage({
 
             {/* Description */}
             {kos.description && (
-              <p className="mt-4 text-sm text-on-surface-variant leading-relaxed">
+              <p className="mt-4 text-sm font-normal text-on-surface-variant leading-relaxed">
                 {kos.description}
               </p>
             )}
 
             {/* Distance */}
-            <div className="mt-4 flex flex-wrap gap-2 text-sm">
+            <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium">
               {kos.distance_to_school_km !== null && (
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
                   <span className="material-symbols-outlined text-sm align-text-bottom">school</span>
@@ -165,13 +165,13 @@ export default async function DetailKosSiswaPage({
 
             {/* Facilities */}
             {kos.fasilitas && kos.fasilitas.length > 0 && (
-              <div className="mt-5">
-                <h3 className="text-sm font-semibold text-on-surface mb-3">Fasilitas</h3>
+              <div className="mt-6 pt-5 border-t border-outline-variant/30">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-outline mb-3">Fasilitas</h3>
                 <div className="flex flex-wrap gap-2">
                   {kos.fasilitas.map((f: any) => (
                     <span
                       key={f.id}
-                      className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface px-3 py-1 text-xs text-on-surface-variant"
+                      className="inline-flex items-center gap-1 rounded-lg border border-outline-variant/60 bg-surface px-3 py-1.5 text-xs font-medium text-on-surface-variant"
                     >
                       <span className="material-symbols-outlined text-[16px] text-primary">
                         {facilityIcon(f)}
@@ -186,12 +186,12 @@ export default async function DetailKosSiswaPage({
         </div>
 
         {/* Rooms */}
-        <h2 className="mb-4 mt-8 text-lg font-bold text-on-surface">
+        <h2 className="mb-4 mt-8 text-xl font-bold text-on-surface tracking-tight">
           Kamar ({allRooms?.length ?? 0})
         </h2>
 
         {!allRooms || allRooms.length === 0 ? (
-          <div className="rounded-xl border border-outline-variant bg-white p-8 text-center text-outline text-sm">
+          <div className="rounded-xl border border-outline-variant bg-white p-8 text-center text-outline text-sm font-normal">
             Tidak ada kamar tersedia saat ini.
           </div>
         ) : (
@@ -199,24 +199,29 @@ export default async function DetailKosSiswaPage({
             {allRooms.map((room: any) => (
               <div
                 key={room.id}
-                className="flex items-center justify-between rounded-xl border border-outline-variant bg-white p-4"
+                className="flex items-center justify-between rounded-xl border border-outline-variant bg-white p-4 hover:border-primary/40 transition-colors"
               >
                 <div>
-                  <h3 className="font-medium text-on-surface">
-                    {room.room_number} <span className="text-xs text-outline font-normal">({room.status})</span>
+                  <h3 className="font-bold text-base text-on-surface">
+                    Kamar {room.room_number}{" "}
+                    <span className={`text-xs font-semibold uppercase tracking-wide ml-1.5 px-2 py-0.5 rounded-full ${
+                      room.status === "tersedia" ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-high text-outline"
+                    }`}>
+                      {room.status}
+                    </span>
                   </h3>
-                  <p className="text-sm text-on-surface-variant">
+                  <p className="text-sm font-semibold text-primary mt-1">
                     Rp {Number(room.price_per_month).toLocaleString("id-ID")}/bln
-                    {room.size_sqm ? ` · ${room.size_sqm} m²` : ""}
+                    {room.size_sqm ? <span className="text-xs font-normal text-on-surface-variant"> · {room.size_sqm} m²</span> : ""}
                   </p>
                   {room.description && (
-                    <p className="text-xs text-outline mt-0.5">{room.description}</p>
+                    <p className="text-xs font-normal text-on-surface-variant mt-1 leading-relaxed">{room.description}</p>
                   )}
                 </div>
                 {room.status === "tersedia" && (
                   <a
                     href={`/booking/${kos.id}`}
-                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-on-primary hover:opacity-90 transition-opacity"
+                    className="rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-on-primary hover:opacity-90 active:scale-95 transition-all"
                   >
                     Booking
                   </a>
