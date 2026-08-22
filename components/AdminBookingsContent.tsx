@@ -87,7 +87,7 @@ export default function AdminBookingsContent({
       setOverrideTarget(null);
       setOverrideReason("");
       window.location.reload();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(toReadableError(err));
       setOverrideSubmitting(false);
     }
@@ -124,16 +124,16 @@ export default function AdminBookingsContent({
       <main className="p-margin-mobile md:p-margin-desktop pb-32">
         <div className="flex items-start justify-between mb-stack-lg flex-wrap gap-2">
           <div>
-            <h2 className="font-headline-lg text-headline-lg text-primary">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">
               Booking Masuk
-            </h2>
-            <p className="text-body-md text-on-surface-variant">
+            </h1>
+            <p className="text-sm font-normal text-on-surface-variant mt-1 leading-relaxed">
               Kelola seluruh permintaan pemesanan kamar di platform.
             </p>
           </div>
           <Link
             href="/admin/overrides"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 hover:bg-primary/10 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 hover:bg-primary/10 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">
               history
@@ -151,10 +151,10 @@ export default function AdminBookingsContent({
               </span>
             </div>
             <div>
-              <p className="text-label-md text-on-surface-variant">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-outline mb-0.5">
                 Menunggu Konfirmasi
               </p>
-              <p className="font-headline-md text-headline-md text-primary">
+              <p className="text-2xl font-extrabold text-primary tracking-tight">
                 {stats.pending}
               </p>
             </div>
@@ -166,10 +166,10 @@ export default function AdminBookingsContent({
               </span>
             </div>
             <div>
-              <p className="text-label-md text-on-surface-variant">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-outline mb-0.5">
                 Disetujui (Bulan Ini)
               </p>
-              <p className="font-headline-md text-headline-md text-primary">
+              <p className="text-2xl font-extrabold text-primary tracking-tight">
                 {stats.approvedThisMonth}
               </p>
             </div>
@@ -181,10 +181,10 @@ export default function AdminBookingsContent({
               </span>
             </div>
             <div>
-              <p className="text-label-md text-on-surface-variant">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-outline mb-0.5">
                 Kamar Tersedia
               </p>
-              <p className="font-headline-md text-headline-md text-primary">
+              <p className="text-2xl font-extrabold text-primary tracking-tight">
                 {stats.availableRooms}
               </p>
             </div>

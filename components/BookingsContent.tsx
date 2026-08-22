@@ -59,10 +59,10 @@ export default function BookingsContent({ bookings }: Props) {
     <>
       {/* Page Header */}
       <div className="mb-stack-lg">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight mb-2">
           Riwayat Booking
         </h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">
+        <p className="text-sm md:text-base font-normal text-on-surface-variant leading-relaxed">
           Tinjau masa inap Anda sebelumnya dan kelola reservasi Anda berikutnya.
         </p>
       </div>
@@ -75,10 +75,10 @@ export default function BookingsContent({ bookings }: Props) {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`pb-stack-sm border-b-2 font-label-md text-label-md transition-colors ${
+              className={`pb-stack-sm border-b-2 text-sm font-semibold transition-colors ${
                 isActive
                   ? "border-primary text-primary font-bold"
-                  : "border-transparent text-on-surface-variant hover:text-primary"
+                  : "border-transparent text-on-surface-variant hover:text-primary font-medium"
               }`}
             >
               {tab.label}
@@ -93,14 +93,14 @@ export default function BookingsContent({ bookings }: Props) {
           <span className="material-symbols-outlined text-4xl text-outline">
             calendar_month
           </span>
-          <p className="mt-3 text-on-surface-variant font-body-md text-body-md">
+          <p className="mt-3 text-on-surface-variant text-sm font-normal">
             {bookings.length === 0
               ? "Belum ada booking."
               : "Tidak ada booking dengan filter ini."}
           </p>
           <Link
             href="/kos"
-            className="mt-4 inline-block px-6 py-2 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all"
+            className="mt-4 inline-block px-6 py-2.5 bg-primary text-on-primary font-bold text-sm rounded-lg hover:opacity-90 active:scale-95 transition-all"
           >
             Cari Kos
           </Link>
@@ -138,14 +138,14 @@ export default function BookingsContent({ bookings }: Props) {
 
                 {/* Body */}
                 <div className="p-stack-md flex flex-col flex-grow">
-                  <h3 className="font-title-lg text-title-lg text-primary mb-1">
+                  <h3 className="text-lg font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">
                     {b.rooms?.kos?.name ?? "Kos"}
                   </h3>
-                  <div className="flex items-center gap-2 text-on-surface-variant mb-2">
-                    <span className="material-symbols-outlined text-sm">
+                  <div className="flex items-center gap-1.5 text-on-surface-variant mb-3">
+                    <span className="material-symbols-outlined text-sm text-outline">
                       bed
                     </span>
-                    <span className="font-body-sm text-body-sm">
+                    <span className="text-xs font-normal text-on-surface-variant">
                       {b.rooms?.room_number ?? "Kamar Standar"}
                     </span>
                   </div>
@@ -153,7 +153,7 @@ export default function BookingsContent({ bookings }: Props) {
                   {/* Status Badge */}
                   <div className="mb-stack-md flex">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${cfg.className}`}
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1 ${cfg.className}`}
                     >
                       {cfg.icon && (
                         <span
@@ -169,43 +169,43 @@ export default function BookingsContent({ bookings }: Props) {
 
                   <div className="grid grid-cols-2 gap-4 mb-stack-md bg-surface-container-low p-3 rounded-lg">
                     <div>
-                      <p className="font-label-md text-[10px] uppercase text-outline mb-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
                         TANGGAL MASUK
                       </p>
-                      <p className="font-body-md text-body-md font-semibold">
+                      <p className="text-sm font-semibold text-on-surface">
                         {b.move_in_date
                           ? formatDate(b.move_in_date)
                           : formatDate(b.created_at)}
                       </p>
                     </div>
                     <div>
-                      <p className="font-label-md text-[10px] uppercase text-outline mb-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
                         ID BOOKING
                       </p>
-                      <p className="font-body-md text-body-md font-semibold">
+                      <p className="text-sm font-semibold text-on-surface">
                         {formatBookingId(b.id)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between">
-                    <span className="font-headline-md text-headline-md text-primary">
+                  <div className="mt-auto flex items-center justify-between pt-2 border-t border-outline-variant/20">
+                    <span className="text-base font-bold text-primary">
                       Rp{" "}
                       {(b.rooms?.price_per_month ?? 0).toLocaleString(
                         "id-ID"
                       )}
-                      <span className="text-body-sm font-normal text-on-surface-variant">
+                      <span className="text-xs font-normal text-on-surface-variant">
                         {" "}
                         / bln
                       </span>
                     </span>
                     <Link
                       href={`/bookings/${b.id}`}
-                      className="bg-primary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-2"
+                      className="bg-primary text-on-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5"
                     >
                       Detail
-                      <span className="material-symbols-outlined text-sm">
-                        arrow_forward_ios
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
                       </span>
                     </Link>
                   </div>

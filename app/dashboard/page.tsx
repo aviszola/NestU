@@ -99,15 +99,15 @@ export default async function DashboardPage() {
               <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 p-6 md:p-10 items-center">
                 {/* Left: copy + secondary search */}
                 <ScrollReveal className="flex flex-col justify-center gap-5">
-                  <p className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary-fixed backdrop-blur-sm">
+                  <p className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-fixed backdrop-blur-sm">
                     <span className="material-symbols-outlined !text-sm">home_work</span>
                     Portal Siswa
                   </p>
-                  <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white text-balance">
+                  <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight text-balance">
                     Halo, {profile.full_name?.split(" ")[0] ?? "Siswa"} —{" "}
                     <span className="text-secondary-fixed">cari kos impianmu.</span>
                   </h1>
-                  <p className="text-sm md:text-base text-white/70 max-w-md leading-relaxed">
+                  <p className="text-sm md:text-base font-normal text-white/75 max-w-md leading-relaxed">
                     Jelajahi kos terverifikasi, bandingkan fasilitas, dan amankan
                     kamar impianmu tanpa ribet.
                   </p>
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
                         type="text"
                         name="search"
                         placeholder="Cari kos di sekitar sekolahmu..."
-                        className="h-9 flex-1 border-0 bg-transparent p-0 text-sm text-on-surface outline-none placeholder:text-outline"
+                        className="h-9 flex-1 border-0 bg-transparent p-0 text-sm font-normal text-on-surface outline-none placeholder:text-outline"
                       />
                       <button
                         type="submit"
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
               {/* Left: Kos Terbaru */}
               <div className="xl:col-span-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-on-surface">Kos Terbaru</h2>
+                  <h2 className="text-xl font-bold text-on-surface tracking-tight">Kos Terbaru</h2>
                   <Link
                     href="/kos"
                     className="text-sm font-semibold text-primary hover:underline"
@@ -175,8 +175,8 @@ export default async function DashboardPage() {
                 {/* Booking Aktif — step tracker */}
                 <div className="rounded-2xl border border-outline-variant bg-white overflow-hidden card-shadow">
                   <div className="p-4 border-b border-outline-variant flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-on-surface">Booking Aktif</h3>
-                    <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-tertiary-fixed text-on-tertiary-container">
+                    <h3 className="text-sm font-bold text-on-surface">Booking Aktif</h3>
+                    <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-tertiary-fixed text-on-tertiary-container">
                       {totalBooking} Proses
                     </span>
                   </div>
@@ -191,11 +191,11 @@ export default async function DashboardPage() {
                               <p className="text-sm font-bold text-on-surface truncate">
                                 {booking.rooms?.kos?.name ?? "Kos"}
                               </p>
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${status.className}`}>
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${status.className}`}>
                                 {status.label}
                               </span>
                             </div>
-                            <p className="text-xs text-on-surface-variant mb-3">
+                            <p className="text-xs font-normal text-on-surface-variant mb-3">
                               Kamar {booking.rooms?.room_number ?? "—"} ·{" "}
                               {new Date(booking.move_in_date || booking.created_at).toLocaleDateString("id-ID", {
                                 day: "numeric", month: "short",

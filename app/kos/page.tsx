@@ -127,16 +127,16 @@ export default async function KosPage({
           />
         </div>
         <div className="relative z-20 max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight leading-tight">
             Temukan Kos Impianmu
           </h1>
-          <p className="text-lg text-on-surface-variant mt-2">
+          <p className="text-base md:text-lg font-normal text-on-surface-variant mt-2 max-w-xl mx-auto leading-relaxed">
             Hunian aman dan nyaman untuk mendukung prestasimu.
           </p>
 
           <form action="/kos" method="GET" className="mt-8 max-w-2xl mx-auto">
-            <div className="flex items-center bg-white rounded-full shadow-lg border border-gray-200 overflow-hidden">
-              <span className="material-symbols-outlined text-gray-400 pl-5">
+            <div className="flex items-center bg-white rounded-full shadow-lg border border-outline-variant/50 overflow-hidden focus-within:ring-2 focus-within:ring-primary/20">
+              <span className="material-symbols-outlined text-outline pl-5">
                 search
               </span>
               <input
@@ -144,11 +144,11 @@ export default async function KosPage({
                 name="search"
                 defaultValue={search}
                 placeholder="Cari berdasarkan sekolah atau daerah..."
-                className="flex-1 px-4 py-4 outline-none bg-transparent text-base"
+                className="flex-1 px-4 py-4 outline-none bg-transparent text-sm md:text-base font-normal text-on-surface"
               />
               <button
                 type="submit"
-                className="px-8 py-3 bg-primary text-white font-semibold rounded-full mr-2 hover:opacity-90 transition-colors"
+                className="px-6 md:px-8 py-3 bg-primary text-on-primary font-semibold text-sm rounded-full mr-2 hover:opacity-90 active:scale-95 transition-all duration-200"
               >
                 Cari Sekarang
               </button>
@@ -177,10 +177,10 @@ export default async function KosPage({
             {/* Header Results */}
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-primary">
+                  <h2 className="text-2xl font-bold text-on-surface tracking-tight">
                     Kos di Sekitar Kamu
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-normal text-on-surface-variant mt-0.5">
                     Menampilkan {total} hasil{" "}
                     {search ? `untuk "${search}"` : ""}
                   </p>

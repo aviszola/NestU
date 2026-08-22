@@ -85,16 +85,10 @@ export default async function OwnerDashboardPage() {
         <main className="flex-1 lg:ml-64 px-4 md:px-8 py-6 pb-32 max-w-7xl mx-auto w-full">
           {/* Header */}
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="material-symbols-outlined text-lg">home</span>
-              <span className="text-base font-bold text-on-surface">
-                NestU
-              </span>
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold text-on-surface mt-2">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">
               Kelola Properti Anda
             </h1>
-            <p className="text-sm text-outline mt-1">
+            <p className="text-sm font-normal text-on-surface-variant mt-1 leading-relaxed">
               Pantau dan kelola seluruh properti kos Anda dari satu dashboard
             </p>
           </div>
@@ -108,17 +102,17 @@ export default async function OwnerDashboardPage() {
             ].map((card) => (
               <div
                 key={card.label}
-                className="rounded-xl border border-outline-variant bg-white p-5"
+                className="rounded-xl border border-outline-variant bg-white p-5 card-shadow"
               >
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-2xl text-primary">
                     {card.icon}
                   </span>
                   <div>
-                    <p className="text-2xl font-bold text-on-surface">
+                    <p className="text-2xl font-extrabold text-on-surface tracking-tight">
                       {card.value}
                     </p>
-                    <p className="text-xs text-outline mt-0.5">{card.label}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-outline mt-0.5">{card.label}</p>
                   </div>
                 </div>
               </div>
@@ -126,14 +120,14 @@ export default async function OwnerDashboardPage() {
           </div>
 
           {/* Properties Table */}
-          <div className="rounded-xl border border-outline-variant bg-white overflow-hidden">
+          <div className="rounded-xl border border-outline-variant bg-white overflow-hidden card-shadow">
             <div className="p-5 border-b border-outline-variant">
-              <h3 className="text-base font-bold text-on-surface">
+              <h2 className="text-base font-bold text-on-surface tracking-tight">
                 Daftar Properti
-              </h3>
+              </h2>
             </div>
             {!kosList || kosList.length === 0 ? (
-              <div className="p-10 text-center text-outline text-sm">
+              <div className="p-10 text-center text-outline text-sm font-normal">
                 Belum ada properti.{" "}
                 <Link
                   href="/owner/kos/new"
@@ -147,7 +141,7 @@ export default async function OwnerDashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-surface-container text-left text-xs font-semibold text-outline uppercase tracking-wider">
+                      <tr className="bg-surface-container text-left text-[11px] font-semibold text-outline uppercase tracking-wider">
                         <th className="px-5 py-3">Properti</th>
                         <th className="px-5 py-3">Status</th>
                         <th className="px-5 py-3">Aksi</th>
@@ -178,10 +172,10 @@ export default async function OwnerDashboardPage() {
                                 )}
                               </div>
                               <div>
-                                <p className="font-medium text-on-surface">
+                                <p className="font-bold text-sm text-on-surface">
                                   {k.name}
                                 </p>
-                                <p className="text-xs text-outline mt-0.5">
+                                <p className="text-xs font-normal text-on-surface-variant mt-0.5">
                                   {k.address || ""}
                                 </p>
                               </div>
@@ -189,7 +183,7 @@ export default async function OwnerDashboardPage() {
                           </td>
                           <td className="px-5 py-4">
                             <span
-                              className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${statusBadge(k.verification_status)}`}
+                              className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${statusBadge(k.verification_status)}`}
                             >
                               {statusLabel(k.verification_status)}
                             </span>

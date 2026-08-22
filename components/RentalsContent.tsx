@@ -59,10 +59,10 @@ export default function RentalsContent({ rentals }: Props) {
     <>
       {/* Page Header */}
       <div className="mb-stack-lg">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight mb-2">
           Kamar Saya
         </h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">
+        <p className="text-sm md:text-base font-normal text-on-surface-variant leading-relaxed">
           Kamar kos yang sudah Anda sewa dan bayar.
         </p>
       </div>
@@ -72,16 +72,16 @@ export default function RentalsContent({ rentals }: Props) {
           <span className="material-symbols-outlined text-5xl text-outline block mb-3">
             home_work
           </span>
-          <h3 className="font-title-lg text-title-lg text-on-surface font-bold">
+          <h3 className="text-lg font-bold text-on-surface">
             Belum ada kamar yang disewa
           </h3>
-          <p className="text-body-md text-on-surface-variant mt-1 max-w-sm mx-auto">
+          <p className="text-sm font-normal text-on-surface-variant mt-1 max-w-sm mx-auto leading-relaxed">
             Setelah booking Anda disetujui dan pembayaran lunas, kamar akan
             muncul di sini.
           </p>
           <Link
             href="/kos"
-            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all"
+            className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined !text-[18px]">search</span>
             Cari Kos
@@ -112,7 +112,7 @@ export default function RentalsContent({ rentals }: Props) {
                     }}
                   />
                   <span
-                    className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur-md ${
+                    className={`absolute top-4 right-4 px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1 backdrop-blur-md ${
                       isExpired
                         ? "bg-surface/80 text-on-surface-variant"
                         : "bg-secondary/90 text-white"
@@ -127,45 +127,45 @@ export default function RentalsContent({ rentals }: Props) {
 
                 {/* Body */}
                 <div className="p-stack-md flex flex-col flex-grow">
-                  <h3 className="font-title-lg text-title-lg text-primary mb-1 truncate">
+                  <h3 className="text-lg font-bold text-on-surface group-hover:text-primary transition-colors mb-1 truncate">
                     {r.kos_name ?? "Kos"}
                   </h3>
-                  <p className="text-body-sm text-on-surface-variant flex items-center gap-1 mb-stack-md truncate">
-                    <span className="material-symbols-outlined !text-[14px]">location_on</span>
+                  <p className="text-xs font-normal text-on-surface-variant flex items-center gap-1 mb-stack-md truncate">
+                    <span className="material-symbols-outlined !text-[14px] text-outline">location_on</span>
                     {r.kos_address ?? "Alamat tidak tersedia"}
                   </p>
 
                   <div className="grid grid-cols-2 gap-4 mb-stack-md bg-surface-container-low p-3 rounded-lg">
                     <div>
-                      <p className="font-label-md text-[10px] uppercase text-outline mb-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
                         Kamar
                       </p>
-                      <p className="font-body-md font-semibold">
+                      <p className="text-sm font-semibold text-on-surface">
                         {r.rooms?.room_number ?? "-"}
                       </p>
                     </div>
                     <div>
-                      <p className="font-label-md text-[10px] uppercase text-outline mb-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
                         Berakhir
                       </p>
-                      <p className="font-body-md font-semibold">
+                      <p className="text-sm font-semibold text-on-surface">
                         {end ? formatDate(end.toISOString()) : "-"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between">
-                    <span className="font-headline-md text-headline-md text-primary">
+                  <div className="mt-auto flex items-center justify-between pt-2 border-t border-outline-variant/20">
+                    <span className="text-base font-bold text-primary">
                       {formatPrice(r.rooms?.price_per_month)}
-                      <span className="text-body-sm font-normal text-on-surface-variant">
+                      <span className="text-xs font-normal text-on-surface-variant">
                         {" "}
                         / bulan
                       </span>
                     </span>
-                    <span className="inline-flex items-center gap-1 text-primary font-bold text-label-md">
+                    <span className="inline-flex items-center gap-1 text-primary font-semibold text-xs group-hover:underline">
                       Detail
-                      <span className="material-symbols-outlined text-sm">
-                        arrow_forward_ios
+                      <span className="material-symbols-outlined text-xs">
+                        arrow_forward
                       </span>
                     </span>
                   </div>

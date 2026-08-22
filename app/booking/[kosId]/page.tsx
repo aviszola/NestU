@@ -109,12 +109,12 @@ export default function BookingPage({
         <div className="mb-stack-lg">
           <Link
             href={`/kos/${kos?.id || ""}`}
-            className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-stack-sm"
+            className="flex items-center gap-1.5 text-outline hover:text-primary transition-colors mb-2"
           >
-            <span className="material-symbols-outlined">arrow_back</span>
-            <span className="font-label-md text-label-md">KEMBALI KE DETAIL</span>
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">KEMBALI KE DETAIL</span>
           </Link>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">Pengajuan Booking</h2>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">Pengajuan Booking</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
@@ -136,32 +136,32 @@ export default function BookingPage({
                   <div className="flex justify-between items-start">
                     <div>
                       {kos?.verification_status === "verified" && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-secondary/10 text-secondary rounded-lg font-label-md text-label-md mb-2">
-                          <span className="material-symbols-outlined text-[14px]">verified</span> Terverifikasi
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-secondary/10 text-secondary rounded-full text-[10px] font-semibold uppercase tracking-wider mb-2">
+                          <span className="material-symbols-outlined text-[13px]">verified</span> Terverifikasi
                         </span>
                       )}
-                      <h3 className="font-headline-md text-headline-md text-on-surface">{kos?.name || "Kos"}</h3>
+                      <h2 className="text-lg font-bold text-on-surface">{kos?.name || "Kos"}</h2>
                       {room && (
-                        <p className="font-body-md text-body-md text-on-surface-variant">
+                        <p className="text-sm font-normal text-on-surface-variant mt-0.5">
                           Kamar {room.room_number || "Tipe Standar"}
                         </p>
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="font-headline-md text-headline-md text-primary">
+                      <p className="text-lg font-bold text-primary">
                         Rp {price.toLocaleString("id-ID")}
                       </p>
-                      <p className="font-body-sm text-body-sm text-outline">/ bulan</p>
+                      <p className="text-xs font-normal text-outline">/ bulan</p>
                     </div>
                   </div>
                   {facilities.length > 0 && (
-                    <div className="mt-stack-md flex flex-wrap gap-stack-sm">
+                    <div className="mt-stack-md flex flex-wrap gap-1.5">
                       {facilities.slice(0, 6).map((f: any, i: number) => (
                         <div
                           key={f.id || i}
-                          className="flex items-center gap-1 px-3 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md text-label-md"
+                          className="flex items-center gap-1 px-2.5 py-1 bg-surface-container rounded-md text-on-surface-variant text-xs font-medium"
                         >
-                          <span className="material-symbols-outlined text-[16px]">{facilityIcon(f)}</span>
+                          <span className="material-symbols-outlined text-[15px] text-primary">{facilityIcon(f)}</span>
                           {f.name}
                         </div>
                       ))}
@@ -173,14 +173,14 @@ export default function BookingPage({
 
             {/* Booking Form */}
             <section className="bg-white rounded-xl p-stack-md shadow-sm border border-outline-variant">
-              <h4 className="font-title-lg text-title-lg mb-stack-md text-on-surface">
+              <h3 className="text-base font-bold mb-stack-md text-on-surface tracking-tight">
                 Informasi Penyewaan
-              </h4>
+              </h3>
               <div className="space-y-stack-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
                   <div className="flex flex-col gap-1">
                     <label
-                      className="font-label-md text-label-md text-on-surface-variant"
+                      className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide"
                       htmlFor="start_date"
                     >
                       Tanggal Pindah
