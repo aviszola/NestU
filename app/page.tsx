@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getFeaturedKos, getTotalKosCount, getKosMinPrices } from "@/lib/supabase/queries";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -7,6 +8,29 @@ import KosCard from "@/components/KosCard";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import Logo from "@/components/ui/Logo";
+import { SITE_URL, SITE_NAME, OG_DEFAULT_IMAGE } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: SITE_NAME, // Homepage: cukup "NestU", tanpa "| NestU"
+  },
+  description:
+    "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
+  alternates: { canonical: `${SITE_URL}/` },
+  openGraph: {
+    title: `${SITE_NAME} — Temukan Kos Impianmu`,
+    description:
+      "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
+    url: `${SITE_URL}/`,
+    images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: `${SITE_NAME} — Temukan Kos Impianmu` }],
+  },
+  twitter: {
+    title: `${SITE_NAME} — Temukan Kos Impianmu`,
+    description:
+      "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
+    images: [OG_DEFAULT_IMAGE],
+  },
+};
 
 const HERO_IMG =
   "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&q=80";

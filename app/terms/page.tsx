@@ -1,6 +1,16 @@
-﻿import Link from "next/link";
+﻿import type { Metadata } from "next";
+import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import Footer from "@/components/layout/Footer";
+import { SITE_URL } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Syarat & Ketentuan",
+  description:
+    "Baca syarat dan ketentuan penggunaan layanan NestU — platform pencarian kos untuk siswa dan mahasiswa Indonesia.",
+  alternates: { canonical: `${SITE_URL}/terms` },
+  robots: { index: true, follow: true },
+};
 
 const SECTIONS = [
   {

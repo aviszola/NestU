@@ -1,6 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import Footer from "@/components/layout/Footer";
+import { SITE_URL, OG_DEFAULT_IMAGE } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Tentang Kami",
+  description:
+    "NestU hadir untuk memastikan setiap siswa dan mahasiswa menemukan hunian aman, nyaman, dan terjangkau. Pelajari misi, nilai, dan kisah kami di sini.",
+  alternates: { canonical: `${SITE_URL}/about` },
+  openGraph: {
+    title: "Tentang Kami | NestU",
+    description:
+      "NestU hadir untuk memastikan setiap siswa dan mahasiswa menemukan hunian aman, nyaman, dan terjangkau. Pelajari misi, nilai, dan kisah kami di sini.",
+    url: `${SITE_URL}/about`,
+    images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: "Tentang NestU" }],
+  },
+};
 
 const VALUES = [
   {

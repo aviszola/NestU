@@ -2,15 +2,74 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { formatWhatsAppNumber } from "@/lib/utils";
 import FavoriteButton from "@/components/FavoriteButton";
 import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
-
 import { facilityIcon } from "@/lib/facilities";
+import { SITE_URL, SITE_NAME, LOGO_URL, truncate } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+/** generateMetadata — title & OG unik per kos (pakai nama + alamat + foto asli). */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: raw } = await supabase
+    .from("kos")
+    .select("name, address, description, foto")
+    .eq("id", id)
+    .single();
+
+  if (!raw) return { title: "Kos Tidak Ditemukan" };
+
+  const name = raw.name ?? "Kos";
+  const address = raw.address ?? "";
+  const foto: string[] = Array.isArray(raw.foto) ? raw.foto : [];
+  const ogImage = foto[0] ?? null;
+
+  // Title: "Nama Kos — Kos Dekat Sekolah di Kota | NestU" (≤ 60 karakter)
+  const title = truncate(`${name} — Kos di ${address.split(",").slice(-2).join(",").trim()}`, 58);
+
+  // Description: kombinasi deskripsi + alamat (140-160 karakter)
+  const rawDesc = raw.description
+    ? `${truncate(raw.description, 80)} — Berlokasi di ${address}.`
+    : `Kos ${name} berlokasi di ${address}. Temukan fasilitas lengkap, harga terjangkau, dan booking online mudah di NestU.`;
+  const description = truncate(rawDesc, 158);
+
+  const canonicalUrl = `${SITE_URL}/kos/${id}`;
+  const ogImages = ogImage
+    ? [{ url: ogImage, width: 1200, height: 630, alt: `Foto ${name}` }]
+    : [{ url: `${SITE_URL}/images/og-default.jpg`, width: 1200, height: 630, alt: SITE_NAME }];
+
+  return {
+    title,
+    description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title: `${title} | ${SITE_NAME}`,
+      description,
+      url: canonicalUrl,
+      type: "website",
+      locale: "id_ID",
+      siteName: SITE_NAME,
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | ${SITE_NAME}`,
+      description,
+      images: ogImages.map((i) => i.url),
+    },
+  };
+}
 
 export default async function DetailKosSiswaPage({
   params,
@@ -98,7 +157,14 @@ export default async function DetailKosSiswaPage({
             <div className="flex gap-2 overflow-x-auto p-2">
               {kos.foto.map((url: string, i: number) => (
                 <div key={i} className="relative h-64 w-96 shrink-0 rounded-lg overflow-hidden">
-                  <Image src={url} alt={`Foto ${i + 1}`} fill sizes="384px" className="object-cover" />
+                  <Image
+                    src={url}
+                    alt={`${kos.name} — foto ${i + 1}`}
+                    fill
+                    sizes="384px"
+                    className="object-cover"
+                    priority={i === 0}
+                  />
                 </div>
               ))}
             </div>
@@ -231,6 +297,53 @@ export default async function DetailKosSiswaPage({
           </div>
         )}
       </main>
+
+      {/* ── JSON-LD Structured Data (schema.org LodgingBusiness) ── */}
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LodgingBusiness",
+            name: kos.name,
+            description: kos.description ?? `Kos ${kos.name} di ${kos.address}`,
+            url: `${SITE_URL}/kos/${kos.id}`,
+            image: Array.isArray(kos.foto) && kos.foto.length > 0 ? kos.foto : undefined,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: kos.address,
+              addressCountry: "ID",
+            },
+            ...(kos.latitude && kos.longitude
+              ? { geo: { "@type": "GeoCoordinates", latitude: kos.latitude, longitude: kos.longitude } }
+              : {}),
+            ...(tersedia.length > 0
+              ? {
+                  priceRange: `Rp ${Number(tersedia[0].price_per_month).toLocaleString("id-ID")}/bulan`,
+                  offers: {
+                    "@type": "Offer",
+                    price: tersedia[0].price_per_month,
+                    priceCurrency: "IDR",
+                    availability: "https://schema.org/InStock",
+                  },
+                }
+              : {}),
+            amenityFeature: (kos.fasilitas ?? []).map((f: any) => ({
+              "@type": "LocationFeatureSpecification",
+              name: f.name,
+              value: true,
+            })),
+            provider: {
+              "@type": "Organization",
+              name: SITE_NAME,
+              url: SITE_URL,
+              logo: LOGO_URL,
+            },
+          }),
+        }}
+      />
+
       <Footer />
       {isSiswa && <BottomNav activePage="search" userRole="siswa" />}
     </div>

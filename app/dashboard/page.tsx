@@ -73,10 +73,18 @@ export default async function DashboardPage() {
   // Indeks langkah booking saat ini (0-3) — data nyata dari status.
   const getStepIndex = (b: any) => {
     if (b.status === "completed") return 3;
-    if (b.status === "approved" && b.payment_status === "lunas") return 2;
-    if (b.status === "approved") return 1;
-    return 0;
+    if (b.payment_status === "lunas") return 2; // Bayar selesai, menunggu completed
+    if (b.payment_status === "menunggu_konfirmasi") return 2; // Siswa sudah upload, step Bayar aktif
+    if (b.status === "approved") return 1; // Disetujui, belum bayar
+    return 0; // pending
   };
+
+  // Apakah step "Bayar" sedang dalam proses konfirmasi
+  const isWaitingConfirm = (b: any) =>
+    b.payment_status === "menunggu_konfirmasi";
+  // Apakah step "Bayar" sudah lunas tapi booking belum selesai
+  const isPaymentDone = (b: any) =>
+    b.payment_status === "lunas" && b.status !== "completed";
 
   return (
     <div className="min-h-screen bg-surface">
@@ -203,31 +211,46 @@ export default async function DashboardPage() {
                             </p>
                             {/* Step tracker */}
                             <div className="flex items-center justify-between">
-                              {BOOKING_STEPS.map((step, i) => (
-                                <div key={step.key} className="flex flex-1 items-center last:flex-none">
-                                  <div className="flex flex-col items-center gap-1 flex-1">
-                                    <span
-                                      className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
-                                        i < idx
-                                          ? "bg-secondary text-white"
-                                          : i === idx
-                                            ? "bg-primary text-white ring-4 ring-primary/15"
-                                            : "bg-surface-container text-on-surface-variant"
-                                      }`}
-                                    >
-                                      {i < idx ? (
-                                        <span className="material-symbols-outlined !text-[11px]">check</span>
-                                      ) : (
-                                        <span className="text-[10px] font-bold">{i + 1}</span>
+                              {BOOKING_STEPS.map((step, i) => {
+                                const idx = getStepIndex(booking);
+                                const waitConf = isWaitingConfirm(booking);
+                                const payDone = isPaymentDone(booking);
+                                // Step i sudah selesai jika:
+                                // - i < idx, ATAU
+                                // - i === 2 dan payment lunas (payDone) → lingkaran centang
+                                const isDone = i < idx || (i === 2 && payDone);
+                                // Step aktif saat ini
+                                const isActive = !isDone && i === idx;
+                                return (
+                                  <div key={step.key} className="flex flex-1 items-center last:flex-none">
+                                    <div className="flex flex-col items-center gap-0.5 flex-1">
+                                      <span
+                                        className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+                                          isDone
+                                            ? "bg-secondary text-white"
+                                            : isActive
+                                              ? "bg-primary text-white ring-4 ring-primary/15"
+                                              : "bg-surface-container text-on-surface-variant"
+                                        }`}
+                                      >
+                                        {isDone ? (
+                                          <span className="material-symbols-outlined !text-[11px]">check</span>
+                                        ) : (
+                                          <span className="text-[10px] font-bold">{i + 1}</span>
+                                        )}
+                                      </span>
+                                      <span className="text-[9px] text-on-surface-variant whitespace-nowrap hidden sm:block">{step.label}</span>
+                                      {/* Sub-label untuk state menunggu konfirmasi di step Bayar */}
+                                      {i === 2 && isActive && waitConf && (
+                                        <span className="text-[8px] text-tertiary font-medium whitespace-nowrap hidden sm:block leading-tight">Menunggu konfirmasi</span>
                                       )}
-                                    </span>
-                                    <span className="text-[9px] text-on-surface-variant whitespace-nowrap hidden sm:block">{step.label}</span>
+                                    </div>
+                                    {i < BOOKING_STEPS.length - 1 && (
+                                      <span className={`h-0.5 flex-1 mx-1 ${isDone ? "bg-secondary" : "bg-surface-container-high"}`} />
+                                    )}
                                   </div>
-                                  {i < BOOKING_STEPS.length - 1 && (
-                                    <span className={`h-0.5 flex-1 mx-1 ${i < idx ? "bg-secondary" : "bg-surface-container-high"}`} />
-                                  )}
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         );

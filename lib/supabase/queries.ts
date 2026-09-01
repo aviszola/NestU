@@ -888,8 +888,34 @@ export async function submitPaymentProof(
   client: any,
   bookingId: string,
   proofPath: string,
-  note?: string | null
+  note: string | null | undefined,
+  fileMetadata: { type: string; size: number }
 ): Promise<void> {
+  // ── Validasi tipe dan ukuran file (wajib — tidak bisa di-skip) ────────────
+  // fileMetadata sekarang REQUIRED. Caller wajib meneruskan metadata file
+  // sebelum upload ke storage. Bucket storage (migration 032) tetap jalan
+  // sebagai lapis kedua, tapi validasi eksplisit ini memberikan pesan error
+  // yang jelas ke user daripada error storage generic.
+  const ALLOWED_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "application/pdf",
+  ];
+  const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+  if (!ALLOWED_TYPES.includes(fileMetadata.type)) {
+    throw new Error(
+      `Tipe file tidak diizinkan: ${fileMetadata.type}. Hanya JPG, PNG, WebP, dan PDF yang diterima.`
+    );
+  }
+  if (fileMetadata.size > MAX_SIZE_BYTES) {
+    const sizeMB = (fileMetadata.size / (1024 * 1024)).toFixed(1);
+    throw new Error(
+      `Ukuran file (${sizeMB} MB) melebihi batas maksimum 5 MB.`
+    );
+  }
+
   // Verifikasi eksplisit: hanya student pemilik booking yang bisa kirim bukti.
   // (RLS insert-only student sudah membatasi, tapi beri pesan jelas sebelum PATCH.)
   const { data: { user } } = await client.auth.getUser();

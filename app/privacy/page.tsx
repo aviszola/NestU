@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import Footer from "@/components/layout/Footer";
+import { SITE_URL } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Kebijakan Privasi",
+  description:
+    "Pelajari bagaimana NestU mengumpulkan, menggunakan, dan melindungi data pribadi Anda sesuai peraturan yang berlaku di Indonesia.",
+  alternates: { canonical: `${SITE_URL}/privacy` },
+  robots: { index: true, follow: true },
+};
 
 const SECTIONS = [
   {

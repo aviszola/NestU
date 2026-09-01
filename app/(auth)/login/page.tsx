@@ -202,10 +202,10 @@ function LoginContent() {
 
             <div className="mb-stack-lg text-center md:text-left">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
-                Selamat Datang Kembali
+                Selamat Datang Kembali!
               </h2>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Silakan masukkan detail akun Anda untuk melanjutkan.
+                Yuk lanjut cari kos impianmu.
               </p>
             </div>
 

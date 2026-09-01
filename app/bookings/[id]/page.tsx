@@ -16,6 +16,7 @@ import { toastSuccess, toastError, toastInfo, toastLoading, toastDismiss } from 
 import { getSnapScriptUrl } from "@/lib/midtrans";
 import { BOOKING_STATUS, getStatusKey } from "@/lib/bookingStatus";
 import { formatWhatsAppNumber } from "@/lib/utils";
+import Footer from "@/components/layout/Footer";
 
 interface BookingDetail {
   id: string;
@@ -152,7 +153,10 @@ export default function BookingDetailPage() {
       if (upErr) throw new Error("Gagal unggah file. Pastikan bucket 'bukti-transfer' ada.");
 
       // Simpan PATH (bukan public URL) — akses via signed URL
-      await submitPaymentProof(supabase, id, path, note || null);
+      await submitPaymentProof(supabase, id, path, note || null, {
+        type: proofFile.type,
+        size: proofFile.size,
+      });
       toastDismiss(toastId);
       toastSuccess("Bukti transfer terkirim. Menunggu konfirmasi pemilik.");
       setModalOpen(false);
@@ -269,9 +273,24 @@ export default function BookingDetailPage() {
   const kos = booking.rooms?.kos;
   const total = booking.total_amount ?? (booking.rooms?.price_per_month ?? 0) * (booking.duration_months ?? 1);
 
+  // ── Stepper helpers (same logic as dashboard widget) ──
+  const BOOKING_STEPS_DETAIL = [
+    { key: "pending", label: "Menunggu" },
+    { key: "approved", label: "Disetujui" },
+    { key: "bayar", label: "Bayar" },
+    { key: "completed", label: "Selesai" },
+  ];
+  let stepIdx = 0;
+  if (booking.status === "completed") stepIdx = 3;
+  else if (booking.payment_status === "lunas") stepIdx = 2;
+  else if (booking.payment_status === "menunggu_konfirmasi") stepIdx = 2;
+  else if (booking.status === "approved") stepIdx = 1;
+  const isPayDone = booking.payment_status === "lunas" && booking.status !== "completed";
+
   return (
-    <div className="min-h-screen bg-background px-margin-mobile md:px-margin-desktop py-stack-lg">
-      <div className="max-w-3xl mx-auto">
+    <>
+      <div className="min-h-screen bg-background px-margin-mobile md:px-margin-desktop py-stack-lg">
+        <div className="max-w-3xl mx-auto">
         {/* Back */}
         <Link
           href="/bookings"
@@ -328,6 +347,52 @@ export default function BookingDetailPage() {
                 {statusLabels[getStatusKeyLocal(booking)] || booking.status}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* ── Progress Stepper ── */}
+        <div className="bg-surface-container-lowest rounded-xl card-shadow p-4 mb-gutter">
+          <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-4">
+            Progress Booking
+          </p>
+          <div className="flex items-start justify-between">
+            {BOOKING_STEPS_DETAIL.map((step, i) => {
+              const isDone = i < stepIdx || (i === 2 && isPayDone);
+              const isActive = !isDone && i === stepIdx;
+              return (
+                <div key={step.key} className="flex flex-1 items-center last:flex-none">
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <span
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors font-bold text-sm ${
+                        isDone
+                          ? "bg-secondary text-white"
+                          : isActive
+                            ? "bg-primary text-white ring-4 ring-primary/15"
+                            : "bg-surface-container text-on-surface-variant"
+                      }`}
+                    >
+                      {isDone ? (
+                        <span className="material-symbols-outlined !text-base">check</span>
+                      ) : (
+                        <span>{i + 1}</span>
+                      )}
+                    </span>
+                    <span className={`text-[11px] font-medium text-center whitespace-nowrap ${isActive ? "text-primary" : isDone ? "text-secondary" : "text-on-surface-variant"}`}>
+                      {step.label}
+                    </span>
+                    {/* Sub-label saat menunggu konfirmasi pemilik */}
+                    {i === 2 && isActive && waitingConfirm && (
+                      <span className="text-[10px] text-tertiary font-medium text-center leading-tight">
+                        Menunggu konfirmasi pemilik
+                      </span>
+                    )}
+                  </div>
+                  {i < BOOKING_STEPS_DETAIL.length - 1 && (
+                    <span className={`h-0.5 flex-1 mx-2 mt-[-16px] ${isDone ? "bg-secondary" : "bg-surface-container-high"}`} />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -503,6 +568,8 @@ export default function BookingDetailPage() {
           </div>
         </form>
       </Modal>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }

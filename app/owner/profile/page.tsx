@@ -6,15 +6,20 @@ import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import { updateProfile } from "@/lib/supabase/actions";
+import AvatarUploadField from "@/components/AvatarUploadField";
+import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 
 export default function OwnerProfilePage() {
   const router = useRouter();
-  const [userId, setUserId] = useState("");
+
   const [profile, setProfile] = useState({ full_name: "", email: "", phone: "" });
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
+
+  // Avatar — shared hook (satu sumber kebenaran bersama /profile siswa)
+  const avatar = useAvatarUpload({ onError: (m) => { setIsError(true); setMsg(m); } });
 
   useEffect(() => {
     async function load() {
@@ -22,11 +27,10 @@ export default function OwnerProfilePage() {
       const sup = createClient();
       const { data: { user } } = await sup.auth.getUser();
       if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
-      setUserId(user.id);
 
       const { data: prof } = await sup
         .from("profiles")
-        .select("full_name, phone")
+        .select("full_name, phone, avatar_url")
         .eq("id", user.id)
         .single();
       setProfile({
@@ -34,9 +38,11 @@ export default function OwnerProfilePage() {
         email: user.email || "",
         phone: prof?.phone || "",
       });
+      avatar.initialize(prof?.avatar_url || "");
       setLoaded(true);
     }
     load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   async function handleSave(e: React.FormEvent) {
@@ -45,9 +51,17 @@ export default function OwnerProfilePage() {
     setMsg("");
     setIsError(false);
 
+    let uploadedUrl = avatar.avatarUrl;
+    if (avatar.avatarFile) {
+      const url = await avatar.uploadAvatar();
+      if (!url) { setSaving(false); return; }
+      uploadedUrl = url;
+    }
+
     const result = await updateProfile({
       fullName: profile.full_name,
       phone: profile.phone,
+      avatarUrl: uploadedUrl,
     });
 
     setSaving(false);
@@ -57,17 +71,20 @@ export default function OwnerProfilePage() {
       return;
     }
 
+    avatar.commitUpload(uploadedUrl);
     setIsError(false);
     setMsg("Profil berhasil disimpan!");
   }
 
   if (!loaded) return null;
 
+  const userInitial = (profile.full_name || "P").charAt(0).toUpperCase();
+
   return (
     <>
       <TopNav
         userRole="pemilik"
-        userAvatar="/images/avatar-placeholder.svg"
+        userAvatar={avatar.avatarPreview || "/images/avatar-placeholder.svg"}
         showSearch
         searchPlaceholder="Cari..."
         searchValue=""
@@ -79,6 +96,11 @@ export default function OwnerProfilePage() {
           <h1 className="text-2xl font-bold text-on-surface mb-6">Profil Saya</h1>
 
           <form onSubmit={handleSave} className="bg-white rounded-xl border border-outline-variant p-6 space-y-5">
+
+            {/* ── Avatar upload (shared component) ── */}
+            <AvatarUploadField avatar={avatar} initial={userInitial} />
+
+            {/* ── Nama Lengkap ── */}
             <div>
               <label className="block text-sm font-medium text-on-surface-variant mb-1">Nama Lengkap</label>
               <input
@@ -90,17 +112,19 @@ export default function OwnerProfilePage() {
               />
             </div>
 
+            {/* ── Email (readonly) ── */}
             <div>
               <label className="block text-sm font-medium text-on-surface-variant mb-1">Email</label>
               <input
                 type="email"
                 value={profile.email}
                 readOnly
-                className="w-full rounded-lg border border-outline-variant px-4 py-3 text-sm bg-gray-50 text-gray-500 cursor-not-allowed"
+                className="w-full rounded-lg border border-outline-variant px-4 py-3 text-sm bg-surface-container text-on-surface-variant cursor-not-allowed"
               />
               <p className="text-xs text-outline mt-1">Email tidak dapat diubah.</p>
             </div>
 
+            {/* ── Nomor Telepon ── */}
             <div>
               <label className="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon</label>
               <input
