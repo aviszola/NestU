@@ -29,7 +29,7 @@ export default function KosCard({
         {foto ? (
           <Image
             src={foto}
-            alt={kos.name}
+            alt={`Foto kos ${kos.name}${kos.address ? ` di ${kos.address.split(",")[0]}` : ""}`}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

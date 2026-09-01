@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { getKosList, getFacilities } from "@/lib/supabase/queries";
+import { getKosList, getFacilities, getKosMinPrices } from "@/lib/supabase/queries";
+import type { Metadata } from "next";
+import Image from "next/image";
 import KosCard from "@/components/KosCard";
 import FilterSidebar from "@/components/kos/FilterSidebar";
 import FilterChips from "@/components/kos/FilterChips";
@@ -10,6 +12,27 @@ import Logo from "@/components/ui/Logo";
 import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
+import { SITE_URL, OG_DEFAULT_IMAGE } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Cari Kos Terdekat",
+  description:
+    "Temukan ratusan pilihan kos terverifikasi di dekat sekolah atau kampusmu. Filter berdasarkan harga, lokasi, dan fasilitas — booking online langsung di NestU.",
+  alternates: { canonical: `${SITE_URL}/kos` },
+  openGraph: {
+    title: "Cari Kos Terdekat | NestU",
+    description:
+      "Temukan ratusan pilihan kos terverifikasi di dekat sekolah atau kampusmu. Filter berdasarkan harga, lokasi, dan fasilitas — booking online langsung di NestU.",
+    url: `${SITE_URL}/kos`,
+    images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: "Cari Kos Terdekat — NestU" }],
+  },
+  twitter: {
+    title: "Cari Kos Terdekat | NestU",
+    description:
+      "Temukan ratusan pilihan kos terverifikasi di dekat sekolah atau kampusmu. Filter berdasarkan harga, lokasi, dan fasilitas — booking online langsung di NestU.",
+    images: [OG_DEFAULT_IMAGE],
+  },
+};
 
 export default async function KosPage({
   searchParams,
@@ -86,25 +109,12 @@ export default async function KosPage({
   const { data: kosList, total } = kosResult;
   const totalPages = Math.ceil(total / limit);
 
-  // Fetch cheapest room prices for displayed kos
-  let minPriceMap: Record<string, number> = {};
-  if (kosList.length > 0) {
-    const kosIds = kosList.map((k) => k.id);
-    const { data: rooms } = await supabase
-      .from("rooms")
-      .select("kos_id, price_per_month")
-      .in("kos_id", kosIds)
-      .eq("status", "tersedia")
-      .order("price_per_month", { ascending: true });
-
-    if (rooms) {
-      for (const r of rooms) {
-        if (minPriceMap[r.kos_id] === undefined) {
-          minPriceMap[r.kos_id] = r.price_per_month;
-        }
-      }
-    }
-  }
+  // Fetch cheapest room prices for displayed kos — sama dengan homepage,
+  // satu sumber kebenaran via getKosMinPrices (hanya kamar berstatus 'tersedia').
+  const minPriceMap: Record<string, number> =
+    kosList.length > 0
+      ? await getKosMinPrices(supabase, kosList.map((k) => k.id))
+      : {};
 
   const kosWithFav = kosList.map((k) => ({
     ...k,
@@ -119,11 +129,14 @@ export default async function KosPage({
       <section className="relative py-12 px-4 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary-container/10 z-10" />
-          <div
-            className="w-full h-full bg-cover bg-center opacity-30"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80')`,
-            }}
+          <Image
+            src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80"
+            alt=""
+            fill
+            className="object-cover opacity-30"
+            aria-hidden="true"
+            priority
+            sizes="100vw"
           />
         </div>
         <div className="relative z-20 max-w-4xl mx-auto text-center">

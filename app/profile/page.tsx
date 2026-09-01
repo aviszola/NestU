@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfile, changePassword, logout } from "@/lib/supabase/actions";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
+import AvatarUploadField from "@/components/AvatarUploadField";
+import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -23,9 +24,6 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [role, setRole] = useState<"siswa" | "pemilik" | "admin" | "">("");
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState("");
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   // Password fields
   const [oldPassword, setOldPassword] = useState("");
@@ -35,7 +33,8 @@ export default function ProfilePage() {
   // UI state
   const [isEditing, setIsEditing] = useState(false);
 
-  const fileRef = useRef<HTMLInputElement>(null);
+  // Avatar — shared hook (satu sumber kebenaran bersama owner/profile)
+  const avatar = useAvatarUpload({ onError: (msg) => setError(msg) });
 
   useEffect(() => {
     (async () => {
@@ -57,43 +56,10 @@ export default function ProfilePage() {
       setPhone(profile.phone ?? "");
       setSchoolName(profile.school_name ?? "");
       setRole(profile.role ?? "");
-      setAvatarUrl(profile.avatar_url ?? "");
-      setAvatarPreview(profile.avatar_url ?? "");
+      avatar.initialize(profile.avatar_url ?? "");
       setLoading(false);
     })();
   }, [router]);
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setError("File avatar harus berupa gambar, maksimal 2MB");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      setError("File avatar harus berupa gambar, maksimal 2MB");
-      return;
-    }
-    setError(null);
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
-  }
-
-  async function uploadAvatar(): Promise<string | null> {
-    if (!avatarFile) return avatarUrl || null;
-
-    const sup = createClient();
-    const ext = avatarFile.name.split(".").pop() ?? "jpg";
-    const filePath = `avatar-${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await sup.storage
-      .from("avatars")
-      .upload(filePath, avatarFile, { upsert: true });
-    if (uploadError) { setError("Gagal upload avatar: " + uploadError.message); return null; }
-
-    const { data: publicUrl } = sup.storage.from("avatars").getPublicUrl(filePath);
-    return publicUrl.publicUrl;
-  }
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -101,9 +67,9 @@ export default function ProfilePage() {
     setSuccess(null);
     setSaving(true);
 
-    let uploadedUrl = avatarUrl;
-    if (avatarFile) {
-      const url = await uploadAvatar();
+    let uploadedUrl = avatar.avatarUrl;
+    if (avatar.avatarFile) {
+      const url = await avatar.uploadAvatar();
       if (!url) { setSaving(false); return; }
       uploadedUrl = url;
     }
@@ -117,8 +83,7 @@ export default function ProfilePage() {
 
     setSaving(false);
     if (result.error) { setError(result.error); return; }
-    setAvatarUrl(uploadedUrl);
-    setAvatarFile(null);
+    avatar.commitUpload(uploadedUrl);
     setSuccess("Profil berhasil disimpan");
     setIsEditing(false);
   }
@@ -198,51 +163,10 @@ export default function ProfilePage() {
 
               <form onSubmit={handleSaveProfile} className="space-y-4">
                 {/* Avatar */}
-                <div className="flex items-center gap-4 mb-4">
-                  {avatarPreview ? (
-                    <Image
-                      src={avatarPreview}
-                      alt="Preview"
-                      width={64}
-                      height={64}
-                      className="h-16 w-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-16 w-16 rounded-full bg-primary text-on-primary flex items-center justify-center text-lg font-bold">
-                      {userInitial}
-                    </div>
-                  )}
-                  {isEditing && (
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => fileRef.current?.click()}
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        Upload New Photo
-                      </button>
-                      {avatarUrl && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAvatarPreview("");
-                            setAvatarUrl("");
-                            setAvatarFile(null);
-                          }}
-                          className="block text-xs text-error hover:underline mt-0.5"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileChange}
+                <AvatarUploadField
+                  avatar={avatar}
+                  initial={userInitial}
+                  isEditing={isEditing}
                 />
 
                 {/* Full Name */}

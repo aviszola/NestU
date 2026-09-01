@@ -32,7 +32,7 @@ const adminMenu: MenuItem[] = [
 ];
 
 const studentMenu: MenuItem[] = [
-  { label: "Cari", icon: "search", href: "/kos", page: "search" },
+  { label: "Cari", icon: "search", href: "/dashboard", page: "search" },
   { label: "Favorit", icon: "favorite", href: "/favorites", page: "favorites" },
   { label: "Booking", icon: "receipt_long", href: "/bookings", page: "bookings" },
   { label: "Kamar Saya", icon: "home_work", href: "/rental", page: "rental" },

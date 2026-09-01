@@ -14,7 +14,7 @@ interface Tab {
 
 // Satu-satunya bottom nav NestU — label Bahasa Indonesia konsisten di semua halaman
 const studentTabs: Tab[] = [
-  { label: "Cari", icon: "search", href: "/kos", page: "search" },
+  { label: "Cari", icon: "search", href: "/dashboard", page: "search" },
   { label: "Favorit", icon: "favorite", href: "/favorites", page: "favorites" },
   { label: "Booking", icon: "receipt_long", href: "/bookings", page: "bookings" },
   { label: "Profil", icon: "person", href: "/profile", page: "profile" },
