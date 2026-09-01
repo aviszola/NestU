@@ -74,3 +74,46 @@ export function mapAuthError(err: any): string {
 
   return "Gagal memproses otentikasi. Silakan coba beberapa saat lagi.";
 }
+
+/**
+ * Ekstrak nama Kota/Kabupaten dari alamat lengkap kos.
+ * Mengutamakan segmen yang berisi "Kota", "Kabupaten", atau "Kab."
+ * dan mengabaikan kode pos 5 digit (mis. 65165) serta kata "Indonesia".
+ *
+ * Contoh:
+ * - "Jl. Sigura-gura, Sumbersari, Kota Malang, Jawa Timur 65145" → "Kota Malang"
+ * - "Jl. Raya Tlogomas, Karangploso, Kabupaten Malang" → "Kabupaten Malang"
+ * - "Jl. Bendungan Sutami No. 1, Lowokwaru, 65165, Indonesia" → "Lowokwaru"
+ */
+export function extractCityFromAddress(address: string | null | undefined): string {
+  if (!address) return "Indonesia";
+
+  const parts = address.split(",").map((p) => p.trim()).filter(Boolean);
+
+  // 1. Cari segmen yang punya kata "Kota" atau "Kabupaten" atau "Kab."
+  const cityWithPrefix = parts.find((p) =>
+    /\b(kota|kabupaten|kab\.)\b/i.test(p)
+  );
+  if (cityWithPrefix) {
+    return cityWithPrefix.replace(/\d{5}/g, "").trim();
+  }
+
+  // 2. Filter bagian yang murni kode pos, "Indonesia", atau provinsi
+  const filtered = parts.filter((p) => {
+    const clean = p.replace(/\d{5}/g, "").trim();
+    if (!clean) return false;
+    if (/^(indonesia|id)$/i.test(clean)) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) return "Indonesia";
+
+  // Ambil elemen terakhir yang tersisa setelah di-filter
+  const candidate = filtered[filtered.length - 1].replace(/\d{5}/g, "").trim();
+
+  if (/^jawa\s+(timur|barat|tengah)/i.test(candidate) && filtered.length > 1) {
+    return filtered[filtered.length - 2].replace(/\d{5}/g, "").trim();
+  }
+
+  return candidate || "Malang";
+}
