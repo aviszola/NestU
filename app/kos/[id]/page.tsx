@@ -12,6 +12,7 @@ import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import { facilityIcon } from "@/lib/facilities";
 import { SITE_URL, SITE_NAME, LOGO_URL, truncate } from "@/lib/seo";
+import type { Kos, Room } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -156,8 +157,20 @@ export default async function DetailKosSiswaPage({
     .eq("id", id)
     .single();
 
-  const kos: any = raw
-    ? { ...raw, fasilitas: (raw.kos_facilities ?? []).map((kf: any) => ({ id: kf.facility_id, name: kf.facility?.name ?? kf.facility_id })) }
+  type KosFacilityJoin = {
+    facility_id: string;
+    facility: { name: string } | null;
+  };
+
+  const kos: Kos | null = raw
+    ? {
+        ...raw,
+        fasilitas: ((raw.kos_facilities as unknown as KosFacilityJoin[]) ?? []).map((kf) => ({
+          id: kf.facility_id,
+          name: kf.facility?.name ?? kf.facility_id,
+          icon: null,
+        })),
+      }
     : null;
   if (!kos) notFound();
 
@@ -201,7 +214,8 @@ export default async function DetailKosSiswaPage({
     .eq("kos_id", id)
     .order("price_per_month", { ascending: true });
 
-  const tersedia = (allRooms ?? []).filter((r: any) => r.status === "tersedia");
+  const typedRooms = (allRooms as Room[] | null) ?? [];
+  const tersedia = typedRooms.filter((r) => r.status === "tersedia");
 
   const isVerified = kos.verification_status === "verified";
 
@@ -302,7 +316,7 @@ export default async function DetailKosSiswaPage({
               <div className="mt-6 pt-5 border-t border-outline-variant/30">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-outline mb-3">Fasilitas</h3>
                 <div className="flex flex-wrap gap-2">
-                  {kos.fasilitas.map((f: any) => (
+                  {kos.fasilitas.map((f) => (
                     <span
                       key={f.id}
                       className="inline-flex items-center gap-1 rounded-lg border border-outline-variant/60 bg-surface px-3 py-1.5 text-xs font-medium text-on-surface-variant"
@@ -321,16 +335,16 @@ export default async function DetailKosSiswaPage({
 
         {/* Rooms */}
         <h2 className="mb-4 mt-8 text-xl font-bold text-on-surface tracking-tight">
-          Kamar ({allRooms?.length ?? 0})
+          Kamar ({typedRooms.length})
         </h2>
 
-        {!allRooms || allRooms.length === 0 ? (
+        {typedRooms.length === 0 ? (
           <div className="rounded-xl border border-outline-variant bg-white p-8 text-center text-outline text-sm font-normal">
             Tidak ada kamar tersedia saat ini.
           </div>
         ) : (
           <div className="space-y-3">
-            {allRooms.map((room: any) => (
+            {typedRooms.map((room) => (
               <div
                 key={room.id}
                 className="flex items-center justify-between rounded-xl border border-outline-variant bg-white p-4 hover:border-primary/40 transition-colors"
@@ -397,7 +411,7 @@ export default async function DetailKosSiswaPage({
                   },
                 }
               : {}),
-            amenityFeature: (kos.fasilitas ?? []).map((f: any) => ({
+            amenityFeature: (kos.fasilitas ?? []).map((f) => ({
               "@type": "LocationFeatureSpecification",
               name: f.name,
               value: true,
