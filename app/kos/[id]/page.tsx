@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createBrowserClient } from "@/lib/supabase/client";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,62 +14,76 @@ import { SITE_URL, SITE_NAME, LOGO_URL, truncate } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-/** generateMetadata — title & OG unik per kos (pakai nama + alamat + foto asli). */
+/**
+ * generateMetadata — title & OG unik per kos (pakai nama + alamat + foto asli).
+ *
+ * NOTE: Menggunakan createServerClient Supabase secara minimal (hanya select
+ * data publik kos, tidak butuh auth). Error di sini SILENT di Next.js —
+ * fallback ke metadata root layout tanpa warning ke user.
+ */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
-  const supabase = await createClient();
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
 
-  const { data: raw } = await supabase
-    .from("kos")
-    .select("name, address, description, foto")
-    .eq("id", id)
-    .single();
+    const { data: raw } = await supabase
+      .from("kos")
+      .select("name, address, description, foto")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (!raw) return { title: "Kos Tidak Ditemukan" };
+    if (!raw) return { title: "Kos Tidak Ditemukan" };
 
-  const name = raw.name ?? "Kos";
-  const address = raw.address ?? "";
-  const foto: string[] = Array.isArray(raw.foto) ? raw.foto : [];
-  const ogImage = foto[0] ?? null;
+    const name = raw.name ?? "Kos";
+    const address = raw.address ?? "";
+    const foto: string[] = Array.isArray(raw.foto) ? raw.foto : [];
+    const ogImage = foto[0] ?? null;
 
-  // Title: "Nama Kos — Kos Dekat Sekolah di Kota | NestU" (≤ 60 karakter)
-  const title = truncate(`${name} — Kos di ${address.split(",").slice(-2).join(",").trim()}`, 58);
+    // Title: max 58 karakter
+    const cityParts = address.split(",");
+    const cityShort = cityParts.slice(-2).join(",").trim();
+    const title = truncate(`${name} — Kos di ${cityShort}`, 58);
 
-  // Description: kombinasi deskripsi + alamat (140-160 karakter)
-  const rawDesc = raw.description
-    ? `${truncate(raw.description, 80)} — Berlokasi di ${address}.`
-    : `Kos ${name} berlokasi di ${address}. Temukan fasilitas lengkap, harga terjangkau, dan booking online mudah di NestU.`;
-  const description = truncate(rawDesc, 158);
+    // Description: 140-160 karakter
+    const rawDesc = raw.description
+      ? `${truncate(raw.description, 80)} — Berlokasi di ${address}.`
+      : `Kos ${name} berlokasi di ${address}. Fasilitas lengkap, harga terjangkau, booking online di NestU.`;
+    const description = truncate(rawDesc, 158);
 
-  const canonicalUrl = `${SITE_URL}/kos/${id}`;
-  const ogImages = ogImage
-    ? [{ url: ogImage, width: 1200, height: 630, alt: `Foto ${name}` }]
-    : [{ url: `${SITE_URL}/images/og-default.jpg`, width: 1200, height: 630, alt: SITE_NAME }];
+    const canonicalUrl = `${SITE_URL}/kos/${id}`;
+    const ogImages = ogImage
+      ? [{ url: ogImage, width: 1200, height: 630, alt: `Foto kos ${name}` }]
+      : [{ url: `${SITE_URL}/images/og-default.jpg`, width: 1200, height: 630, alt: SITE_NAME }];
 
-  return {
-    title,
-    description,
-    alternates: { canonical: canonicalUrl },
-    openGraph: {
-      title: `${title} | ${SITE_NAME}`,
+    return {
+      title,
       description,
-      url: canonicalUrl,
-      type: "website",
-      locale: "id_ID",
-      siteName: SITE_NAME,
-      images: ogImages,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${title} | ${SITE_NAME}`,
-      description,
-      images: ogImages.map((i) => i.url),
-    },
-  };
+      alternates: { canonical: canonicalUrl },
+      openGraph: {
+        title: `${title} | ${SITE_NAME}`,
+        description,
+        url: canonicalUrl,
+        type: "website",
+        locale: "id_ID",
+        siteName: SITE_NAME,
+        images: ogImages,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | ${SITE_NAME}`,
+        description,
+        images: ogImages.map((i) => i.url),
+      },
+    };
+  } catch (err) {
+    // Jangan crash halaman — fallback ke title default
+    console.error("[generateMetadata /kos/[id]] Error:", err);
+    return { title: "Detail Kos — NestU" };
+  }
 }
 
 export default async function DetailKosSiswaPage({
