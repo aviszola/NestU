@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { getBookingStatus } from "@/lib/bookingStatus";
+import { getBookingStatus, getStatusKey } from "@/lib/bookingStatus";
 
 type FilterTab = "all" | "active" | "history";
 
@@ -17,6 +17,7 @@ interface Booking {
     room_number?: string;
     price_per_month?: number;
     kos?: {
+      id?: string;
       name?: string;
       foto?: string[];
     };
@@ -109,6 +110,7 @@ export default function BookingsContent({ bookings }: Props) {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
           {filtered.map((b) => {
             const cfg = getBookingStatus(b);
+            const isExpired = getStatusKey(b) === "expired";
             const isPast =
               b.status === "completed" || b.status === "cancelled";
             const imgSrc =
@@ -187,6 +189,24 @@ export default function BookingsContent({ bookings }: Props) {
                       </p>
                     </div>
                   </div>
+
+                  {isExpired && (
+                    <div className="mb-stack-md rounded-lg bg-error/5 border border-error/20 p-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                      <p className="text-xs text-on-surface-variant leading-relaxed flex-1">
+                        Pembayaran tidak diselesaikan dan transaksi telah
+                        kadaluarsa. Kamu bisa mencoba memesan ulang.
+                      </p>
+                      <Link
+                        href={b.rooms?.kos?.id ? `/kos/${b.rooms.kos.id}` : "/kos"}
+                        className="shrink-0 inline-flex items-center justify-center gap-1.5 bg-error text-on-error px-3.5 py-2 rounded-lg text-xs font-bold hover:brightness-110 active:scale-95 transition-all"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          refresh
+                        </span>
+                        Booking Ulang
+                      </Link>
+                    </div>
+                  )}
 
                   <div className="mt-auto flex items-center justify-between pt-2 border-t border-outline-variant/20">
                     <span className="text-base font-bold text-primary">

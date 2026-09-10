@@ -9,6 +9,7 @@ export type BookingStatusKey =
   | "approved"
   | "menunggu_konfirmasi"
   | "lunas"
+  | "expired"
   | "cancelled"
   | "rejected"
   | "completed";
@@ -40,6 +41,11 @@ export const BOOKING_STATUS: Record<BookingStatusKey, BookingStatusCfg> = {
     className: "bg-secondary/10 text-secondary",
     icon: "check_circle",
   },
+  expired: {
+    label: "Transaksi Kadaluarsa",
+    className: "bg-error/10 text-error",
+    icon: "timer_off",
+  },
   cancelled: {
     label: "Dibatalkan",
     className: "bg-error/10 text-error",
@@ -62,6 +68,11 @@ export function getStatusKey(booking: {
   status: string;
   payment_status?: string | null;
 }): BookingStatusKey {
+  // Transaksi gagal/kadaluarsa (payment expired) harus tampil jelas sbg
+  // "Transaksi Kadaluarsa", bukan "Selesai"/"Dibatalkan" — kecuali ditolak admin.
+  if (booking.payment_status === "expired" && booking.status !== "rejected") {
+    return "expired";
+  }
   if (booking.status === "approved") {
     if (booking.payment_status === "lunas") return "lunas";
     if (booking.payment_status === "menunggu_konfirmasi") return "menunggu_konfirmasi";

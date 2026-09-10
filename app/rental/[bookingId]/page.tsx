@@ -95,7 +95,7 @@ export default async function RentalDetailPage({
       ownBooking.status === "cancelled"
         ? { icon: "cancel", title: "Booking dibatalkan", desc: "Booking ini telah dibatalkan dan tidak lagi aktif." }
         : ownBooking.payment_status === "expired"
-          ? { icon: "event_busy", title: "Masa sewa telah berakhir", desc: "Masa sewa booking ini sudah berakhir. Silakan kembali ke Kamar Saya untuk melihat booking aktif." }
+          ? { icon: "timer_off", title: "Transaksi Kadaluarsa", desc: "Pembayaran tidak diselesaikan sehingga transaksi ini kadaluarsa. Silakan buat booking baru untuk memesan ulang." }
           : ownBooking.status === "pending"
             ? { icon: "hourglass_empty", title: "Menunggu persetujuan", desc: "Booking ini masih menunggu persetujuan pemilik kos." }
             : { icon: "event_busy", title: "Booking tidak aktif", desc: "Booking ini sudah tidak aktif saat ini." };
