@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Logo from "@/components/ui/Logo";
 import Footer from "@/components/layout/Footer";
+import PublicHeader from "@/components/layout/PublicHeader";
 import { SITE_URL, SITE_NAME, OG_DEFAULT_IMAGE } from "@/lib/seo";
 
 // ── Profil pengembang ──
@@ -56,38 +56,7 @@ export default function DeveloperPage() {
 
   return (
     <>
-      {/* Header — konsisten dgn halaman publik /about */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-outline-variant/20">
-        <div className="max-w-7xl mx-auto px-4 md:px-10">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <Logo variant="full" className="h-12 w-auto text-primary" />
-            </Link>
-            <nav className="hidden md:flex items-center gap-8">
-              <Link href="/kos" className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200">
-                Cari Kos
-              </Link>
-              <Link href="/about" className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200">
-                Tentang Kami
-              </Link>
-              <Link href="/developer" className="text-sm font-semibold text-primary transition-colors duration-200">
-                Pengembang
-              </Link>
-              <Link href="/contact" className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200">
-                Bantuan
-              </Link>
-            </nav>
-            <div className="hidden md:flex items-center gap-3">
-              <Link href="/login" className="px-5 py-2.5 text-sm font-semibold text-primary rounded-full hover:bg-primary/10 transition-all duration-200">
-                Login
-              </Link>
-              <Link href="/register" className="px-5 py-2.5 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200">
-                Register
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
       {/* Hero / Profil */}
       <section className="pt-16 bg-gradient-to-b from-primary-container/30 to-surface">
         <div className="max-w-4xl mx-auto px-4 md:px-10 py-16 md:py-20 text-center">
