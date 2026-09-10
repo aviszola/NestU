@@ -10,7 +10,7 @@ import { SITE_URL, SITE_NAME, OG_DEFAULT_IMAGE } from "@/lib/seo";
 // dengan profil LinkedIn asli Anda sebelum/atau segera setelah deploy.
 const DEVELOPER_NAME = "Avis Zola Raditya Kurniawan";
 const DEVELOPER_GITHUB_URL = "https://github.com/aviszola";
-const DEVELOPER_LINKEDIN_URL = "https://www.linkedin.com/in/aviszola";
+const DEVELOPER_LINKEDIN_URL = "https://www.linkedin.com/in/avis-zola-raditya-kurniawan-407388377/";
 const DEVELOPER_JOB_TITLE = "Full-Stack Developer & Founder";
 
 const DEVELOPER_PAGE_URL = `${SITE_URL}/developer`;

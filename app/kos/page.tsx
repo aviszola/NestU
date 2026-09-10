@@ -68,7 +68,7 @@ export default async function KosPage({
         .from("favorites")
         .select("kos_id")
         .eq("student_id", user.id);
-      if (favs) favoriteIds = new Set(favs.map((f: any) => f.kos_id));
+      if (favs) favoriteIds = new Set(favs.map((f: { kos_id: string }) => f.kos_id));
     }
   }
 
