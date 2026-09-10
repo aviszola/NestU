@@ -2,11 +2,6 @@ import Logo from "@/components/ui/Logo";
 import Link from "next/link";
 
 /** Satu-satunya footer NestU — dipakai di semua halaman publik. */
-// Links verifikasi kepatuhan — DIISI TIM LEGAL/COMPLIANCE. Kosong = teks biasa (bukan link).
-const VERIFICATION_BADGES = [
-  { label: "ISO 27001 Certified", href: "" },
-  { label: "Verified by OJK", href: "" },
-];
 
 export default function Footer() {
   return (
@@ -77,30 +72,6 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-          {/* Badge kepatuhan — jadi <a> menuju dokumen verifikasi resmi begitu tim legal
-              memberikan link. JANGAN isi sendiri; kalau kosong, render span non-link. */}
-          <div className="flex items-center gap-2 mt-4">
-            {VERIFICATION_BADGES.map((b) =>
-              b.href ? (
-                <a
-                  key={b.label}
-                  href={b.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1 text-[10px] font-bold text-white/80 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-                >
-                  {b.label}
-                </a>
-              ) : (
-                <span
-                  key={b.label}
-                  className="px-3 py-1 text-[10px] font-bold text-white/80 bg-white/10 rounded-full"
-                >
-                  {b.label}
-                </span>
-              )
-            )}
-          </div>
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-center">
