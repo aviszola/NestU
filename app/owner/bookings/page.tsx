@@ -10,6 +10,40 @@ import { toastSuccess, toastError } from "@/lib/toast";
 import { toReadableError } from "@/lib/utils";
 import { BOOKING_STATUS, getStatusKey as sharedGetStatusKey } from "@/lib/bookingStatus";
 
+// ── Booking shape: DB row + joined relations + merged student profile ────────
+type BookingStudent = {
+  id: string;
+  full_name: string | null;
+  school_name: string | null;
+  phone: string | null;
+};
+
+type BookingRoom = {
+  id: string;
+  room_number: string | null;
+  price_per_month: number | null;
+  kos: { id: string; name: string } | null;
+};
+
+type Booking = {
+  id: string;
+  student_id: string;
+  room_id: string;
+  status: string;
+  payment_status: string | null;
+  payment_proof_url: string | null;
+  payment_proof_path: string | null;
+  rejection_reason: string | null;
+  check_in_date: string | null;
+  check_out_date: string | null;
+  created_at: string | null;
+  notes: string | null;
+  rooms: BookingRoom | null;
+  student: BookingStudent | null;
+  payment_note: string | null;
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 type PaymentKey =
   | "pending"
   | "approved"
@@ -28,7 +62,7 @@ const statusCfg: Record<PaymentKey, { label: string; icon: string; className: st
   menunggu_konfirmasi: { label: "Menunggu Konfirmasi Pembayaran", icon: "hourglass_top", className: "bg-tertiary/10 text-tertiary" },
 };
 
-function getStatusKey(b: any): PaymentKey {
+function getStatusKey(b: { status: string; payment_status?: string | null }): PaymentKey {
   return sharedGetStatusKey(b);
 }
 
@@ -54,14 +88,14 @@ function formatPrice(n: number): string {
 }
 
 export default function OwnerBookingsPage() {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<{ id: string; mode: "booking" | "proof" } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
-  const [proofTarget, setProofTarget] = useState<any | null>(null);
+  const [proofTarget, setProofTarget] = useState<Booking | null>(null);
   const [proofUrl, setProofUrl] = useState<string | null>(null);
   const [proofLoading, setProofLoading] = useState(false);
 
@@ -102,13 +136,15 @@ export default function OwnerBookingsPage() {
         .order("created_at", { ascending: false });
 
       if (bookings && bookings.length > 0) {
-        const studentIds = [...new Set(bookings.map((b: any) => b.student_id))];
+        const studentIds = [...new Set(bookings.map((b) => b.student_id))];
         const { data: profiles } = await supabase
           .from("profiles_public")
           .select("id, full_name, school_name, phone")
           .in("id", studentIds);
-        const profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
-        const enriched = (bookings as any[]).map((b: any) => ({
+        const profileMap = Object.fromEntries(
+          (profiles ?? []).map((p) => [p.id, p as BookingStudent])
+        );
+        const enriched: Booking[] = bookings.map((b) => ({
           ...b,
           student: profileMap[b.student_id] ?? null,
         }));
@@ -116,7 +152,7 @@ export default function OwnerBookingsPage() {
       } else {
         setBookings([]);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(toReadableError(err));
     } finally {
       setLoading(false);
@@ -124,12 +160,14 @@ export default function OwnerBookingsPage() {
   }
 
   useEffect(() => {
-    loadAllBookings();
+    (async () => {
+      await loadAllBookings();
+    })();
   }, []);
 
-  const [approveConfirmTarget, setApproveConfirmTarget] = useState<{ id: string; kosName?: string; roomNumber?: string } | null>(null);
+  const [approveConfirmTarget, setApproveConfirmTarget] = useState<{ id: string; kosName?: string | null; roomNumber?: string | null } | null>(null);
 
-  async function handleStatus(id: string, status: "approved" | "cancelled" | "completed", bookingInfo?: any) {
+  async function handleStatus(id: string, status: "approved" | "cancelled" | "completed", bookingInfo?: Booking) {
     if (status === "approved") {
       setApproveConfirmTarget({
         id,
@@ -158,7 +196,7 @@ export default function OwnerBookingsPage() {
       await updateBookingStatus(supabase, id, status, { rejectionReason: reason ?? null });
       toastSuccess("Status booking diperbarui.");
       loadAllBookings();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(toReadableError(err));
       toastError("Gagal memperbarui booking: " + toReadableError(err));
     } finally {
@@ -174,7 +212,7 @@ export default function OwnerBookingsPage() {
       await confirmPayment(supabase, id);
       toastSuccess("Pembayaran dikonfirmasi. Status booking: Lunas.");
       loadAllBookings();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(toReadableError(err));
       toastError("Gagal konfirmasi pembayaran: " + toReadableError(err));
     } finally {
@@ -192,7 +230,7 @@ export default function OwnerBookingsPage() {
       setRejectTarget(null);
       setRejectReason("");
       loadAllBookings();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(toReadableError(err));
       toastError("Gagal menolak bukti: " + toReadableError(err));
     } finally {
@@ -200,7 +238,7 @@ export default function OwnerBookingsPage() {
     }
   }
 
-  async function openProofView(b: any) {
+  async function openProofView(b: Booking) {
     setProofTarget(b);
     setProofUrl(null);
     setProofLoading(true);
@@ -209,7 +247,7 @@ export default function OwnerBookingsPage() {
       const url = await getSignedProofUrl(supabase, b.payment_proof_path, 3600);
       if (!url) throw new Error("Bukti tidak ditemukan");
       setProofUrl(url);
-    } catch (err: any) {
+    } catch (err: unknown) {
       toastError("Gagal memuat bukti: " + toReadableError(err));
       setProofTarget(null);
     } finally {
@@ -366,7 +404,7 @@ export default function OwnerBookingsPage() {
           </div>
         ) : (
           <div className="mt-4 space-y-4">
-            {filteredBookings.map((b: any) => {
+            {filteredBookings.map((b) => {
               const cfg = statusCfg[getStatusKey(b)] ?? statusCfg.pending;
               const isPending = b.status === "pending";
               const isApproved = b.status === "approved";
@@ -414,11 +452,13 @@ export default function OwnerBookingsPage() {
                         </span>
                         <span className="inline-flex items-center gap-1">
                           <span className="material-symbols-outlined !text-[14px]">event</span>
-                          {new Date(b.created_at).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {b.created_at
+                            ? new Date(b.created_at).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "—"}
                         </span>
                       </p>
                       {b.notes && (
