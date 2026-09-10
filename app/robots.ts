@@ -16,6 +16,7 @@ export default function robots(): MetadataRoute.Robots {
           "/kos",
           "/kos/",
           "/about",
+          "/developer",
           "/contact",
           "/terms",
           "/privacy",

@@ -41,6 +41,7 @@ export default function Footer() {
           <ul className="mt-3 space-y-2">
             {[
               { label: "Tentang Kami", href: "/about" },
+              { label: "Tentang Pengembang", href: "/developer" },
               { label: "Syarat & Ketentuan", href: "/terms" },
               { label: "Kebijakan Privasi", href: "/privacy" },
             ].map((l) => (

@@ -19,6 +19,7 @@ const PUBLIC_PATHS: string[] = [
   "/",
   "/kos",
   "/about",
+  "/developer",
   "/terms",
   "/privacy",
   "/contact",
@@ -58,7 +59,9 @@ function isStaticOrApi(pathname: string): boolean {
     pathname.startsWith("/fonts") ||
     pathname.startsWith("/images") ||
     pathname.startsWith("/api") ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml"
   );
 }
 
@@ -138,7 +141,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Catatan: '/fonts' wajib ikut dikecualikan — public font self-host
-  // (mis. material-symbols-outlined.ttf) TIDAK boleh di-guard auth / di-307 ke /login.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|fonts/|images/|api/).*)"],
+  // Catatan: '/fonts', '/robots.txt', '/sitemap.xml' wajib ikut dikecualikan —
+  // aset/folder publik SEO tidak boleh di-guard auth / di-307 ke /login.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|fonts/|images/|api/|robots.txt|sitemap.xml).*)"],
 };
