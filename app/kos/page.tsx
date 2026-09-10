@@ -130,10 +130,10 @@ export default async function KosPage({
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary-container/10 z-10" />
           <Image
-            src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80"
+            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1920&q=80"
             alt=""
             fill
-            className="object-cover opacity-30"
+            className="object-cover opacity-40"
             aria-hidden="true"
             priority
             sizes="100vw"
@@ -198,7 +198,7 @@ export default async function KosPage({
                     {search ? `untuk "${search}"` : ""}
                   </p>
                 </div>
-                <MapToggleButton />
+                <MapToggleButton kos={kosWithFav} minPriceMap={minPriceMap} />
               </div>
 
               {/* Mobile Filter Chips */}
