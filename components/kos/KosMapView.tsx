@@ -67,52 +67,54 @@ export default function KosMapView({ items }: { items: KosMapItem[] }) {
   }
 
   return (
-    <MapContainer
-      bounds={bounds!}
-      boundsOptions={{ padding: [40, 40], maxZoom: 15 }}
-      scrollWheelZoom
-      className="h-full w-full z-0"
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {withCoords.map((k) => (
-        <Marker key={k.id} position={[k.latitude, k.longitude]} icon={icon}>
-          <Popup maxWidth={280}>
-            <div className="min-w-[180px]">
-              {k.foto && k.foto[0] && (
-                <img
-                  src={k.foto[0]}
-                  alt={k.name}
-                  className="w-full h-24 object-cover rounded-md mb-2"
-                  loading="lazy"
-                />
-              )}
-              <p className="text-sm font-bold text-on-surface leading-snug">
-                {k.name}
-              </p>
-              <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">
-                {k.address}
-              </p>
-              {k.minPrice != null && (
-                <p className="text-sm font-semibold text-primary mt-1">
-                  Rp {k.minPrice.toLocaleString("id-ID")}/bln
+    <div className="h-[60vh] w-full overflow-hidden">
+      <MapContainer
+        bounds={bounds!}
+        boundsOptions={{ padding: [40, 40], maxZoom: 15 }}
+        scrollWheelZoom
+        className="h-full w-full z-0"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {withCoords.map((k) => (
+          <Marker key={k.id} position={[k.latitude, k.longitude]} icon={icon}>
+            <Popup maxWidth={280}>
+              <div className="min-w-[180px]">
+                {k.foto && k.foto[0] && (
+                  <img
+                    src={k.foto[0]}
+                    alt={k.name}
+                    className="w-full h-24 object-cover rounded-md mb-2"
+                    loading="lazy"
+                  />
+                )}
+                <p className="text-sm font-bold text-on-surface leading-snug">
+                  {k.name}
                 </p>
-              )}
-              <Link
-                href={`/kos/${k.id}`}
-                className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
-              >
-                Lihat detail
-                <span className="material-symbols-outlined text-sm">
-                  arrow_forward
-                </span>
-              </Link>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+                <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">
+                  {k.address}
+                </p>
+                {k.minPrice != null && (
+                  <p className="text-sm font-semibold text-primary mt-1">
+                    Rp {k.minPrice.toLocaleString("id-ID")}/bln
+                  </p>
+                )}
+                <Link
+                  href={`/kos/${k.id}`}
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                >
+                  Lihat detail
+                  <span className="material-symbols-outlined text-sm">
+                    arrow_forward
+                  </span>
+                </Link>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 }
