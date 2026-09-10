@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateProfile, changePassword, logout } from "@/lib/supabase/actions";
+import { updateProfile, changePassword } from "@/lib/supabase/actions";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
+import LogoutConfirmModal from "@/components/LogoutConfirmModal";
 import AvatarUploadField from "@/components/AvatarUploadField";
 import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 
@@ -32,6 +33,7 @@ export default function ProfilePage() {
 
   // UI state
   const [isEditing, setIsEditing] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   // Avatar — shared hook (satu sumber kebenaran bersama owner/profile)
   const avatar = useAvatarUpload({ onError: (msg) => setError(msg) });
@@ -295,14 +297,13 @@ export default function ProfilePage() {
 
               {/* Logout */}
               <div className="mt-6 pt-5 border-t border-outline-variant">
-                <form action={logout}>
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 rounded-lg border border-error text-error text-sm font-medium hover:bg-error/5 transition-colors"
-                  >
-                    Logout
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  onClick={() => setLogoutOpen(true)}
+                  className="w-full py-2.5 rounded-lg border border-error text-error text-sm font-medium hover:bg-error/5 transition-colors"
+                >
+                  Logout
+                </button>
               </div>
             </div>
           </div>
@@ -311,6 +312,7 @@ export default function ProfilePage() {
 
       <Footer />
       <BottomNav activePage="profile" userRole="siswa" />
+      <LogoutConfirmModal open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </div>
   );
 }
