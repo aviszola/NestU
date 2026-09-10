@@ -46,6 +46,14 @@ export default function TopNav({
   const subtitle =
     userRole === "admin" ? "Welcome back, Admin" : undefined;
 
+  // Path profil sesuai role (avatar di pojok kanan atas mengarah ke halaman Profil)
+  const profileHref =
+    userRole === "pemilik"
+      ? "/owner/profile"
+      : userRole === "admin"
+        ? "/admin" // TopNav belum dipakai su admin; fallback ke dashboard admin
+        : "/profile";
+
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between px-4 md:px-8 py-3 bg-surface-container-low/80 backdrop-blur-md border-b border-outline-variant">
       {/* Left: Back button + Hamburger + Title */}
@@ -127,8 +135,13 @@ export default function TopNav({
         {/* Notifications */}
         <NotifBell />
 
-        {/* Avatar */}
-        <div className="w-8 h-8 rounded-full bg-surface-container overflow-hidden relative" style={{ position: "relative" }}>
+        {/* Avatar → link ke halaman Profil (path sesuai role) */}
+        <Link
+          href={profileHref}
+          aria-label={`Profil ${userName || ""}`.trim()}
+          title="Profil"
+          className="w-8 h-8 rounded-full bg-surface-container overflow-hidden relative transition-opacity hover:opacity-80"
+        >
           <Image
             src={userAvatar}
             alt={userName || "Avatar"}
@@ -136,7 +149,7 @@ export default function TopNav({
             sizes="32px"
             className="object-cover"
           />
-        </div>
+        </Link>
       </div>
     </header>
   );

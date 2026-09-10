@@ -37,7 +37,6 @@ const studentMenu: MenuItem[] = [
   { label: "Favorit", icon: "favorite", href: "/favorites", page: "favorites" },
   { label: "Booking", icon: "receipt_long", href: "/bookings", page: "bookings" },
   { label: "Kamar Saya", icon: "home_work", href: "/rental", page: "rental" },
-  { label: "Profil", icon: "person", href: "/profile", page: "profile" },
 ];
 
 const ownerMenu: MenuItem[] = [
@@ -45,7 +44,6 @@ const ownerMenu: MenuItem[] = [
   { label: "Kelola Properti", icon: "apartment", href: "/owner/kos", page: "properties" },
   { label: "Booking Masuk", icon: "receipt_long", href: "/owner/bookings", page: "bookings" },
   { label: "Laporan", icon: "report_problem", href: "/owner/reports", page: "reports" },
-  { label: "Profil", icon: "person", href: "/owner/profile", page: "profile" },
 ];
 
 const ownerBottomItems: BottomItem[] = [
