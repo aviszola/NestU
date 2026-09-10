@@ -55,6 +55,7 @@ function isPublicPath(pathname: string): boolean {
 function isStaticOrApi(pathname: string): boolean {
   return (
     pathname.startsWith("/_next") ||
+    pathname.startsWith("/fonts") ||
     pathname.startsWith("/images") ||
     pathname.startsWith("/api") ||
     pathname === "/favicon.ico"
@@ -137,5 +138,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|images/|api/).*)"],
+  // Catatan: '/fonts' wajib ikut dikecualikan — public font self-host
+  // (mis. material-symbols-outlined.ttf) TIDAK boleh di-guard auth / di-307 ke /login.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|fonts/|images/|api/).*)"],
 };
