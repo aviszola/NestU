@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Footer from "@/components/layout/Footer";
-import PublicHeader from "@/components/layout/PublicHeader";
 import { SITE_URL, OG_DEFAULT_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -45,8 +43,6 @@ const STATS = [
 export default function AboutPage() {
   return (
     <>
-      <PublicHeader />
-
       {/* Hero */}
       <section className="pt-16 bg-gradient-to-b from-primary-container/30 to-surface">
         <div className="max-w-4xl mx-auto px-4 md:px-10 py-16 md:py-24 text-center">
@@ -150,7 +146,6 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
-          <Footer />
     </>
   );
 }

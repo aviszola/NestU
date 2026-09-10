@@ -5,9 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getFeaturedKos, getTotalKosCount, getKosMinPrices } from "@/lib/supabase/queries";
 import ScrollReveal from "@/components/ScrollReveal";
 import KosCard from "@/components/KosCard";
-import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
-import Logo from "@/components/ui/Logo";
 import { SITE_URL, SITE_NAME, OG_DEFAULT_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -64,98 +62,13 @@ const PAYMENT_METHODS = ["Bank Transfer", "E-Wallet", "Virtual Account"];
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  let profile: { role?: string; full_name?: string } | null = null;
-  if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("role, full_name")
-      .eq("id", user.id)
-      .single();
-    profile = data;
-  }
 
   const kosList = await getFeaturedKos(supabase, 3);
   const totalKos = await getTotalKosCount(supabase);
   const minPrices = await getKosMinPrices(supabase, kosList.map((kos) => kos.id));
 
-  const dashboardLink = profile?.role === "siswa"
-    ? "/dashboard"
-    : profile?.role === "pemilik"
-    ? "/owner"
-    : profile?.role === "admin"
-    ? "/admin"
-    : null;
-
   return (
     <>
-      {/* ===== HEADER ===== */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-outline-variant/20">
-        <div className="max-w-7xl mx-auto px-4 md:px-10">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <Logo variant="full" className="h-12 w-auto text-primary" />
-            </Link>
-            <nav className="hidden md:flex items-center gap-8">
-              <Link
-                href="/kos"
-                className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200"
-              >
-                Cari Kos
-              </Link>
-              <Link
-                href="/about"
-                className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200"
-              >
-                Tentang Kami
-              </Link>
-              <Link
-                href="/contact"
-                className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors duration-200"
-              >
-                Bantuan
-              </Link>
-            </nav>
-            <div className="hidden md:flex items-center gap-3">
-              {user && profile?.full_name ? (
-                <>
-                  <span className="text-sm font-semibold text-on-surface-variant">{profile.full_name}</span>
-                  <Link
-                    href={dashboardLink || "/"}
-                    className="px-5 py-2.5 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200"
-                  >
-                    Dashboard
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="px-5 py-2.5 text-sm font-semibold text-primary rounded-full hover:bg-primary/10 transition-all duration-200"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="px-5 py-2.5 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200"
-                  >
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
-            <button
-              id="menuToggle"
-              className="md:hidden p-2 rounded-lg hover:bg-surface-container-low transition-colors"
-              aria-label="Menu"
-            >
-              <span className="material-symbols-outlined text-on-surface-variant text-2xl">menu</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* ===== HERO ===== */}
       <section className="relative min-h-[540px] md:min-h-[620px] flex items-center overflow-hidden pt-16">
         <div className="absolute inset-0 bg-on-surface">
@@ -358,8 +271,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <Footer />
 
       {/* ===== MOBILE BOTTOM NAV — shared ===== */}
       <BottomNav activePage="search" userRole="siswa" />
