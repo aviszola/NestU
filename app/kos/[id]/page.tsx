@@ -11,7 +11,7 @@ import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import { facilityIcon } from "@/lib/facilities";
-import { SITE_URL, SITE_NAME, LOGO_URL, truncate } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, LOGO_URL, OG_DEFAULT_IMAGE, truncate } from "@/lib/seo";
 import type { Kos, Room } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export async function generateMetadata({
   const defaultDesc =
     "Platform pencarian kos terpercaya untuk siswa dan mahasiswa. Hunian terverifikasi, harga transparan, booking online mudah.";
   const defaultOgImages = [
-    { url: `${SITE_URL}/images/og-default.jpg`, width: 1200, height: 630, alt: SITE_NAME },
+    { url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: SITE_NAME },
   ];
 
   try {

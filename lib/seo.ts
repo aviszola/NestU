@@ -16,7 +16,7 @@ export function makeTitle(pageTitle: string): string {
 }
 
 /** OG image fallback global (dipakai kalau halaman tidak punya foto). */
-export const OG_DEFAULT_IMAGE = `${SITE_URL}/images/og-default.jpg`;
+export const OG_DEFAULT_IMAGE = `${SITE_URL}/images/hero-student.jpg`;
 
 /** Gambar logo untuk structured data. */
 export const LOGO_URL = `${SITE_URL}/images/logo-full.svg`;
