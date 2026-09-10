@@ -14,6 +14,7 @@ type PaymentKey =
   | "pending"
   | "approved"
   | "menunggu_konfirmasi"
+| "expired"
   | "lunas"
   | "cancelled"
   | "rejected"
