@@ -61,7 +61,10 @@ function isStaticOrApi(pathname: string): boolean {
     pathname.startsWith("/api") ||
     pathname === "/favicon.ico" ||
     pathname === "/robots.txt" ||
-    pathname === "/sitemap.xml"
+    pathname === "/sitemap.xml" ||
+    // File verifikasi Google Search Console — harus disajikan mentah
+    // (raw), TIDAK boleh di-guard auth / di-redirect ke /login.
+    pathname === "/googleab080d559f3e14a4.html"
   );
 }
 
