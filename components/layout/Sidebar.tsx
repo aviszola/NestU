@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Logo from "@/components/ui/Logo";
+import LogoutConfirmModal from "@/components/LogoutConfirmModal";
 
 export type ActivePage = "dashboard" | "search" | "favorites" | "bookings" | "rental" | "profile" | "properties" | "settings" | "reports";
 
@@ -63,6 +64,7 @@ export default function Sidebar({ activePage, userRole = "siswa", userName }: Si
 
   // Badge jumlah laporan status 'baru' utk owner — pola refund badge AdminShell
   const [newReportCount, setNewReportCount] = useState(0);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   useEffect(() => {
     if (userRole !== "pemilik") return;
     let cancelled = false;
@@ -124,17 +126,31 @@ export default function Sidebar({ activePage, userRole = "siswa", userName }: Si
 
       {/* Bottom menu (Settings, Logout) */}
       <div className="px-3 py-4 space-y-1 border-t border-outline-variant">
-        {bottom.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">{item.icon}</span>
-            <span>{item.label}</span>
-          </Link>
-        ))}
+        {bottom.map((item) =>
+          item.label === "Keluar" ? (
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => setLogoutOpen(true)}
+              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors text-left"
+            >
+              <span className="material-symbols-outlined text-lg">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ) : (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          )
+        )}
       </div>
+
+      <LogoutConfirmModal open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </aside>
   );
 }

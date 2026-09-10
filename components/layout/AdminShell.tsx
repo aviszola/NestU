@@ -6,6 +6,7 @@ import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import NotifBell from "@/components/layout/NotifBell";
 import Footer from "@/components/layout/Footer";
+import LogoutConfirmModal from "@/components/LogoutConfirmModal";
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -14,6 +15,12 @@ interface AdminShellProps {
 
 export default function AdminShell({ children, activePage }: AdminShellProps) {
   const router = useRouter();
+
+  // Semua hooks dipanggil SEBELUM early-return `if (!authed)` agar urutan
+  // panggilan React hooks konsisten di setiap render (rules-of-hooks).
+  const [authed, setAuthed] = useState(false);
+  const [refundCount, setRefundCount] = useState(0);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +45,24 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
     return () => { cancelled = true; };
   }, [router]);
 
-  const [authed, setAuthed] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const sup = createClient();
+        const { count } = await sup
+          .from("bookings")
+          .select("*", { count: "exact", head: true })
+          .eq("refund_status", "pending");
+        if (!cancelled) setRefundCount(count ?? 0);
+      } catch {
+        // ignore — badge opsional
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   if (!authed) return null;
 
   const menu = [
@@ -48,24 +72,6 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
     { label: "Refund", icon: "payments", href: "/admin/refunds", page: "refunds" as const },
     { label: "Kelola User", icon: "group", href: "/admin/users", page: "users" as const },
   ];
-
-  // Badge jumlah refund pending — fetch saat mount
-  const [refundCount, setRefundCount] = useState(0);
-  useEffect(() => {
-    (async () => {
-      try {
-        const { createClient } = await import("@/lib/supabase/client");
-        const sup = createClient();
-        const { count } = await sup
-          .from("bookings")
-          .select("*", { count: "exact", head: true })
-          .eq("refund_status", "pending");
-        setRefundCount(count ?? 0);
-      } catch {
-        // ignore — badge opsional
-      }
-    })();
-  }, []);
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
@@ -130,10 +136,14 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
               <span className="material-symbols-outlined">settings</span>
               <span className="font-label-md text-label-md">Settings</span>
             </Link>
-            <Link href="/logout" className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all">
+            <button
+              type="button"
+              onClick={() => setLogoutOpen(true)}
+              className="flex w-full items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all text-left"
+            >
               <span className="material-symbols-outlined">logout</span>
               <span className="font-label-md text-label-md">Logout</span>
-            </Link>
+            </button>
           </div>
         </aside>
 
@@ -163,6 +173,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
       </nav>
 
       <Footer />
+      <LogoutConfirmModal open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </div>
   );
 }
