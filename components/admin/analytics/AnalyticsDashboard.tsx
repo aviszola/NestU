@@ -20,7 +20,7 @@ function EmptyState() {
       </span>
       <p className="text-lg font-semibold text-on-surface">Belum ada data di periode ini</p>
       <p className="text-on-surface-variant font-body-md">
-        Kies ander periode (7d/30d/90d/custom) of wacht tot er data binnenkomt.
+        Pilih periode lain (7d/30d/90d/custom); periode terpilih mungkin belum ada data.
       </p>
     </div>
   );
@@ -78,9 +78,9 @@ export default function AnalyticsDashboard({
               />
               <KpiCard
                 icon="group"
-                label="Active Users"
+                label="User Aktif (booking 30d)"
                 value={String(k.activeUsers)}
-                sub={`${k.activeSiswa} siswa · ${k.activePemilik} pemilik`}
+                sub={`${k.activeSiswa} siswa · ${k.activePemilik} pemilik · user met booking 30d`}
               />
             </div>
 
@@ -88,7 +88,7 @@ export default function AnalyticsDashboard({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
               <div className="bg-surface-container-lowest rounded-xl card-shadow p-6">
                 <h2 className="font-title-lg text-title-lg text-on-surface">Booking Trend</h2>
-                <p className="text-xs text-outline">Booking nieuwe + completed per dag</p>
+                <p className="text-xs text-outline">Booking baru + completed per dag</p>
                 <div className="mt-2">
                   {analytics.trend.length
                     ? <BookingTrendChart data={analytics.trend} />

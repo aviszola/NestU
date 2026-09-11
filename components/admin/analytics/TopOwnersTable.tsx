@@ -18,7 +18,7 @@ export default function TopOwnersTable({ rows }: { rows: TopOwnerRow[] }) {
             <tr>
               <th className="px-3 py-2">Pemilik</th>
               <th className="px-3 py-2 text-right">Kos</th>
-              <th className="px-3 py-2 text-right">Booking</th>
+              <th className="px-3 py-2 text-right">Booking (Lunas)</th>
               <th className="px-3 py-2 text-right">Revenue</th>
             </tr>
           </thead>
@@ -27,7 +27,9 @@ export default function TopOwnersTable({ rows }: { rows: TopOwnerRow[] }) {
               <tr key={r.ownerId} className="hover:bg-surface-container-lowest">
                 <td className="px-3 py-2 text-on-surface">{r.ownerName}</td>
                 <td className="px-3 py-2 text-on-surface-variant text-right">{r.kosCount}</td>
-                <td className="px-3 py-2 text-on-surface-variant text-right">{r.bookings}</td>
+                <td className="px-3 py-2 text-on-surface-variant text-right">
+                  {r.bookings} ({r.paidBookings})
+                </td>
                 <td className="px-3 py-2 text-on-surface-variant text-right">
                   {formatRupiah(r.revenue)}
                 </td>
@@ -35,6 +37,12 @@ export default function TopOwnersTable({ rows }: { rows: TopOwnerRow[] }) {
             ))}
           </tbody>
         </table>
+      )}
+      {rows.length > 0 && (
+        <p className="px-3 py-1.5 text-[11px] text-outline">
+          Booking (Lunas): &quot;X (Y)&quot; = X booking, Y davon lunas. Revenue Rp 0 berarti
+          booking belum lunas.
+        </p>
       )}
     </div>
   );

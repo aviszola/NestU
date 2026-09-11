@@ -5,7 +5,7 @@ export interface KpiCardProps {
   icon: string;
   label: string;
   value: string;
-  /** Delta % vs periode vorige. null = geen data prev periode. */
+  /** Delta % vs periode sebelum. null = periode sebelum tanpa delta. */
   deltaPct?: number | null;
   deltaUp?: boolean;
   /** Voor metrik waar laag beter is (bv. refund rate). */
@@ -46,7 +46,9 @@ export default function KpiCard({
           <span className="text-outline text-xs">vs periode sebelumnya</span>
         </div>
       ) : (
-        <div className="text-sm text-outline">Geen delta (periode vorige zonder data)</div>
+        <div className="text-sm text-outline">
+          <span className="font-semibold">—</span> Tidak ada delta (periode sebelumnya tanpa data)
+        </div>
       )}
       {sub && <div className="text-xs text-outline">{sub}</div>}
     </div>
