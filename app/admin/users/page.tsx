@@ -56,12 +56,28 @@ export default function AdminUsersPage() {
     // Email tersimpan di auth.users, bukan profiles — akses via
     // RPC admin-only get_users_with_email() (SECURITY DEFINER, validasi is_admin).
     const { data, error } = await supabase.rpc("get_users_with_email");
-    if (error) {
-      toastError("Gagal memuat data user: " + (error.message || "Terjadi kesalahan"));
+    if (!error && data) {
+      setUsers((data as UserRow[] | null) ?? []);
       setLoading(false);
       return;
     }
-    setUsers((data as UserRow[] | null) ?? []);
+
+    // Fallback: Jika migration 036_admin_users_with_email.sql belum dijalankan (PGRST202),
+    // load langsung dari profiles agar halaman admin tetap dapat mengelola user
+    if (error?.code === "PGRST202") {
+      const { data: profileList, error: pErr } = await supabase
+        .from("profiles")
+        .select("id, full_name, role, is_active, created_at, school_name")
+        .order("created_at", { ascending: false });
+
+      if (!pErr && profileList) {
+        setUsers(profileList.map((p) => ({ ...p, email: null })) as UserRow[]);
+        setLoading(false);
+        return;
+      }
+    }
+
+    toastError("Gagal memuat data user: " + (error?.message || "Terjadi kesalahan"));
     setLoading(false);
   }
 
