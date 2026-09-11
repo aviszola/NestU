@@ -131,10 +131,11 @@ export default function BookingDetailPage() {
       toastError("Pilih file bukti transfer terlebih dahulu");
       return;
     }
-    const isImage = proofFile.type.startsWith("image/");
-    const isPdf = proofFile.type === "application/pdf";
-    if (!isImage && !isPdf) {
-      toastError("File harus berupa gambar atau PDF, maksimal 5MB");
+    // Validasi tipe file SEBELUM upload: hanya gambar (JPG/PNG/WEBP) atau PDF
+    // (konsisten dengan validasi server-side di submitPaymentProof)
+    const PROOF_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+    if (!PROOF_ALLOWED_TYPES.includes(proofFile.type)) {
+      toastError("File harus berupa gambar (JPG/PNG/WEBP) atau PDF, maksimal 5MB");
       return;
     }
     if (proofFile.size > 5 * 1024 * 1024) {
@@ -546,7 +547,7 @@ export default function BookingDetailPage() {
             <input
               id="proof-file"
               type="file"
-              accept="image/*,.pdf"
+              accept="image/jpeg,image/png,image/webp,.pdf"
               onChange={(e) => setProofFile(e.target.files?.[0] ?? null)}
               className="w-full text-sm text-on-surface-variant file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-primary file:text-on-primary file:font-bold file:cursor-pointer hover:file:brightness-110 transition-all"
             />
