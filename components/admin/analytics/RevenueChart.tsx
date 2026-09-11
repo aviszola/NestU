@@ -9,8 +9,10 @@ export default function RevenueChart({
 }: {
   data: RevenueMonth[];
 }) {
+  const allZero = data.length === 0 || data.every((d) => d.revenue === 0);
+
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <ResponsiveContainer
         width="100%"
         height={280}
@@ -22,6 +24,11 @@ export default function RevenueChart({
           <Bar dataKey="revenue" />
         </BarChart>
       </ResponsiveContainer>
+      {allZero && (
+        <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant font-body-sm">
+          Belum ada revenue di periode ini
+        </div>
+      )}
     </div>
   );
 }

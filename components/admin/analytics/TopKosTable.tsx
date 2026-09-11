@@ -18,7 +18,7 @@ export default function TopKosTable({ rows }: { rows: TopKosRow[] }) {
           <thead className="bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
             <tr>
               <th className="px-3 py-2">Kos</th>
-              <th className="px-3 py-2 text-right">Booking</th>
+              <th className="px-3 py-2 text-right">Booking (Lunas)</th>
               <th className="px-3 py-2 text-right">Revenue</th>
             </tr>
           </thead>
@@ -31,7 +31,9 @@ export default function TopKosTable({ rows }: { rows: TopKosRow[] }) {
                   </Link>
                   <div className="text-xs text-outline">{r.ownerName}</div>
                 </td>
-                <td className="px-3 py-2 text-on-surface-variant text-right">{r.bookings}</td>
+                <td className="px-3 py-2 text-on-surface-variant text-right">
+                  {r.bookings} ({r.paidBookings})
+                </td>
                 <td className="px-3 py-2 text-on-surface-variant text-right">
                   {formatRupiah(r.revenue)}
                 </td>
@@ -39,6 +41,12 @@ export default function TopKosTable({ rows }: { rows: TopKosRow[] }) {
             ))}
           </tbody>
         </table>
+      )}
+      {rows.length > 0 && (
+        <p className="px-3 py-1.5 text-[11px] text-outline">
+          Booking (Lunas): &quot;X (Y)&quot; = X booking, Y davon lunas. Revenue Rp 0 berarti
+          booking belum lunas.
+        </p>
       )}
     </div>
   );

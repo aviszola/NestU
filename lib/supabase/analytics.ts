@@ -44,6 +44,7 @@ export interface TopKosRow {
   kosName: string;
   ownerName: string;
   bookings: number;
+  paidBookings: number;
   revenue: number;
 }
 
@@ -52,6 +53,7 @@ export interface TopOwnerRow {
   ownerName: string;
   kosCount: number;
   bookings: number;
+  paidBookings: number;
   revenue: number;
 }
 
@@ -61,6 +63,8 @@ export interface ActivityRow {
   action: string;
   target: string;
   href?: string;
+  oldValue?: string | null;
+  newValue?: string | null;
 }
 
 export interface AnalyticsHealth {
@@ -251,7 +255,7 @@ export async function getAnalytics(
   }
 
   // Top 10 kos by booking count.
-  const kosAgg: Record<string, { kosId: string; kosName: string; ownerId: string; bookings: number; revenue: number }> = {};
+  const kosAgg: Record<string, { kosId: string; kosName: string; ownerId: string; bookings: number; paidBookings: number; revenue: number }> = {};
   cur.forEach((b: any) => {
     const k = b.room?.kos;
     if (!k) return;
@@ -260,10 +264,14 @@ export async function getAnalytics(
       kosName: k.name,
       ownerId: k.owner_id,
       bookings: 0,
+      paidBookings: 0,
       revenue: 0,
     });
     a.bookings++;
-    if (b.payment_status === "lunas") a.revenue += b.total_amount || 0;
+    if (b.payment_status === "lunas") {
+      a.paidBookings++;
+      a.revenue += b.total_amount || 0;
+    }
   });
   const topKos: TopKosRow[] = Object.values(kosAgg)
     .map((r) => ({
@@ -271,13 +279,14 @@ export async function getAnalytics(
       kosName: r.kosName,
       ownerName: nameMap.get(r.ownerId) || "-",
       bookings: r.bookings,
+      paidBookings: r.paidBookings,
       revenue: r.revenue,
     }))
     .sort((a, b) => b.bookings - a.bookings)
     .slice(0, 10);
 
   // Top 10 pemilik by revenue.
-  const ownerAgg: Record<string, { ownerId: string; kosSet: Set<string>; bookings: number; revenue: number }> = {};
+  const ownerAgg: Record<string, { ownerId: string; kosSet: Set<string>; bookings: number; paidBookings: number; revenue: number }> = {};
   cur.forEach((b: any) => {
     const k = b.room?.kos;
     if (!k || !k.owner_id) return;
@@ -285,11 +294,15 @@ export async function getAnalytics(
       ownerId: k.owner_id,
       kosSet: new Set<string>(),
       bookings: 0,
+      paidBookings: 0,
       revenue: 0,
     });
     a.kosSet.add(k.id);
     a.bookings++;
-    if (b.payment_status === "lunas") a.revenue += b.total_amount || 0;
+    if (b.payment_status === "lunas") {
+      a.paidBookings++;
+      a.revenue += b.total_amount || 0;
+    }
   });
   const topOwners: TopOwnerRow[] = Object.values(ownerAgg)
     .map((r) => ({
@@ -297,6 +310,7 @@ export async function getAnalytics(
       ownerName: nameMap.get(r.ownerId) || "-",
       kosCount: r.kosSet.size,
       bookings: r.bookings,
+      paidBookings: r.paidBookings,
       revenue: r.revenue,
     }))
     .sort((a, b) => b.revenue - a.revenue)
@@ -307,8 +321,10 @@ export async function getAnalytics(
     time: l.created_at,
     actor: l.admin?.full_name || "Admin",
     action: l.action_type || "status_override",
-    target: `Booking ${String(l.booking_id || "").slice(0, 8)}`,
+    target: `Booking #${String(l.booking_id || "").slice(0, 8)}`,
     href: "/admin/bookings",
+    oldValue: l.old_value,
+    newValue: l.new_value,
   }));
 
   // Health metrics.
@@ -341,6 +357,17 @@ export async function getAnalytics(
   );
   const activeSet = new Set<string>([...siswaSet, ...ownerSet]);
 
+  // Benchmark conversion — configurable via app_config.conversion_benchmark_pct.
+  // [TODO: seed key in DB:
+  //   INSERT INTO app_config(key,value) VALUES ('conversion_benchmark_pct','20');
+  let conversionTarget = 20;
+  const { data: cfg } = await client
+    .from("app_config")
+    .select("value")
+    .eq("key", "conversion_benchmark_pct")
+    .maybeSingle();
+  if (cfg?.value && !isNaN(Number(cfg.value))) conversionTarget = Number(cfg.value);
+
   const kpi: AnalyticsKpi = {
     gmv,
     gmvDeltaPct,
@@ -350,7 +377,7 @@ export async function getAnalytics(
     approved,
     completed,
     conversionRate,
-    conversionTarget: 20,
+    conversionTarget,
     activeUsers: activeSet.size,
     activeSiswa: siswaSet.size,
     activePemilik: ownerSet.size,
