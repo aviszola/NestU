@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Logo from "@/components/ui/Logo";
 import LogoutConfirmModal from "@/components/LogoutConfirmModal";
 
-export type ActivePage = "dashboard" | "search" | "favorites" | "bookings" | "rental" | "profile" | "properties" | "settings" | "reports";
+export type ActivePage = "dashboard" | "analytics" | "search" | "favorites" | "bookings" | "rental" | "profile" | "properties" | "settings" | "reports";
 
 interface SidebarProps {
   activePage: ActivePage;
@@ -28,6 +28,7 @@ interface BottomItem {
 
 const adminMenu: MenuItem[] = [
   { label: "Dashboard", icon: "dashboard", href: "/admin", page: "dashboard" },
+  { label: "Analytics", icon: "monitoring", href: "/admin/analytics", page: "analytics" },
   { label: "Verifikasi Kos", icon: "apartment", href: "/admin/kos", page: "properties" },
   { label: "Bookings", icon: "receipt_long", href: "/admin/bookings", page: "bookings" },
 ];

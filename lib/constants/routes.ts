@@ -24,6 +24,7 @@ export const ROUTES = {
   // Admin routes
   ADMIN: {
     HOME: "/admin",
+    ANALYTICS: "/admin/analytics",
     KOS: "/admin/kos",
     BOOKINGS: "/admin/bookings",
   },
