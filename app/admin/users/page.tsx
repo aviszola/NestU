@@ -53,16 +53,15 @@ export default function AdminUsersPage() {
 
   async function loadUsers() {
     const supabase = createClient();
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, email, full_name, role, is_active, created_at, school_name")
-      .order("created_at", { ascending: false });
+    // Email tersimpan di auth.users, bukan profiles — akses via
+    // RPC admin-only get_users_with_email() (SECURITY DEFINER, validasi is_admin).
+    const { data, error } = await supabase.rpc("get_users_with_email");
     if (error) {
       toastError("Gagal memuat data user: " + (error.message || "Terjadi kesalahan"));
       setLoading(false);
       return;
     }
-    setUsers(data ?? []);
+    setUsers((data as UserRow[] | null) ?? []);
     setLoading(false);
   }
 
