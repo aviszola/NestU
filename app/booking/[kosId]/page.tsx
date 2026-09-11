@@ -1,28 +1,41 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getKosById } from "@/lib/supabase/queries";
-import { notFound, redirect, useRouter } from "next/navigation";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import SubmitBookingButton from "@/components/SubmitBookingButton";
 import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
-
 import { facilityIcon } from "@/lib/facilities";
 
-export default function BookingPage({
+interface RoomData {
+  id: string;
+  room_number: string;
+  price_per_month: number;
+  status: string;
+  size_sqm?: number | null;
+  description?: string | null;
+}
+
+function BookingContent({
   params,
 }: {
   params: Promise<{ kosId: string }>;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedRoomId = searchParams.get("room") || searchParams.get("roomId");
+
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
   const [kos, setKos] = useState<any>(null);
-  const [room, setRoom] = useState<any>(null);
+  const [allRooms, setAllRooms] = useState<RoomData[]>([]);
+  const [activeBookedSet, setActiveBookedSet] = useState<Set<string>>(new Set());
+  const [room, setRoom] = useState<RoomData | null>(null);
+  const [roomError, setRoomError] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [duration, setDuration] = useState("1");
   const [kosId, setKosId] = useState<string>("");
@@ -36,12 +49,18 @@ export default function BookingPage({
 
   useEffect(() => {
     if (!kosId) return;
-    
+
     (async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace(`/login?redirect=${window.location.pathname}`); return; }
-      setUser(user);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        const currentPath = `${window.location.pathname}${window.location.search}`;
+        router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
+        return;
+      }
 
       const kosData = await getKosById(supabase, kosId);
       if (!kosData) {
@@ -50,14 +69,80 @@ export default function BookingPage({
       }
       setKos(kosData);
 
-      const { data: allRooms } = await supabase
+      // Ambil semua kamar dari kos ini
+      const { data: roomsData } = await supabase
         .from("rooms")
-        .select("id, price_per_month, room_number")
+        .select("id, price_per_month, room_number, status, size_sqm, description")
         .eq("kos_id", kosData.id)
-        .eq("status", "tersedia")
-        .order("price_per_month", { ascending: true })
-        .limit(1);
-      setRoom(allRooms?.[0]);
+        .order("price_per_month", { ascending: true });
+
+      const roomList: RoomData[] = roomsData ?? [];
+      setAllRooms(roomList);
+
+      // Ambil booking aktif untuk semua kamar pada kos ini
+      const roomIds = roomList.map((r) => r.id);
+      let activeSet = new Set<string>();
+      if (roomIds.length > 0) {
+        const { data: rpcActive, error: rpcErr } = await supabase
+          .rpc("get_active_booked_room_ids", { p_room_ids: roomIds });
+        if (!rpcErr && Array.isArray(rpcActive)) {
+          activeSet = new Set(
+            (rpcActive as Array<{ room_id?: string } | string>)
+              .map((row) => (typeof row === "string" ? row : (row.room_id ?? "")))
+              .filter(Boolean)
+          );
+        } else {
+          const { data: activeBookings } = await supabase
+            .from("bookings")
+            .select("room_id")
+            .in("room_id", roomIds)
+            .in("status", ["pending", "approved"]);
+          if (activeBookings) {
+            activeSet = new Set(activeBookings.map((b) => b.room_id));
+          }
+        }
+      }
+      setActiveBookedSet(activeSet);
+
+      // Tentukan kamar yang dipilih
+      if (requestedRoomId) {
+        const target = roomList.find((r) => r.id === requestedRoomId);
+        if (!target) {
+          setRoom(null);
+          setRoomError("Kamar yang Anda pilih tidak ditemukan pada kos ini.");
+        } else {
+          setRoom(target);
+          const isBooked = activeSet.has(target.id);
+          const isAvail = target.status === "tersedia" && !isBooked;
+          if (!isAvail) {
+            if (isBooked) {
+              setRoomError(
+                `Kamar ${target.room_number} sedang memiliki proses booking aktif. Silakan pilih kamar lain.`
+              );
+            } else {
+              setRoomError(
+                `Kamar ${target.room_number} saat ini tidak tersedia (${target.status}). Silakan pilih kamar lain.`
+              );
+            }
+          } else {
+            setRoomError(null);
+          }
+        }
+      } else {
+        // Jika tidak ada parameter spesifik, pilih kamar pertama yang benar-benar tersedia
+        const firstAvail = roomList.find(
+          (r) => r.status === "tersedia" && !activeSet.has(r.id)
+        );
+        if (firstAvail) {
+          setRoom(firstAvail);
+          setRoomError(null);
+        } else {
+          setRoom(null);
+          setRoomError(
+            "Semua kamar pada kos ini sedang penuh atau memiliki booking aktif."
+          );
+        }
+      }
 
       const { data: profileData } = await supabase
         .from("profiles")
@@ -67,19 +152,39 @@ export default function BookingPage({
       setProfile(profileData);
       setLoading(false);
     })();
-  }, [kosId, router]);
+  }, [kosId, requestedRoomId, router]);
+
+  const handleRoomChange = (newRoomId: string) => {
+    const selected = allRooms.find((r) => r.id === newRoomId);
+    if (!selected) return;
+    setRoom(selected);
+    const isBooked = activeBookedSet.has(selected.id);
+    const isAvail = selected.status === "tersedia" && !isBooked;
+    if (!isAvail) {
+      if (isBooked) {
+        setRoomError(
+          `Kamar ${selected.room_number} sedang memiliki proses booking aktif. Silakan pilih kamar lain.`
+        );
+      } else {
+        setRoomError(
+          `Kamar ${selected.room_number} saat ini tidak tersedia (${selected.status}). Silakan pilih kamar lain.`
+        );
+      }
+    } else {
+      setRoomError(null);
+    }
+  };
 
   const price = room?.price_per_month ?? 0;
   const serviceFee = 25000;
   const adminFee = 5000;
-  
+
   // Calculate total based on duration - LINEAR: harga bulanan × jumlah bulan
   const calculateTotal = (months: number) => {
     const monthlyTotal = price * months;
     return monthlyTotal + serviceFee + adminFee;
   };
 
-  // Calculate breakdown for display - LINEAR (sama setiap bulan)
   const calculateBreakdown = (months: number, basePrice: number) => {
     const monthlyTotal = basePrice * months;
     return `${months} bulan × Rp ${basePrice.toLocaleString("id-ID")} = Rp ${monthlyTotal.toLocaleString("id-ID")}`;
@@ -90,7 +195,6 @@ export default function BookingPage({
   const monthlyPriceTotal = total - serviceFee - adminFee;
   const facilities = kos?.fasilitas || [];
   const foto = kos?.foto?.[0] || "/images/placeholder.jpg";
-  const avatarUrl = profile?.avatar_url;
 
   if (loading) {
     return (
@@ -112,10 +216,23 @@ export default function BookingPage({
             className="flex items-center gap-1.5 text-outline hover:text-primary transition-colors mb-2"
           >
             <span className="material-symbols-outlined text-sm">arrow_back</span>
-            <span className="text-[11px] font-semibold uppercase tracking-wider">KEMBALI KE DETAIL</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">KEMBALI KE DETAIL KOS</span>
           </Link>
           <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">Pengajuan Booking</h1>
         </div>
+
+        {/* Warning / Error Alert jika kamar tidak tersedia / sudah dibooking */}
+        {roomError && (
+          <div className="mb-stack-md p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 shadow-sm">
+            <span className="material-symbols-outlined text-amber-600 shrink-0 text-2xl">warning</span>
+            <div className="space-y-1">
+              <p className="text-sm font-bold">{roomError}</p>
+              <p className="text-xs text-amber-800">
+                Pilih kamar yang masih berstatus (Tersedia) pada daftar kamar di bawah, atau kembali ke halaman detail kos.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
           {/* Left Side: Form & Summary */}
@@ -141,18 +258,42 @@ export default function BookingPage({
                         </span>
                       )}
                       <h2 className="text-lg font-bold text-on-surface">{kos?.name || "Kos"}</h2>
-                      {room && (
-                        <p className="text-sm font-normal text-on-surface-variant mt-0.5">
-                          Kamar {room.room_number || "Tipe Standar"}
+                      {room ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-sm font-semibold text-primary">
+                            Kamar {room.room_number}
+                          </p>
+                          {activeBookedSet.has(room.id) ? (
+                            <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                              Sedang Dibooking
+                            </span>
+                          ) : room.status === "tersedia" ? (
+                            <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">
+                              Tersedia
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-surface-container-high text-outline">
+                              {room.status}
+                            </span>
+                          )}
+                          {room.size_sqm && (
+                            <span className="text-xs text-outline">({room.size_sqm} m²)</span>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-error font-medium mt-1">
+                          Belum ada kamar yang dipilih
                         </p>
                       )}
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-primary">
-                        Rp {price.toLocaleString("id-ID")}
-                      </p>
-                      <p className="text-xs font-normal text-outline">/ bulan</p>
-                    </div>
+                    {room && (
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-primary">
+                          Rp {price.toLocaleString("id-ID")}
+                        </p>
+                        <p className="text-xs font-normal text-outline">/ bulan</p>
+                      </div>
+                    )}
                   </div>
                   {facilities.length > 0 && (
                     <div className="mt-stack-md flex flex-wrap gap-1.5">
@@ -177,6 +318,39 @@ export default function BookingPage({
                 Informasi Penyewaan
               </h3>
               <div className="space-y-stack-md">
+                {/* Pilihan Kamar (Dropdown jika kos memiliki kamar) */}
+                {allRooms.length > 1 && (
+                  <div className="flex flex-col gap-1">
+                    <label
+                      className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide"
+                      htmlFor="room_select"
+                    >
+                      Pilihan Kamar
+                    </label>
+                    <select
+                      id="room_select"
+                      value={room?.id ?? ""}
+                      onChange={(e) => handleRoomChange(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary focus:ring-3 focus:ring-primary/10 outline-none transition-all font-body-md text-body-md bg-white"
+                    >
+                      {allRooms.map((r) => {
+                        const isBooked = activeBookedSet.has(r.id);
+                        const isAvail = r.status === "tersedia" && !isBooked;
+                        const labelStatus = isAvail
+                          ? "(Tersedia)"
+                          : isBooked
+                          ? "(Sedang Dibooking)"
+                          : `(${r.status})`;
+                        return (
+                          <option key={r.id} value={r.id}>
+                            Kamar {r.room_number} — Rp {Number(r.price_per_month).toLocaleString("id-ID")}/bln {labelStatus}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
                   <div className="flex flex-col gap-1">
                     <label
@@ -223,6 +397,7 @@ export default function BookingPage({
                     </select>
                   </div>
                 </div>
+
                 <div className="flex flex-col gap-1">
                   <label
                     className="font-label-md text-label-md text-on-surface-variant"
@@ -238,6 +413,7 @@ export default function BookingPage({
                     rows={4}
                   />
                 </div>
+
                 <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
                   <span className="material-symbols-outlined text-primary">info</span>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
@@ -281,21 +457,29 @@ export default function BookingPage({
                     <span className="text-primary font-bold">Rp {total.toLocaleString("id-ID")}</span>
                   </div>
                 </div>
+
                 {kos && (
-                  room ? (
+                  room && !roomError ? (
                     <SubmitBookingButton kosId={kos.id} roomId={room.id} />
                   ) : (
                     <div className="p-4 rounded-xl bg-error/10 border border-error/20 text-error space-y-3">
                       <div className="flex items-start gap-2">
                         <span className="material-symbols-outlined shrink-0 text-xl">error</span>
                         <p className="font-body-sm text-body-sm font-medium">
-                          Kamar pada kos ini sudah tidak tersedia saat ini. Silakan cari kos lain atau hubungi pemilik.
+                          {roomError || "Kamar ini tidak dapat dibooking saat ini."}
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2 pt-1">
                         <Link
+                          href={`/kos/${kos.id}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-white font-bold text-xs rounded-lg hover:opacity-90 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-sm">view_list</span>
+                          Pilih Kamar Lain
+                        </Link>
+                        <Link
                           href="/kos"
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-error text-white font-bold text-xs rounded-lg hover:brightness-110 transition-all"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-surface-container-high text-on-surface font-semibold text-xs rounded-lg hover:bg-surface-container-highest transition-all"
                         >
                           <span className="material-symbols-outlined text-sm">search</span>
                           Cari Kos Lain
@@ -315,6 +499,7 @@ export default function BookingPage({
                     </div>
                   )
                 )}
+
                 <p className="text-center font-label-md text-label-md text-outline mt-3">
                   Setelah diajukan, pemilik kos akan meninjau permintaan Anda. Anda akan diminta membayar setelah booking disetujui.
                 </p>
@@ -339,9 +524,24 @@ export default function BookingPage({
         </div>
       </main>
 
-            <Footer />
-
-            <BottomNav activePage="bookings" userRole="siswa" />
+      <Footer />
+      <BottomNav activePage="bookings" userRole="siswa" />
     </>
+  );
+}
+
+export default function BookingPage(props: {
+  params: Promise<{ kosId: string }>;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-outline">Memuat halaman booking...</p>
+        </div>
+      }
+    >
+      <BookingContent params={props.params} />
+    </Suspense>
   );
 }
