@@ -95,7 +95,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="hidden lg:flex flex-col h-[calc(100vh-64px)] w-64 sticky top-16 p-stack-md border-r border-outline-variant bg-surface-container-low">
+        <aside className="hidden lg:flex flex-col w-64 lg:fixed lg:top-16 lg:bottom-0 lg:left-0 z-30 p-stack-md border-r border-outline-variant bg-surface-container-low">
           <div className="mb-stack-lg px-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
@@ -107,7 +107,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
               </div>
             </div>
           </div>
-          <nav className="flex-1 space-y-2">
+          <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
             {menu.map((item) => {
               const isActive = item.page === activePage;
               return (
@@ -148,7 +148,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-h-screen">
+        <main className="flex-1 min-h-screen lg:ml-64">
           {children}
         </main>
       </div>
