@@ -365,6 +365,17 @@ export default async function DetailKosSiswaPage({
           Kamar ({typedRooms.length})
         </h2>
 
+        {/* Banner: semua kamar penuh / tidak tersedia — siswa sadar langsung */}
+        {typedRooms.length > 0 && tersedia.length === 0 && (
+          <div className="mt-4 rounded-xl border border-error/30 bg-error/10 p-4 flex items-center gap-2 font-body-md">
+            <span className="material-symbols-outlined text-xl shrink-0">bedtime</span>
+            <span>
+              <span className="font-semibold">Semua kamar sedang penuh.</span>{" "}
+              Saat ini tidak ada kamar tersedia untuk booking dalam kos ini.
+            </span>
+          </div>
+        )}
+
         {typedRooms.length === 0 ? (
           <div className="rounded-xl border border-outline-variant bg-white p-8 text-center text-outline text-sm font-normal">
             Tidak ada kamar tersedia saat ini.
