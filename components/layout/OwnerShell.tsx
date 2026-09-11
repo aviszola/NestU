@@ -45,14 +45,17 @@ export default function OwnerShell({ children, activePage, userName }: OwnerShel
 
   return (
     <>
-      <TopNav
-        userRole="pemilik"
-        userAvatar="/images/avatar-placeholder.svg"
-        showSearch
-        searchPlaceholder="Cari properti..."
-        searchValue=""
-        onSearchChange={() => {}}
-      />
+      {/* TopNav hanya untuk area konten kanan — camera tidak ketutup sidebar fixed */}
+      <div className="lg:ml-64">
+        <TopNav
+          userRole="pemilik"
+          userAvatar="/images/avatar-placeholder.svg"
+          showSearch
+          searchPlaceholder="Cari properti..."
+          searchValue=""
+          onSearchChange={() => {}}
+        />
+      </div>
       <div className="flex min-h-screen">
         <Sidebar activePage={activePage} userRole="pemilik" userName={userName || "Pemilik Kos"} />
         <main className="flex-1 lg:ml-64 min-h-screen">
