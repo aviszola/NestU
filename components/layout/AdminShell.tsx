@@ -75,82 +75,85 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-sm bg-surface shadow-sm">
-        <div className="flex items-center gap-stack-md">
-          <Logo variant="full" className="h-11 w-auto text-primary" />
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant">
-            <span className="material-symbols-outlined text-outline mr-2">search</span>
-            <input className="bg-transparent border-none focus:ring-0 text-body-sm w-64" placeholder="Search property or owner..." type="text" />
-          </div>
-          <NotifBell />
-          <button className="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">help</button>
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary bg-primary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-primary-container">admin_panel_settings</span>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden lg:flex flex-col w-64 lg:fixed lg:top-16 lg:bottom-0 lg:left-0 z-30 p-stack-md border-r border-outline-variant bg-surface-container-low">
-          <div className="mb-stack-lg px-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
-                <span className="material-symbols-outlined">admin_panel_settings</span>
-              </div>
-              <div>
-                <p className="font-label-md text-label-md text-primary font-bold">Admin Panel</p>
-                <p className="text-[10px] text-outline">Verification & Management</p>
-              </div>
+      {/* Sidebar fixed full-height — flush top-left, tidak ikut scroll */}
+      <aside className="hidden lg:flex flex-col w-64 fixed inset-y-0 left-0 z-40 border-r border-outline-variant bg-surface-container-low">
+        <div className="pt-stack-md mb-stack-lg px-2">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
+              <span className="material-symbols-outlined">admin_panel_settings</span>
+            </div>
+            <div>
+              <p className="font-label-md text-label-md text-primary font-bold">Admin Panel</p>
+              <p className="text-[10px] text-outline">Verification & Management</p>
             </div>
           </div>
-          <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-            {menu.map((item) => {
-              const isActive = item.page === activePage;
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-secondary-container text-on-secondary-container font-bold"
-                      : "text-on-surface-variant hover:bg-surface-container-high"
-                  }`}
-                >
-                  <span className="material-symbols-outlined">{item.icon}</span>
-                  <span className="font-label-md text-label-md">{item.label}</span>
-                  {item.page === "refunds" && refundCount > 0 && (
-                    <span className="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-error text-white text-[11px] font-bold">
-                      {refundCount}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="pt-stack-md border-t border-outline-variant space-y-2">
-            <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
-              <span className="material-symbols-outlined">settings</span>
-              <span className="font-label-md text-label-md">Settings</span>
-            </Link>
-            <button
-              type="button"
-              onClick={() => setLogoutOpen(true)}
-              className="flex w-full items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all text-left"
-            >
-              <span className="material-symbols-outlined">logout</span>
-              <span className="font-label-md text-label-md">Logout</span>
-            </button>
+        </div>
+        <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+          {menu.map((item) => {
+            const isActive = item.page === activePage;
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? "bg-secondary-container text-on-secondary-container font-bold"
+                    : "text-on-surface-variant hover:bg-surface-container-high"
+                }`}
+              >
+                <span className="material-symbols-outlined">{item.icon}</span>
+                <span className="font-label-md text-label-md">{item.label}</span>
+                {item.page === "refunds" && refundCount > 0 && (
+                  <span className="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-error text-white text-[11px] font-bold">
+                    {refundCount}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="pt-stack-md pb-stack-md border-t border-outline-variant space-y-2">
+          <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+            <span className="material-symbols-outlined">settings</span>
+            <span className="font-label-md text-label-md">Settings</span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => setLogoutOpen(true)}
+            className="flex w-full items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all text-left"
+          >
+            <span className="material-symbols-outlined">logout</span>
+            <span className="font-label-md text-label-md">Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Konten kanan — offset past the fixed sidebar */}
+      <div className="lg:pl-64">
+        {/* Top Bar (hanya area konten kanan) */}
+        <header className="sticky top-0 z-30 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-sm bg-surface shadow-sm">
+          <div className="flex items-center gap-stack-md">
+            <Logo variant="full" className="h-11 w-auto text-primary" />
           </div>
-        </aside>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant">
+              <span className="material-symbols-outlined text-outline mr-2">search</span>
+              <input className="bg-transparent border-none focus:ring-0 text-body-sm w-64" placeholder="Search property or owner..." type="text" />
+            </div>
+            <NotifBell />
+            <button className="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">help</button>
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary bg-primary-container flex items-center justify-center">
+              <span className="material-symbols-outlined text-on-primary-container">admin_panel_settings</span>
+            </div>
+          </div>
+        </header>
 
         {/* Main */}
-        <main className="flex-1 min-h-screen lg:ml-64">
+        <main className="min-h-screen">
           {children}
         </main>
+
+        <Footer />
       </div>
 
       {/* Bottom Nav Mobile */}
@@ -172,7 +175,6 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
         })}
       </nav>
 
-      <Footer />
       <LogoutConfirmModal open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </div>
   );
