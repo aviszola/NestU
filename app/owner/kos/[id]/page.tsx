@@ -509,6 +509,8 @@ export default function DetailKosPage() {
             id="rm-price"
             label="Harga per Bulan (Rp)"
             type="number"
+            min="1"
+            step="1"
             value={rmPrice}
             onChange={(e) => setRmPrice(e.target.value)}
             required
