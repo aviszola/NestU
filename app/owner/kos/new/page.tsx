@@ -194,6 +194,9 @@ export default function CreateKosPage() {
     }
   }
 
+  // Koordinat & minimal 1 foto WAJIB sebelum submit berhasil (disabled sampai selesai)
+  const canSubmit = latitude !== null && longitude !== null && fotoFiles.length >= 1;
+
   return (
     <OwnerShell activePage="properties">
       <main className="w-full px-margin-mobile md:px-margin-desktop py-stack-lg max-w-[1280px]">
@@ -409,7 +412,7 @@ export default function CreateKosPage() {
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !canSubmit}
                     className="w-full sm:w-auto px-12 py-3 rounded-lg bg-primary text-on-primary font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 font-label-md text-label-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="material-symbols-outlined">save</span>
