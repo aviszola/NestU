@@ -215,7 +215,34 @@ export default async function DetailKosSiswaPage({
     .order("price_per_month", { ascending: true });
 
   const typedRooms = (allRooms as Room[] | null) ?? [];
-  const tersedia = typedRooms.filter((r) => r.status === "tersedia");
+
+  // Ambil booking aktif untuk semua kamar pada kos ini
+  const roomIds = typedRooms.map((r) => r.id);
+  let activeBookedRoomIds = new Set<string>();
+  if (roomIds.length > 0) {
+    const { data: rpcActive, error: rpcErr } = await supabase
+      .rpc("get_active_booked_room_ids", { p_room_ids: roomIds });
+    if (!rpcErr && Array.isArray(rpcActive)) {
+      activeBookedRoomIds = new Set(
+        (rpcActive as Array<{ room_id?: string } | string>)
+          .map((row) => (typeof row === "string" ? row : (row.room_id ?? "")))
+          .filter(Boolean)
+      );
+    } else {
+      const { data: activeBookings } = await supabase
+        .from("bookings")
+        .select("room_id")
+        .in("room_id", roomIds)
+        .in("status", ["pending", "approved"]);
+      if (activeBookings) {
+        activeBookedRoomIds = new Set(activeBookings.map((b) => b.room_id));
+      }
+    }
+  }
+
+  const tersedia = typedRooms.filter(
+    (r) => r.status === "tersedia" && !activeBookedRoomIds.has(r.id)
+  );
 
   const isVerified = kos.verification_status === "verified";
 
@@ -344,38 +371,70 @@ export default async function DetailKosSiswaPage({
           </div>
         ) : (
           <div className="space-y-3">
-            {typedRooms.map((room) => (
-              <div
-                key={room.id}
-                className="flex items-center justify-between rounded-xl border border-outline-variant bg-white p-4 hover:border-primary/40 transition-colors"
-              >
-                <div>
-                  <h3 className="font-bold text-base text-on-surface">
-                    Kamar {room.room_number}{" "}
-                    <span className={`text-xs font-semibold uppercase tracking-wide ml-1.5 px-2 py-0.5 rounded-full ${
-                      room.status === "tersedia" ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-high text-outline"
-                    }`}>
-                      {room.status}
-                    </span>
-                  </h3>
-                  <p className="text-sm font-semibold text-primary mt-1">
-                    Rp {Number(room.price_per_month).toLocaleString("id-ID")}/bln
-                    {room.size_sqm ? <span className="text-xs font-normal text-on-surface-variant"> · {room.size_sqm} m²</span> : ""}
-                  </p>
-                  {room.description && (
-                    <p className="text-xs font-normal text-on-surface-variant mt-1 leading-relaxed">{room.description}</p>
+            {typedRooms.map((room) => {
+              const hasActiveBooking = activeBookedRoomIds.has(room.id);
+              const isAvailable = room.status === "tersedia" && !hasActiveBooking;
+
+              return (
+                <div
+                  key={room.id}
+                  className="flex items-center justify-between rounded-xl border border-outline-variant bg-white p-4 hover:border-primary/40 transition-colors"
+                >
+                  <div>
+                    <h3 className="font-bold text-base text-on-surface flex items-center flex-wrap gap-2">
+                      <span>Kamar {room.room_number}</span>
+                      {isAvailable ? (
+                        <span className="text-xs font-semibold uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">
+                          Tersedia
+                        </span>
+                      ) : hasActiveBooking ? (
+                        <span className="text-xs font-semibold uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                          Sedang Dibooking
+                        </span>
+                      ) : (
+                        <span className="text-xs font-semibold uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-surface-container-high text-outline">
+                          {room.status === "terisi" ? "Terisi" : room.status === "dipesan" ? "Dipesan" : room.status}
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-sm font-semibold text-primary mt-1">
+                      Rp {Number(room.price_per_month).toLocaleString("id-ID")}/bln
+                      {room.size_sqm ? (
+                        <span className="text-xs font-normal text-on-surface-variant"> · {room.size_sqm} m²</span>
+                      ) : null}
+                    </p>
+                    {room.description && (
+                      <p className="text-xs font-normal text-on-surface-variant mt-1 leading-relaxed">{room.description}</p>
+                    )}
+                  </div>
+                  {isAvailable ? (
+                    <Link
+                      href={`/booking/${kos.id}?room=${room.id}`}
+                      className="rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-on-primary hover:opacity-90 active:scale-95 transition-all shrink-0"
+                    >
+                      Ajukan Booking
+                    </Link>
+                  ) : hasActiveBooking ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="rounded-lg bg-surface-container-high px-4 py-2.5 text-xs font-semibold text-outline cursor-not-allowed shrink-0 border border-outline-variant/60"
+                      title="Kamar ini sedang memiliki proses booking aktif yang belum selesai"
+                    >
+                      Sedang Dibooking
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="rounded-lg bg-surface-container-high px-4 py-2.5 text-xs font-semibold text-outline cursor-not-allowed shrink-0 border border-outline-variant/60"
+                    >
+                      Tidak Tersedia
+                    </button>
                   )}
                 </div>
-                {room.status === "tersedia" && (
-                  <a
-                    href={`/booking/${kos.id}`}
-                    className="rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-on-primary hover:opacity-90 active:scale-95 transition-all"
-                  >
-                    Booking
-                  </a>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
