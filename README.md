@@ -21,6 +21,7 @@
 - [11. 📦 Deployment](#11--deployment)
 - [12. 📅 Roadmap / Future Work](#12--roadmap--future-work)
 - [13. 🤝 Kontribusi](#13--kontribusi)
+- [🔄 Development Workflow](#development-workflow)
 - [14. 📄 License](#14--license)
 - [15. 👥 Authors / Kontak](#15--authors--kontak)
 - [16. 🧹 Pengecekan Akun Test](#16--pengecekan-akun-test)
@@ -667,9 +668,26 @@ Dal commit history (`git log`) &amp; code marker:
 - **Sync role log &amp; audit:** `admin_action_log` override exists; expansion audit actions `[TODO]`.
 - Po mark `[TODO: perlu dilengkapi]` lain sepanjang codebase cek `grep -r TODO app lib components`.
 
+## 🔄 Development Workflow
+
+Project ini pakai **branch protection** + **CI/CD**:
+
+- `main` protected → wajib PR + CI hijau sebelum merge
+- Setiap PR → **Vercel Preview URL** otomatis (untuk QA visual)
+- CI jalan otomatis: typecheck + lint + build
+
+### Alur Kontribusi
+1. Buat branch: `git checkout -b feat/<scope>`
+2. Commit + push ke branch
+3. Buka PR → CI jalan, Vercel bikin preview
+4. Cek preview URL di komentar PR
+5. Merge setelah approve + CI hijau
+
+Lihat [CONTRIBUTING.md](./CONTRIBUTING.md) untuk detail.
+
 ## 13. 🤝 Kontribusi
 
-> `[TODO: perlu dilengkapi]` — file `CONTRIBUTING.md` belum ada. Recommendation pola, berdasarkan convention repo:
+> Panduan kontribusi lengkap: [CONTRIBUTING.md](./CONTRIBUTING.md). Convention repo:
 
 1. Fork &amp; branch feature, branch dari `main`.
 2. Convention commit: `feat(...)` / `fix(...)` / `style(...)` / `security(...)` (lihat history `git log`).

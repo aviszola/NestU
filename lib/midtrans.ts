@@ -115,6 +115,10 @@ export function verifySignature(
   grossAmount: string,
   signatureKey: string
 ): boolean {
+  // "crypto" is een node builtin (server-only). Geen top-level import omdat dit
+  // bestand ook door client-componenten wordt ingelezen (getSnapScriptUrl) en een
+  // top-level `import ... from "crypto"` de node builtin naar de client zou bundelen.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const crypto = require("crypto");
   const serverKey = process.env.MIDTRANS_SERVER_KEY || "";
   const payload = `${orderId}${statusCode}${grossAmount}${serverKey}`;
