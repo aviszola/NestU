@@ -38,13 +38,13 @@ BEGIN
 
   RETURN QUERY
     SELECT p.id,
-           u.email,
-           p.full_name,
-           p.role,
+           u.email::TEXT,
+           p.full_name::TEXT,
+           p.role::TEXT,
            p.is_active,
            p.created_at,
-           p.school_name,
-           p.phone
+           p.school_name::TEXT,
+           p.phone::TEXT
     FROM public.profiles p
     LEFT JOIN auth.users u ON u.id = p.id
     ORDER BY p.created_at DESC;
