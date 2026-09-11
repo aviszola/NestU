@@ -8,7 +8,7 @@ export async function getVerifiedKosList(
   client: any,
   userId?: string
 ): Promise<any[]> {
-  let query = client
+  const query = client
     .from("kos")
     .select("*, kos_facilities(facility_id, facility:facility_id(name))")
     .eq("verification_status", "verified")

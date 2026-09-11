@@ -42,8 +42,8 @@ export default async function OwnerKosListPage() {
   let totalRooms = 0;
   let availableRooms = 0;
   let totalBookings = 0;
-  let kosRoomsMap: Record<string, { total: number; available: number }> = {};
-  let kosBookingsMap: Record<string, number> = {};
+  const kosRoomsMap: Record<string, { total: number; available: number }> = {};
+  const kosBookingsMap: Record<string, number> = {};
 
   if (kosIds.length > 0) {
     const { data: rooms } = await supabase
