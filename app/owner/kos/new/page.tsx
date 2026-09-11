@@ -245,7 +245,7 @@ export default function CreateKosPage() {
                         id="kos-wa"
                         value={whatsappNumber.replace("+62", "")}
                         onChange={(e) => {
-                          let v = e.target.value.replace(/[^\d]/g, "");
+                          const v = e.target.value.replace(/[^\d]/g, "");
                           setWhatsappNumber("+62" + v);
                         }}
                         placeholder="812 3456 7890"
