@@ -49,9 +49,19 @@ export async function rejectKos(
   const kosId = formData.get("kosId") as string;
   if (!kosId) return { error: "Missing kosId" };
 
+  // Alasan penolakan WAJIB (minimal 10 karakter) — validasi server-side,
+  // pola sama dgn reject booking oleh pemilik. Jangan cuma client-side.
+  const reason = (formData.get("reason") as string ?? "").trim();
+  if (reason.length < 10) {
+    return { error: "Alasan penolakan wajib diisi (minimal 10 karakter)" };
+  }
+
   const { error } = await supabase
     .from("kos")
-    .update({ verification_status: "rejected" })
+    .update({
+      verification_status: "rejected",
+      rejection_reason: reason.slice(0, 500),
+    })
     .eq("id", kosId);
   if (error) return { error: error.message };
 
