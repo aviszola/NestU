@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import AdminShell from "@/components/layout/AdminShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { toastSuccess, toastError } from "@/lib/toast";
 import { createClient } from "@/lib/supabase/client";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Pagination from "@/components/ui/Pagination";
 
 interface UserRow {
   id: string;
@@ -39,10 +41,20 @@ function formatDate(d: string | null): string {
   });
 }
 
+/** Maksimal user per halaman di /admin/users pagination. */
+const USERS_PER_PAGE = 30;
+
 export default function AdminUsersPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminUsersBody />
+    </Suspense>
+  );
+}
+
+function AdminUsersBody() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [suspendTarget, setSuspendTarget] = useState<UserRow | null>(null);
   const [suspendModalOpen, setSuspendModalOpen] = useState(false);
   const [suspendLoading, setSuspendLoading] = useState(false);
@@ -50,6 +62,13 @@ export default function AdminUsersPage() {
   const [roleTarget, setRoleTarget] = useState<UserRow | null>(null);
   const [roleValue, setRoleValue] = useState<"siswa" | "pemilik" | "admin">("siswa");
   const [roleSaving, setRoleSaving] = useState(false);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Bug #5 — Search URL-synced via query param `?q=...` (shareable + back button).
+  const search = searchParams.get("q") ?? "";
 
   async function loadUsers() {
     const supabase = createClient();
@@ -91,6 +110,38 @@ export default function AdminUsersPage() {
       (u.email ?? "").toLowerCase().includes(search.toLowerCase()) ||
       (u.role ?? "").toLowerCase().includes(search.toLowerCase())
   );
+
+  // Pagination — slice client-side dari seluruh list loaded via RPC.
+  // [TODO: optimize] user count masih kecil (<1000) — acceptable. Untuk scale
+  // besar, migrasi ke server-side: RPC get_users_with_email(p_limit, p_offset)
+  // + RPC count, supaya tidak load semua user.
+  const requestedPage =
+    Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
+  const totalFiltered = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / USERS_PER_PAGE));
+  const currentPage = Math.min(requestedPage, totalPages);
+  const startIdx = (currentPage - 1) * USERS_PER_PAGE;
+  const pageUsers = filtered.slice(startIdx, startIdx + USERS_PER_PAGE);
+
+  // Bug #3 — Sync URL saat requestedPage di-clamp (mis. ?page=99 → page terakhir).
+  useEffect(() => {
+    if (requestedPage !== currentPage) {
+      const params = new URLSearchParams();
+      if (search) params.set("q", search);
+      params.set("page", String(currentPage));
+      router.replace(`${pathname}?${params.toString()}`);
+    }
+  }, [requestedPage, currentPage, search, pathname, router]);
+
+  // Bug #4 — Search berubah → reset page ke 1, sync `?q=` to URL.
+  function updateSearchQuery(value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("limit");
+    if (value) params.set("q", value);
+    else params.delete("q");
+    params.set("page", "1");
+    router.replace(`${pathname}?${params.toString()}`);
+  }
 
   function openSuspendModal(u: UserRow) {
     setSuspendTarget(u);
@@ -166,7 +217,7 @@ export default function AdminUsersPage() {
               id="user-search"
               placeholder="Cari nama, email, atau role..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => updateSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -199,7 +250,7 @@ export default function AdminUsersPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((u) => {
+                  pageUsers.map((u) => {
                     const active = u.is_active ?? true;
                     return (
                       <tr key={u.id} className="hover:bg-surface-container-lowest transition-colors">
@@ -248,6 +299,19 @@ export default function AdminUsersPage() {
             </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {!loading && filtered.length > 0 && (
+          <div className="mt-6 flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalFiltered}
+              itemsPerPage={USERS_PER_PAGE}
+              basePath="/admin/users"
+            />
+          </div>
+        )}
       </div>
 
       {/* Suspend Confirmation Modal */}
