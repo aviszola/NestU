@@ -46,6 +46,7 @@ export interface PersonRef {
 export interface TxOwner {
   id: string;
   full_name?: string | null;
+  email?: string | null;
 }
 
 export interface TransactionRow {
@@ -185,11 +186,25 @@ function endOfDay(iso?: string | null): number | null {
 
 // ─── Core fetch (server-only, admin client) ────────────────────────────────────
 
+/** Email di auth.users, bukan profiles — fetch via RPC admin-only get_users_with_email(). */
+async function fetchEmailMap(client: any): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  try {
+    const { data } = await client.rpc("get_users_with_email");
+    for (const u of data ?? []) {
+      if (u?.id && u?.email) map.set(u.id, u.email);
+    }
+  } catch {
+    // non-fatal — email tampil null kalau RPC tak tersedia
+  }
+  return map;
+}
+
 async function fetchAllRows(client: any): Promise<TransactionRow[]> {
   const { data: bookings, error } = await client
     .from("bookings")
     .select(
-      "*, rooms:room_id(id, room_number, price_per_month, kos:kos_id(id, name, owner_id)), student:student_id(id, full_name, email)"
+      "*, rooms:room_id(id, room_number, price_per_month, kos:kos_id(id, name, owner_id)), student:student_id(id, full_name)"
     )
     .order("created_at", { ascending: false });
 
@@ -212,6 +227,8 @@ async function fetchAllRows(client: any): Promise<TransactionRow[]> {
     for (const o of owners ?? []) ownerMap.set(o.id, o.full_name || o.id);
   }
 
+  const emailMap = await fetchEmailMap(client);
+
   const rows: TransactionRow[] = (bookings ?? []).map((b: any) => {
     const kos = b.rooms?.kos ?? null;
     const student = b.student ?? null;
@@ -223,11 +240,19 @@ async function fetchAllRows(client: any): Promise<TransactionRow[]> {
       createdAt: b.created_at,
       dateLabel: formatDateIndo(b.created_at),
       student: student
-        ? { id: student.id, full_name: student.full_name, email: student.email }
+        ? {
+            id: student.id,
+            full_name: student.full_name,
+            email: emailMap.get(student.id) ?? null,
+          }
         : null,
       kos: kos ? { id: kos.id, name: kos.name } : null,
       owner: ownerId
-        ? { id: ownerId, full_name: ownerMap.get(ownerId) ?? null }
+        ? {
+            id: ownerId,
+            full_name: ownerMap.get(ownerId) ?? null,
+            email: emailMap.get(ownerId) ?? null,
+          }
         : null,
       roomNumber: b.rooms?.room_number,
       durationMonths: b.duration_months,
@@ -359,7 +384,7 @@ export async function getTransactionDetail(
   const { data: booking, error } = await client
     .from("bookings")
     .select(
-      "*, rooms:room_id(id, room_number, price_per_month, kos:kos_id(id, name, owner_id)), student:student_id(id, full_name, email)"
+      "*, rooms:room_id(id, room_number, price_per_month, kos:kos_id(id, name, owner_id)), student:student_id(id, full_name)"
     )
     .eq("id", bookingId)
     .maybeSingle();
@@ -382,6 +407,8 @@ export async function getTransactionDetail(
     if (owner) ownerMap.set(owner.id, owner.full_name || owner.id);
   }
 
+  const emailMap = await fetchEmailMap(client);
+
   const row: TransactionRow = {
     bookingId: booking.id,
     orderId: resolveOrderId(booking),
@@ -392,14 +419,18 @@ export async function getTransactionDetail(
       ? {
           id: booking.student.id,
           full_name: booking.student.full_name,
-          email: booking.student.email,
+          email: emailMap.get(booking.student.id) ?? null,
         }
       : null,
     kos: booking.rooms?.kos
       ? { id: booking.rooms.kos.id, name: booking.rooms.kos.name }
       : null,
     owner: ownerId
-      ? { id: ownerId, full_name: ownerMap.get(ownerId) ?? null }
+      ? {
+          id: ownerId,
+          full_name: ownerMap.get(ownerId) ?? null,
+          email: emailMap.get(ownerId) ?? null,
+        }
       : null,
     roomNumber: booking.rooms?.room_number,
     durationMonths: booking.duration_months,
