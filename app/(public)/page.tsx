@@ -20,9 +20,13 @@ export const metadata: Metadata = {
     description:
       "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
     url: `${SITE_URL}/`,
+    type: "website",
+    locale: "id_ID",
+    siteName: SITE_NAME,
     images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: `${SITE_NAME} — Temukan Kos Impianmu` }],
   },
   twitter: {
+    card: "summary_large_image",
     title: `${SITE_NAME} — Temukan Kos Impianmu`,
     description:
       "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
