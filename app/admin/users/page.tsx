@@ -274,7 +274,7 @@ function AdminUsersBody() {
                               active ? "bg-secondary/10 text-secondary" : "bg-error/10 text-error"
                             }`}
                           >
-                            {active ? "Aktif" : "Suspend"}
+                            {active ? "Aktif" : "Tendasuk"}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-body-sm text-on-surface-variant">
@@ -289,7 +289,7 @@ function AdminUsersBody() {
                               variant={active ? "danger" : "primary"}
                               onClick={() => openSuspendModal(u)}
                             >
-                              {active ? "Suspend" : "Aktifkan"}
+                              {active ? "Tendasuk" : "Aktifkan"}
                             </Button>
                           </div>
                         </td>
