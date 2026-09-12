@@ -6,7 +6,10 @@ import FavoriteButton from "@/components/FavoriteButton";
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/components/layout/TopNav";
 import Footer from "@/components/layout/Footer";
+import type { Metadata } from "next";
 import BottomNav from "@/components/layout/BottomNav";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export const dynamic = "force-dynamic";
 
