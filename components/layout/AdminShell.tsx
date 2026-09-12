@@ -10,7 +10,7 @@ import LogoutConfirmModal from "@/components/LogoutConfirmModal";
 
 interface AdminShellProps {
   children: React.ReactNode;
-  activePage: "dashboard" | "analytics" | "verification" | "bookings" | "users" | "refunds";
+  activePage: "dashboard" | "analytics" | "verification" | "bookings" | "users" | "refunds" | "transactions";
 }
 
 export default function AdminShell({ children, activePage }: AdminShellProps) {
@@ -70,7 +70,8 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
     { label: "Analytics", icon: "monitoring", href: "/admin/analytics", page: "analytics" as const },
     { label: "Verifikasi Kos", icon: "verified_user", href: "/admin/kos", page: "verification" as const },
     { label: "Bookings", icon: "receipt_long", href: "/admin/bookings", page: "bookings" as const },
-    { label: "Refund", icon: "payments", href: "/admin/refunds", page: "refunds" as const },
+    { label: "Transaksi", icon: "payments", href: "/admin/transactions", page: "transactions" as const },
+    { label: "Refund", icon: "sync_alt", href: "/admin/refunds", page: "refunds" as const },
     { label: "Kelola User", icon: "group", href: "/admin/users", page: "users" as const },
   ];
 

@@ -27,6 +27,8 @@ export const ROUTES = {
     ANALYTICS: "/admin/analytics",
     KOS: "/admin/kos",
     BOOKINGS: "/admin/bookings",
+    TRANSACTIONS: "/admin/transactions",
+    RECONCILIATION: "/admin/transactions/reconciliation",
   },
 
   /** Map role string → landing/home path */

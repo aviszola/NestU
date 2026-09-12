@@ -140,7 +140,7 @@ export function resolvePeriod(
       from = startOfDay(addDays(now, -29));
       to = endOfDay(now);
       key = "30d";
-      label = "30 dau";
+      label = "30 hari";
     } else {
       key = "custom";
       label = `${sp.from} → ${sp.to}`;
@@ -150,7 +150,7 @@ export function resolvePeriod(
     to = endOfDay(now);
     from = startOfDay(addDays(now, -(days - 1)));
     key = sp.period || "30d";
-    label = key === "7d" ? "7 dau" : key === "90d" ? "90 dau" : "30 dau";
+    label = key === "7d" ? "7 hari" : key === "90d" ? "90 hari" : "30 hari";
   }
 
   const spanDays = Math.max(1, Math.round((to.getTime() - from.getTime()) / DAY_MS) + 1);
@@ -345,7 +345,7 @@ export async function getAnalytics(
     .select("*", { count: "exact", head: true })
     .eq("refund_status", "pending");
 
-  // Active users (30 dau terakhir, opp til span.to).
+  // Active users (30 hari terakhir, opp til span.to).
   const activeFrom = startOfDay(addDays(span.to, -29));
   const active = bookings.filter((b) => {
     const t = new Date(b.created_at).getTime();

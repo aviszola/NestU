@@ -23,7 +23,7 @@ function relativeTime(t: string | null): string {
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs} jam lalu`;
   const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days} dau lalu`;
+  if (days < 30) return `${days} hari lalu`;
   const months = Math.floor(days / 30);
   return `${months} bulan lalu`;
 }
