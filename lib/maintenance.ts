@@ -30,7 +30,7 @@ export const MAINT_STATUS: Record<
   { label: string; className: string; icon: string }
 > = {
   baru: { label: "Baru", className: "bg-tertiary/10 text-tertiary", icon: "fiber_new" },
-  diproses: { label: "Diproses", className: "bg-primary/10 text-primary", icon: "engineering" },
+  diproses: { label: "Diproses", className: "bg-tertiary/10 text-tertiary", icon: "engineering" },
   selesai: { label: "Selesai", className: "bg-secondary/10 text-secondary", icon: "task_alt" },
 };
 

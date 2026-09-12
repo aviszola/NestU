@@ -123,7 +123,7 @@ export default function TransactionFilters({
         <div className="flex items-center gap-2">
           {hasActive && (
             <button type="button" onClick={reset}
-              className="flex items-center gap-1 text-sm font-medium text-error hover:bg-error-container/20 rounded-lg px-2 py-1">
+              className="flex items-center gap-1 text-sm font-medium text-error hover:bg-error-container/20 rounded-lg px-2 py-1 active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <span className="material-symbols-outlined text-base">restart_alt</span>
               Reset Filter
             </button>

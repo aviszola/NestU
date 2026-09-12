@@ -19,22 +19,22 @@ const PAYMENT_BADGES: Record<string, Badge> = {
 };
 
 const BOOKING_BADGES: Record<string, Badge> = {
-  pending: { label: "Pending", className: "bg-tertiary/10 text-tertiary", icon: "hourglass_top" },
-  approved: { label: "Approved", className: "bg-tertiary/10 text-tertiary", icon: "task_alt" },
-  completed: { label: "Completed", className: "bg-secondary/10 text-secondary", icon: "task_alt" },
-  rejected: { label: "Rejected", className: "bg-error/10 text-error", icon: "cancel" },
-  cancelled: { label: "Cancelled", className: "bg-error/10 text-error", icon: "cancel" },
+  pending: { label: "Menunggu", className: "bg-tertiary/10 text-tertiary", icon: "hourglass_top" },
+  approved: { label: "Disetujui", className: "bg-tertiary/10 text-tertiary", icon: "task_alt" },
+  completed: { label: "Selesai", className: "bg-secondary/10 text-secondary", icon: "task_alt" },
+  rejected: { label: "Ditolak", className: "bg-error/10 text-error", icon: "cancel" },
+  cancelled: { label: "Dibatalkan", className: "bg-surface-container-high text-outline", icon: "cancel" },
 };
 
 const REFUND_BADGES: Record<string, Badge> = {
-  none: { label: "None", className: "bg-surface-container-high text-outline", icon: "block" },
-  pending: { label: "Pending", className: "bg-tertiary/10 text-tertiary", icon: "hourglass_top" },
-  processed: { label: "Processed", className: "bg-secondary/10 text-secondary", icon: "check_circle" },
+  none: { label: "Tidak ada", className: "bg-surface-container-high text-outline", icon: "block" },
+  pending: { label: "Menunggu", className: "bg-tertiary/10 text-tertiary", icon: "hourglass_top" },
+  processed: { label: "Diproses", className: "bg-secondary/10 text-secondary", icon: "check_circle" },
 };
 
 const METHOD_BADGES: Record<string, Badge> = {
   midtrans: { label: "Midtrans", className: "bg-primary/10 text-primary", icon: "payments" },
-  manual: { label: "Manual Transfer", className: "bg-surface-container-high text-on-surface-variant", icon: "receipt_long" },
+  manual: { label: "Transfer Manual", className: "bg-surface-container-high text-on-surface-variant", icon: "receipt_long" },
 };
 
 export function paymentBadge(status?: string | null): Badge {

@@ -42,7 +42,8 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
           </h2>
           <button
             onClick={onClose}
-            className="text-outline hover:text-on-surface-variant"
+            aria-label="Tutup"
+            className="text-outline hover:text-on-surface-variant active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <span className="material-symbols-outlined">close</span>
           </button>

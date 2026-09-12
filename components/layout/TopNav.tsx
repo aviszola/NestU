@@ -64,7 +64,7 @@ export default function TopNav({
             type="button"
             onClick={onBackClick}
             className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
-            aria-label="Back"
+            aria-label="Kembali"
           >
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
@@ -75,7 +75,7 @@ export default function TopNav({
           type="button"
           onClick={onMenuClick}
           className="md:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
-          aria-label="Toggle sidebar"
+          aria-label="Ubuka sidebar"
         >
           <span className="material-symbols-outlined">menu</span>
         </button>

@@ -158,7 +158,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-3 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 text-sm font-semibold text-on-primary bg-primary rounded-full hover:opacity-90 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {submitting ? "Membuka Email..." : "Kirim Pesan"}
               </button>

@@ -132,7 +132,7 @@ export default function Sidebar({ activePage, userRole = "siswa", userName }: Si
               key={item.label}
               type="button"
               onClick={() => setLogoutOpen(true)}
-              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors text-left"
+              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-150 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 text-left"
             >
               <span className="material-symbols-outlined text-lg">{item.icon}</span>
               <span>{item.label}</span>

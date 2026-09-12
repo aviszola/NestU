@@ -248,7 +248,7 @@ export default function RegisterForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3.5 bg-primary text-on-primary font-bold text-sm rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50"
+        className="w-full py-3.5 bg-primary text-on-primary font-bold text-sm rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       >
         {loading ? "Memproses..." : "Daftar Sekarang"}
       </button>
