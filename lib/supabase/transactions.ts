@@ -573,7 +573,7 @@ export async function detectAnomalies(
         push(
           "refund_stuck",
           "low",
-          "Refund Pending > 14 hari",
+          "Refund Menunggu > 14 hari",
           "Refund lama belum diproses dalam 14+ hari.",
           r
         );

@@ -217,17 +217,17 @@ const runAction = async (
 {row && (
           <div className="mt-5 flex flex-wrap gap-2">
             <button type="button" onClick={() => { setReason(""); setError(null); setActionOpen("override"); }}
-              className="flex items-center gap-1 text-sm font-medium bg-primary-container text-on-primary-container rounded-lg px-3 py-2">
+              className="flex items-center gap-1 text-sm font-medium bg-primary-container text-on-primary-container rounded-lg px-3 py-2 active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <span className="material-symbols-outlined text-base">tune</span>
               Override Payment Status
             </button>
             <button type="button" onClick={() => { setReason(""); setError(null); setActionOpen("refund"); }}
-              className="flex items-center gap-1 text-sm font-medium bg-tertiary text-on-tertiary rounded-lg px-3 py-2">
+              className="flex items-center gap-1 text-sm font-medium bg-tertiary text-on-tertiary rounded-lg px-3 py-2 active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <span className="material-symbols-outlined text-base">currency_exchange</span>
               Refund
             </button>
             <button type="button" onClick={() => { setReason(""); setError(null); setActionOpen("force-cancel"); }}
-              className="flex items-center gap-1 text-sm font-medium bg-error-container text-on-error-container rounded-lg px-3 py-2">
+              className="flex items-center gap-1 text-sm font-medium bg-error-container text-on-error-container rounded-lg px-3 py-2 active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <span className="material-symbols-outlined text-base">block</span>
               Force Cancel
             </button>

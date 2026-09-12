@@ -292,7 +292,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="w-full py-3 bg-primary text-white font-title-lg text-title-lg rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50"
+                className="w-full py-3 bg-primary text-white font-title-lg text-title-lg rounded-lg hover:bg-primary-container active:scale-98 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {loginLoading ? (
                   <span className="material-symbols-outlined animate-spin">

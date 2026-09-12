@@ -110,7 +110,7 @@ export default function ReconciliationTable({
                       {showSync && (
                         <button type="button" disabled={syncingIds.includes(r.bookingId)}
                           onClick={() => onSync(r.bookingId)}
-                          className="px-2.5 py-1 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 disabled:opacity-50">
+                          className="px-2.5 py-1 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
                           {syncingIds.includes(r.bookingId) ? "Sync..." : "Sync"}
                         </button>
                       )}

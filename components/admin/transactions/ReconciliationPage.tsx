@@ -81,7 +81,7 @@ export default function ReconciliationPage({
             <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)}
               className="bg-surface-container-high border border-outline-variant rounded-lg px-2 py-1.5 text-sm" />
             <button type="button" disabled={!customFrom || !customTo} onClick={() => goRange(customFrom, customTo)}
-              className="flex items-center gap-1 text-sm font-medium bg-primary text-on-primary rounded-lg px-3 py-2 disabled:opacity-50">
+              className="flex items-center gap-1 text-sm font-medium bg-primary text-on-primary rounded-lg px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <span className="material-symbols-outlined text-base">play_arrow</span>
               Jalankan
             </button>
