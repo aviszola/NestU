@@ -75,7 +75,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${plusJakartaSans.variable} ${materialSymbols.variable} h-full antialiased`}
     >
       <head>
