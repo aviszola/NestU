@@ -495,6 +495,22 @@ export default async function DetailKosSiswaPage({
         }}
       />
 
+      {/* ── JSON-LD Structured Data: BreadcrumbList ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+              { "@type": "ListItem", position: 2, name: "Cari Kos", item: `${SITE_URL}/kos` },
+              { "@type": "ListItem", position: 3, name: kos.name, item: `${SITE_URL}/kos/${kos.id}` },
+            ],
+          }),
+        }}
+      />
+
       <Footer />
       {isSiswa && <BottomNav activePage="search" userRole="siswa" />}
     </div>

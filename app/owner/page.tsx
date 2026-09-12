@@ -4,7 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
+import type { Metadata } from "next";
 import Footer from "@/components/layout/Footer";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 
 export default async function OwnerDashboardPage() {

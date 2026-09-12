@@ -81,9 +81,19 @@ export async function proxy(request: NextRequest) {
   if (isStaticOrApi(pathname)) return NextResponse.next();
 
   // Public/auth paths â€” allow all
-  if (isPublicPath(pathname)) return NextResponse.next();
+  // Auth paths → NOINDEX (login/register/forgot/auth) — sesion privat, jangan index
+  if (isPublicPath(pathname)) {
+    if (AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+      const authRes = NextResponse.next();
+      authRes.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return authRes;
+    }
+    return NextResponse.next();
+  }
 
+  // Protected route (requires auth) — NOINDEX so private HTML never indexed
   const response = NextResponse.next();
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
