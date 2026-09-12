@@ -23,7 +23,7 @@ const BOOKING_BADGES: Record<string, Badge> = {
   approved: { label: "Disetujui", className: "bg-tertiary/10 text-tertiary", icon: "task_alt" },
   completed: { label: "Selesai", className: "bg-secondary/10 text-secondary", icon: "task_alt" },
   rejected: { label: "Ditolak", className: "bg-error/10 text-error", icon: "cancel" },
-  cancelled: { label: "Dibatalkan", className: "bg-error/10 text-error", icon: "cancel" },
+  cancelled: { label: "Dibatalkan", className: "bg-surface-container-high text-outline", icon: "cancel" },
 };
 
 const REFUND_BADGES: Record<string, Badge> = {

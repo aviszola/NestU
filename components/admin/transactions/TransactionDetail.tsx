@@ -122,7 +122,7 @@ const runAction = async (
         onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="font-title-lg text-title-lg text-on-surface">Detail Transaksi</h2>
-          <button type="button" onClick={onClose} className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high">
+          <button type="button" onClick={onClose} aria-label="Tutup" className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
