@@ -12,7 +12,7 @@ import Logo from "@/components/ui/Logo";
 import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
-import { SITE_URL, OG_DEFAULT_IMAGE } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, OG_DEFAULT_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Cari Kos Terdekat",
@@ -24,9 +24,13 @@ export const metadata: Metadata = {
     description:
       "Temukan ratusan pilihan kos terverifikasi di dekat sekolah atau kampusmu. Filter berdasarkan harga, lokasi, dan fasilitas — booking online langsung di NestU.",
     url: `${SITE_URL}/kos`,
+    type: "website",
+    locale: "id_ID",
+    siteName: SITE_NAME,
     images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: "Cari Kos Terdekat — NestU" }],
   },
   twitter: {
+    card: "summary_large_image",
     title: "Cari Kos Terdekat | NestU",
     description:
       "Temukan ratusan pilihan kos terverifikasi di dekat sekolah atau kampusmu. Filter berdasarkan harga, lokasi, dan fasilitas — booking online langsung di NestU.",

@@ -6,7 +6,7 @@ import { getFeaturedKos, getTotalKosCount, getKosMinPrices } from "@/lib/supabas
 import ScrollReveal from "@/components/ScrollReveal";
 import KosCard from "@/components/KosCard";
 import BottomNav from "@/components/layout/BottomNav";
-import { SITE_URL, SITE_NAME, OG_DEFAULT_IMAGE } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, LOGO_URL, OG_DEFAULT_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: {
@@ -20,9 +20,13 @@ export const metadata: Metadata = {
     description:
       "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
     url: `${SITE_URL}/`,
+    type: "website",
+    locale: "id_ID",
+    siteName: SITE_NAME,
     images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: `${SITE_NAME} — Temukan Kos Impianmu` }],
   },
   twitter: {
+    card: "summary_large_image",
     title: `${SITE_NAME} — Temukan Kos Impianmu`,
     description:
       "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Temukan hunian terverifikasi dekat sekolahmu, booking online, pembayaran transparan.",
@@ -274,6 +278,45 @@ export default async function HomePage() {
 
       {/* ===== MOBILE BOTTOM NAV — shared ===== */}
       <BottomNav activePage="search" userRole="siswa" />
+
+      {/* ── JSON-LD Structured Data: WebSite + SearchAction ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${SITE_URL}/#website`,
+            url: `${SITE_URL}/`,
+            name: SITE_NAME,
+            potentialAction: {
+              "@type": "SearchAction",
+              target: {
+                "@type": "EntryPoint",
+                urlTemplate: `${SITE_URL}/kos?search={search_term_string}`,
+              },
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        }}
+      />
+
+      {/* ── JSON-LD Structured Data: Organization ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "@id": `${SITE_URL}/#organization`,
+            name: SITE_NAME,
+            url: `${SITE_URL}/`,
+            logo: LOGO_URL,
+            description:
+              "NestU — platform pencarian kos terpercaya untuk siswa dan mahasiswa. Hunian terverifikasi, harga transparan, booking online mudah.",
+          }),
+        }}
+      />
     </>
   );
 }

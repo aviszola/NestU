@@ -7,7 +7,10 @@ import {
 } from "@/lib/supabase/queries";
 import KosCard from "@/components/KosCard";
 import ScrollReveal from "@/components/ScrollReveal";
+import type { Metadata } from "next";
 import { MiniStats, ChartPanel } from "@/components/DashboardHero";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/components/layout/TopNav";
 import Footer from "@/components/layout/Footer";

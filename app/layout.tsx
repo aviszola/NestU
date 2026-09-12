@@ -50,7 +50,14 @@ export const metadata: Metadata = {
     images: [OG_DEFAULT_IMAGE],
   },
   icons: {
-    icon: "/images/logo-full.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/images/logo-full.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico",
   },
   robots: {
     index: true,
@@ -65,6 +72,47 @@ export const viewport: Viewport = {
   themeColor: "#00236F",
 };
 
+/** JSON-LD WebSite + Organization — sinyal branding global untuk Google Search */
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      description:
+        "Platform pencarian kos terpercaya untuk siswa dan mahasiswa. Hunian terverifikasi, harga transparan, booking online mudah.",
+      inLanguage: "id-ID",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${SITE_URL}/kos?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        "@id": `${SITE_URL}/#logo`,
+        url: `${SITE_URL}/images/logo-full.svg`,
+        contentUrl: `${SITE_URL}/images/logo-full.svg`,
+        width: 1024,
+        height: 672,
+        caption: SITE_NAME,
+      },
+      image: { "@id": `${SITE_URL}/#logo` },
+    },
+  ],
+};
+
 import { Suspense } from "react";
 import RouteProgressBar from "@/components/RouteProgressBar";
 
@@ -75,7 +123,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${plusJakartaSans.variable} ${materialSymbols.variable} h-full antialiased`}
     >
       <head>
@@ -91,6 +139,11 @@ export default function RootLayout({
         </Suspense>
         {children}
         <Toaster position="top-right" richColors={false} />
+        {/* JSON-LD WebSite + Organization — global branding signal for Google */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
       </body>
     </html>
   );
