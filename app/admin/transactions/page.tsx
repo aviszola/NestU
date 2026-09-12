@@ -12,6 +12,21 @@ export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 30;
 
+/** searchParams (Next.js 15+) resolve jadi plain record — wrap ambil URLSearchParams. */
+export type TxSearchParams = { [key: string]: string | string[] | undefined };
+
+function toUrlSearchParams(rec: TxSearchParams): URLSearchParams {
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(rec)) {
+    if (Array.isArray(v)) {
+      for (const x of v) sp.append(k, x);
+    } else if (v != null) {
+      sp.append(k, v);
+    }
+  }
+  return sp;
+}
+
 function parseFilters(sp: URLSearchParams): TxFilters {
   const num = (v: string | null) =>
     v != null && v !== "" && !isNaN(Number(v)) ? Number(v) : null;
@@ -34,9 +49,9 @@ function parseFilters(sp: URLSearchParams): TxFilters {
 export default async function AdminTransactionsPage({
   searchParams,
 }: {
-  searchParams: Promise<URLSearchParams>;
+  searchParams: Promise<TxSearchParams>;
 }) {
-  const sp = await searchParams;
+  const sp = toUrlSearchParams(await searchParams);
   const supabase = await createClient();
 
   const {
