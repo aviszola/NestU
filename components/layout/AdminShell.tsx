@@ -122,7 +122,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
           <button
             type="button"
             onClick={() => setLogoutOpen(true)}
-            className="flex w-full items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all text-left"
+            className="flex w-full items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all duration-150 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 text-left"
           >
             <span className="material-symbols-outlined">logout</span>
             <span className="font-label-md text-label-md">Logout</span>
@@ -140,7 +140,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant">
               <span className="material-symbols-outlined text-outline mr-2">search</span>
-              <input className="bg-transparent border-none focus:ring-0 text-body-sm w-64" placeholder="Search property or owner..." type="text" />
+              <input className="bg-transparent border-none focus:ring-0 text-body-sm w-64" placeholder="Cari properti atau pemilik..." type="text" />
             </div>
             <NotifBell />
             <button className="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">help</button>

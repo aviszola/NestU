@@ -48,7 +48,7 @@ export const BOOKING_STATUS: Record<BookingStatusKey, BookingStatusCfg> = {
   },
   cancelled: {
     label: "Dibatalkan",
-    className: "bg-error/10 text-error",
+    className: "bg-surface-container-high text-outline",
     icon: "cancel",
   },
   rejected: {
@@ -58,7 +58,7 @@ export const BOOKING_STATUS: Record<BookingStatusKey, BookingStatusCfg> = {
   },
   completed: {
     label: "Selesai",
-    className: "bg-primary/10 text-primary",
+    className: "bg-secondary/10 text-secondary",
     icon: "task_alt",
   },
 };
