@@ -59,7 +59,7 @@ export default function ReconciliationPage({
         <div>
           <h1 className="font-headline-lg text-headline-lg text-primary">Rekonsiliasi</h1>
           <p className="text-on-surface-variant font-body-md">
-            Badingakan transaksi Midtrans dengan data DB, dan fix mismatch via Sync.
+            Bandingkan transaksi Midtrans dengan data DB, dan fix mismatch via Sync.
           </p>
         </div>
 

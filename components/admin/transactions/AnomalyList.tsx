@@ -10,7 +10,7 @@ function severityCls(sev: string): string {
     : "bg-surface-container-high text-outline";
 }
 function severityLabel(sev: string): string {
-  return sev === "high" ? "Alta" : sev === "medium" ? "Media" : "Baja";
+  return sev === "high" ? "Tinggi" : sev === "medium" ? "Sedang" : "Rendah";
 }
 
 interface AnomalyListProps {

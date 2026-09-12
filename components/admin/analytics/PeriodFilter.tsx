@@ -4,9 +4,9 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const PRESETS = [
-  { key: "7d", label: "7 dau" },
-  { key: "30d", label: "30 dau" },
-  { key: "90d", label: "90 dau" },
+  { key: "7d", label: "7 hari" },
+  { key: "30d", label: "30 hari" },
+  { key: "90d", label: "90 hari" },
 ];
 
 const pillBase =

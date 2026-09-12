@@ -119,7 +119,7 @@ export default function TransactionDetailPage({ bookingId }: { bookingId: string
             <div className="mt-4 bg-surface-container rounded-xl p-3">
               <h2 className="font-label-md text-label-md text-on-surface-variant">Riwayat Admin ({detail?.logs.length ?? 0})</h2>
               {!detail?.logs?.length ? (
-                <p className="text-sm text-outline mt-1">Belum ada override/aki admin.</p>
+                <p className="text-sm text-outline mt-1">Belum ada override/aksi admin.</p>
               ) : (
                 <ul className="mt-1 space-y-1.5 text-sm">
                   {detail!.logs.map((l) => (

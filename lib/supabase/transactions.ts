@@ -466,7 +466,7 @@ export async function getTransactionDetail(
     })),
   };
 }
-// ─── Detekci anomali ───────────────────────────────────────────────────────────
+// ─── Deteksi anomali ───────────────────────────────────────────────────────────
 
 export async function detectAnomalies(
   client: any,

@@ -215,6 +215,8 @@ function AdminUsersBody() {
           <div className="w-full md:w-72">
             <Input
               id="user-search"
+              type="search"
+              aria-label="Cari user berdasarkan nama, email, atau role"
               placeholder="Cari nama, email, atau role..."
               value={search}
               onChange={(e) => updateSearchQuery(e.target.value)}

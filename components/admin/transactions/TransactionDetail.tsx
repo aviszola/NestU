@@ -113,7 +113,6 @@ const runAction = async (
   };
 
   if (!open) return null;
-  if (!open) return null;
 
   const row = detail?.row;
 
@@ -197,7 +196,7 @@ const runAction = async (
             <div className="mt-4 bg-surface-container rounded-xl p-3">
               <h3 className="font-label-md text-label-md text-on-surface-variant">Riwayat Admin ({detail.logs.length})</h3>
               {detail.logs.length === 0 ? (
-                <p className="text-sm text-outline mt-1">Belum ada override/aki admin.</p>
+                <p className="text-sm text-outline mt-1">Belum ada override/aksi admin.</p>
               ) : (
                 <ul className="mt-1 space-y-1.5 text-sm">
                   {detail.logs.map((l) => (
