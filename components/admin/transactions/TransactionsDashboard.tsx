@@ -106,7 +106,7 @@ export default function TransactionsDashboard({
           <div>
             <h1 className="font-headline-lg text-headline-lg text-primary">Transaksi</h1>
             <p className="text-on-surface-variant font-body-md">
-              Manajemen pembayaran, rekonsiliasi Midtrans, dan detekci anomali.
+              Manajemen pembayaran, rekonsiliasi Midtrans, dan deteksi anomali.
             </p>
           </div>
           <Link href="/admin/transactions/reconciliation"
