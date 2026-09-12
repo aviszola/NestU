@@ -120,13 +120,13 @@ export default function TransactionsTable({
                     <td className="px-3 py-2.5"><BadgeSpan cls={ref.className} icon={ref.icon} label={ref.label} /></td>
                     <td className="px-3 py-2.5 text-right">
                       <div className="flex items-center gap-1">
-                        <button type="button" title="Detail" onClick={() => onDetail(r)} className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high">
-                          <span className="material-symbols-outlined text-base">visibility</span>
-                        </button>
-                        <button type="button" title="Refund" onClick={() => onRefund(r)} className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high">
+                        <button type="button" title="Detail" aria-label="Detail transaksi" onClick={() => onDetail(r)} className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+                        <span className="material-symbols-outlined text-base">visibility</span>
+                      </button>
+                        <button type="button" title="Refund" aria-label="Proses refund" onClick={() => onRefund(r)} className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
                           <span className="material-symbols-outlined text-base">currency_exchange</span>
                         </button>
-                        <button type="button" title="Override" onClick={() => onOverride(r)} className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high">
+                        <button type="button" title="Override" aria-label="Override status" onClick={() => onOverride(r)} className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
                           <span className="material-symbols-outlined text-base">tune</span>
                         </button>
                       </div>
