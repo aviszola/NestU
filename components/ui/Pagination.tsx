@@ -62,7 +62,7 @@ export default function Pagination({
   const endIdx = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <nav aria-label="Navigasi paginasi" className="flex flex-col items-center gap-3">
       <p className="text-body-sm text-on-surface-variant">
         Menampilkan {startIdx}–{endIdx} dari {totalItems} user
       </p>
@@ -70,20 +70,20 @@ export default function Pagination({
       <div className="flex items-center gap-1.5">
         {/* Pertama */}
         {currentPage > 1 ? (
-          <Link href={href(1)} className={PAGE_LINK_CLS}>
+          <Link href={href(1)} aria-label="Halaman pertama" className={PAGE_LINK_CLS}>
             « Pertama
           </Link>
         ) : (
-          <span className={PAGE_DISABLED_CLS}>« Pertama</span>
+          <span className={PAGE_DISABLED_CLS} aria-label="Halaman pertama">« Pertama</span>
         )}
 
         {/* Prev */}
         {currentPage > 1 ? (
-          <Link href={href(currentPage - 1)} className={PAGE_LINK_CLS}>
+          <Link href={href(currentPage - 1)} aria-label="Halaman sebelumnya" className={PAGE_LINK_CLS}>
             ‹ Prev
           </Link>
         ) : (
-          <span className={PAGE_DISABLED_CLS}>‹ Prev</span>
+          <span className={PAGE_DISABLED_CLS} aria-label="Halaman sebelumnya">‹ Prev</span>
         )}
 
         {/* Nomor halaman (ja ellipsis) */}
@@ -94,6 +94,7 @@ export default function Pagination({
             <Link
               key={p}
               href={href(p)}
+              aria-label={`Halaman ${p}`}
               className={p === currentPage ? NUM_ACTIVE_CLS : NUM_INACTIVE_CLS}
             >
               {p}
@@ -103,22 +104,22 @@ export default function Pagination({
 
         {/* Next */}
         {currentPage < totalPages ? (
-          <Link href={href(currentPage + 1)} className={PAGE_LINK_CLS}>
+          <Link href={href(currentPage + 1)} aria-label="Halaman selanjutnya" className={PAGE_LINK_CLS}>
             Next ›
           </Link>
         ) : (
-          <span className={PAGE_DISABLED_CLS}>Next ›</span>
+          <span className={PAGE_DISABLED_CLS} aria-label="Halaman selanjutnya">Next ›</span>
         )}
 
         {/* Terakhir */}
         {currentPage < totalPages ? (
-          <Link href={href(totalPages)} className={PAGE_LINK_CLS}>
+          <Link href={href(totalPages)} aria-label="Halaman terakhir" className={PAGE_LINK_CLS}>
             Terakhir »
           </Link>
         ) : (
-          <span className={PAGE_DISABLED_CLS}>Terakhir »</span>
+          <span className={PAGE_DISABLED_CLS} aria-label="Halaman terakhir">Terakhir »</span>
         )}
       </div>
-    </div>
+    </nav>
   );
 }
