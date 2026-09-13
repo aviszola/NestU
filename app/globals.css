@@ -75,8 +75,8 @@
   --font-size-headline-lg-mobile: 24px;
   --font-size-headline-lg-mobile--line-height: 32px;
   --font-size-headline-lg-mobile--font-weight: 700;
-  --font-size-body-sm: 14px;
-  --font-size-body-sm--line-height: 20px;
+  --font-size-body-sm: 16px;
+  --font-size-body-sm--line-height: 24px;
   --font-size-body-sm--font-weight: 400;
   --font-size-body-md: 16px;
   --font-size-body-md--line-height: 24px;
@@ -85,6 +85,12 @@
   --font-size-display-lg--line-height: 60px;
   --font-size-display-lg--letter-spacing: -0.02em;
   --font-size-display-lg--font-weight: 700;
+
+  /* â”€â”€ Aksesibilitas mobile: text-sm default 14px -> 16px (body/input >=16px,
+     mencegah auto-zoom iOS saat fokus input). Badge/label dekoratif tetap kecil
+     lewat text-xs / text-[10px] / text-label-md. â”€â”€ */
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5rem;
 
   /* â”€â”€ Spacing â”€â”€ */
   --spacing-stack-sm: 8px;
