@@ -26,14 +26,14 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 backdrop-blur-sm p-4"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
       <div
         className={cn(
-          "w-full max-w-md rounded-xl bg-surface-container-lowest p-6 shadow-xl"
+          "w-full max-w-md rounded-xl bg-surface-container-lowest p-6 pt-5 shadow-xl max-h-[85vh] overflow-y-auto"
         )}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -43,9 +43,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
           <button
             onClick={onClose}
             aria-label="Tutup"
-            className="text-outline hover:text-on-surface-variant active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="p-2.5 -mr-2.5 rounded-lg text-outline hover:bg-surface-container-low hover:text-on-surface-variant active:scale-[0.98] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[22px] leading-none">close</span>
           </button>
         </div>
         {children}
