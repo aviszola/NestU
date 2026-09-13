@@ -139,9 +139,14 @@ body {
   color: #0b1c30;
 }
 
-/* Cegah horizontal scroll tak disengaja di semua viewport */
+/* Cegah horizontal scroll tak disengaja di semua viewport + clearance bawah utk sticky bar saat keyboard */
 html, body {
   overflow-x: hidden;
+}
+/* Saat elemen (mis. input) di-scroll-into-view saat fokus/keyboard muncul, tambahkan
+   jarak dari bawah agar tidak tertutup sticky submit bar / bottom nav. */
+html {
+  scroll-padding-bottom: 6rem;
 }
 
 .glass-effect {

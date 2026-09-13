@@ -422,6 +422,8 @@ export default function CreateKosPage() {
                   </button>
                 </div>
               </div>
+              {/* Buffer ruang-scroll (mobile) agar field terakhir bisa lewat di atas sticky bar */}
+              <div aria-hidden="true" className="h-12 sm:hidden" />
             </div>
 
             {/* === SIDEBAR === */}
