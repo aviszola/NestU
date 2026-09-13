@@ -243,6 +243,8 @@ export default function CreateKosPage() {
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">+62</span>
                       <input
                         id="kos-wa"
+                        type="tel"
+                        inputMode="numeric"
                         value={whatsappNumber.replace("+62", "")}
                         onChange={(e) => {
                           const v = e.target.value.replace(/[^\d]/g, "");

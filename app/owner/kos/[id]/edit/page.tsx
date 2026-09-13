@@ -215,6 +215,7 @@ export default function EditKosPage() {
           id="whatsapp_number"
           label="Nomor WhatsApp"
           type="tel"
+          inputMode="numeric"
           value={whatsappNumber}
           onChange={(e) => {
             let v = e.target.value;
