@@ -33,7 +33,7 @@ export default function Footer() {
           <h4 className="font-semibold text-sm uppercase tracking-wider text-white/80">
             Tautan Cepat
           </h4>
-          <ul className="mt-3 space-y-2">
+          <ul className="mt-3 space-y-0">
             {[
               { label: "Tentang Kami", href: "/about" },
               { label: "Tentang Pengembang", href: "/developer" },
@@ -43,7 +43,7 @@ export default function Footer() {
               <li key={l.label}>
                 <Link
                   href={l.href}
-                  className="text-sm text-white/60 hover:text-white transition-colors"
+                  className="flex min-h-[44px] items-center text-sm text-white/60 hover:text-white transition-colors"
                 >
                   {l.label}
                 </Link>
@@ -57,7 +57,7 @@ export default function Footer() {
           <h4 className="font-semibold text-sm uppercase tracking-wider text-white/80">
             Kontak
           </h4>
-          <ul className="mt-3 space-y-2">
+          <ul className="mt-3 space-y-0">
             {[
               { label: "Bantuan", href: "/contact" },
               { label: "Cari Kos", href: "/kos" },
@@ -65,7 +65,7 @@ export default function Footer() {
               <li key={l.label}>
                 <Link
                   href={l.href}
-                  className="text-sm text-white/60 hover:text-white transition-colors"
+                  className="flex min-h-[44px] items-center text-sm text-white/60 hover:text-white transition-colors"
                 >
                   {l.label}
                 </Link>

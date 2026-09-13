@@ -352,7 +352,7 @@ export default function OwnerBookingsPage() {
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              className={`px-4 py-1.5 rounded-full text-label-md font-bold transition-colors ${
+              className={`min-h-[44px] inline-flex items-center justify-center px-4 py-1.5 rounded-full text-label-md font-bold transition-colors ${
                 filter === f.key
                   ? "bg-primary-container text-on-primary-container"
                   : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"

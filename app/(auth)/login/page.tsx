@@ -273,21 +273,16 @@ function LoginContent() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <label htmlFor="remember" className="flex items-center gap-3 min-h-[44px] cursor-pointer">
                 <input
                   type="checkbox"
                   id="remember"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary"
+                  className="h-5 w-5 shrink-0 accent-primary rounded border-outline-variant focus:ring-primary"
                 />
-                <label
-                  htmlFor="remember"
-                  className="font-body-sm text-body-sm text-on-surface-variant"
-                >
-                  Ingat saya
-                </label>
-              </div>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">Ingat saya</span>
+              </label>
 
               <button
                 type="submit"
