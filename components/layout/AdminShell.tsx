@@ -143,7 +143,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
               <input className="bg-transparent border-none focus:ring-0 text-body-sm w-64" placeholder="Cari properti atau pemilik..." type="text" />
             </div>
             <NotifBell />
-            <button className="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">help</button>
+            <button className="material-symbols-outlined h-11 w-11 inline-flex items-center justify-center p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">help</button>
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary bg-primary-container flex items-center justify-center">
               <span className="material-symbols-outlined text-on-primary-container">admin_panel_settings</span>
             </div>
