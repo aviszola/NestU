@@ -159,6 +159,7 @@ export default function RegisterForm({
         </label>
         <input
           type="tel"
+          inputMode="numeric"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="081234..."

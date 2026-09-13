@@ -129,6 +129,7 @@ export default function OwnerProfilePage() {
               <label className="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon</label>
               <input
                 type="tel"
+                inputMode="numeric"
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                 placeholder="Contoh: 08123456789"
