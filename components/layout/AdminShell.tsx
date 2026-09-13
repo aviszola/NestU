@@ -158,24 +158,36 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
         <Footer />
       </div>
 
-      {/* Bottom Nav Mobile */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-lg rounded-t-xl safe-area-bottom">
-        {menu.map((item) => {
-          const isActive = item.page === activePage;
-          return (
-            <Link key={item.label} href={item.href}
-              className={`flex flex-col items-center justify-center ${
-                isActive
-                  ? "bg-primary-container text-on-primary-container rounded-full px-4 py-1"
-                  : "text-on-surface-variant"
-              }`}
-            >
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="font-label-md text-label-md">{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Bottom Nav Mobile — 7 item setara-penting: di-swipe horizontal (overflow-x-auto),
+          mempertahankan icon+label (bukan icon-only), tap-target nyaman (min-w 68px) +
+          indikator gradasi sisi kanan agar jelas masih ada konten. */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
+        <nav className="relative flex items-stretch overflow-x-auto no-scrollbar bg-surface shadow-lg rounded-t-xl border-t border-outline-variant">
+          {menu.map((item) => {
+            const isActive = item.page === activePage;
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`shrink-0 min-w-[68px] flex flex-col items-center justify-center gap-0.5 py-2.5 px-2 ${
+                  isActive
+                    ? "bg-primary-container text-on-primary-container rounded-xl"
+                    : "text-on-surface-variant"
+                }`}
+              >
+                <span className="material-symbols-outlined">{item.icon}</span>
+                <span className="font-label-md text-label-md">{item.label}</span>
+              </Link>
+            );
+          })}
+          {/* Indikator: masih ada konten yang bisa discroll ke kanan */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-surface via-surface/70 to-transparent"
+          />
+        </nav>
+      </div>
 
       <LogoutConfirmModal open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </div>
