@@ -62,6 +62,13 @@
   --font-size-label-md--line-height: 16px;
   --font-size-label-md--letter-spacing: 0.05em;
   --font-size-label-md--font-weight: 600;
+  /* Token Tailwind v4 eksplisit utk utility `text-label-md` (12px, label kecil dekoratif).
+     Sebelumnya tidak digenerate sehingga label/button minta `text-label-md` ikut waris
+     ukuran (16px).Dipasang agar konsisten dengan niat desain: label = 12px. */
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
   --font-size-title-lg: 20px;
   --font-size-title-lg--line-height: 28px;
   --font-size-title-lg--font-weight: 600;
