@@ -36,7 +36,7 @@ export default function FavoriteButton({
     <button
       onClick={handleClick}
       disabled={pending}
-      className={`flex items-center gap-1 text-sm transition ${
+      className={`inline-flex items-center justify-center gap-1 p-2 min-w-[44px] min-h-[44px] text-sm transition ${
         initialFavorited
           ? "text-error hover:text-error/80"
           : "text-outline hover:text-error"

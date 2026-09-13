@@ -382,10 +382,10 @@ export default function CreateKosPage() {
                   <label className="block font-label-md text-label-md text-on-surface-variant" htmlFor="kos-desc">Tuliskan keunggulan properti Anda</label>
                   <div className="border border-outline-variant rounded-lg overflow-hidden">
                     <div className="bg-surface-container-high p-2 flex gap-2 border-b border-outline-variant">
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_bold</button>
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_italic</button>
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_list_bulleted</button>
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">link</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_bold</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_italic</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_list_bulleted</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">link</button>
                     </div>
                     <textarea
                       id="kos-desc"
