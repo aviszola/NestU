@@ -397,8 +397,8 @@ export default function CreateKosPage() {
                 </div>
               </div>
 
-              {/* â”€â”€ STICKY SUBMIT BAR â”€â”€ */}
-              <div className="sticky bottom-4 z-10">
+              {/* â”€â”€ STICKY SUBMIT BAR â”€â”€ (safe-area aware) */}
+              <div className="sticky bottom-[calc(env(safe-area-inset-bottom)_+_1rem)] z-10">
                 <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-outline-variant card-shadow p-4 flex flex-col sm:flex-row items-center gap-stack-md justify-end">
                   {error && (
                     <p className="bg-error-container/20 text-on-error-container p-3 rounded-lg font-body-sm text-body-sm w-full sm:w-auto sm:mr-auto">{error}</p>

@@ -159,7 +159,7 @@ export default function AdminShell({ children, activePage }: AdminShellProps) {
       </div>
 
       {/* Bottom Nav Mobile */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-lg rounded-t-xl">
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-lg rounded-t-xl safe-area-bottom">
         {menu.map((item) => {
           const isActive = item.page === activePage;
           return (

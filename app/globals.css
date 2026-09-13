@@ -218,6 +218,11 @@ html, body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Safe-area bottom — iPhone home indicator / notched devices.
+   Dipakai oleh bottom nav & sticky bar yang menempel di dasar layar. */
+.safe-area-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0rem);
+}
 
 .glass-card {
   background: rgba(255, 255, 255, 0.8);
