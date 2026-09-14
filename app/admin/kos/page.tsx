@@ -243,7 +243,7 @@ return (
               key={f.key}
               type="button"
               onClick={() => setFilter(f.key)}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              className={`min-h-[44px] inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                 filter === f.key
                   ? "bg-primary text-on-primary"
                   : "text-on-surface-variant hover:bg-surface-container-high"

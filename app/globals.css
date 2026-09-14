@@ -62,6 +62,13 @@
   --font-size-label-md--line-height: 16px;
   --font-size-label-md--letter-spacing: 0.05em;
   --font-size-label-md--font-weight: 600;
+  /* Token Tailwind v4 eksplisit utk utility `text-label-md` (12px, label kecil dekoratif).
+     Sebelumnya tidak digenerate sehingga label/button minta `text-label-md` ikut waris
+     ukuran (16px).Dipasang agar konsisten dengan niat desain: label = 12px. */
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
   --font-size-title-lg: 20px;
   --font-size-title-lg--line-height: 28px;
   --font-size-title-lg--font-weight: 600;
@@ -75,8 +82,8 @@
   --font-size-headline-lg-mobile: 24px;
   --font-size-headline-lg-mobile--line-height: 32px;
   --font-size-headline-lg-mobile--font-weight: 700;
-  --font-size-body-sm: 14px;
-  --font-size-body-sm--line-height: 20px;
+  --font-size-body-sm: 16px;
+  --font-size-body-sm--line-height: 24px;
   --font-size-body-sm--font-weight: 400;
   --font-size-body-md: 16px;
   --font-size-body-md--line-height: 24px;
@@ -85,6 +92,12 @@
   --font-size-display-lg--line-height: 60px;
   --font-size-display-lg--letter-spacing: -0.02em;
   --font-size-display-lg--font-weight: 700;
+
+  /* â”€â”€ Aksesibilitas mobile: text-sm default 14px -> 16px (body/input >=16px,
+     mencegah auto-zoom iOS saat fokus input). Badge/label dekoratif tetap kecil
+     lewat text-xs / text-[10px] / text-label-md. â”€â”€ */
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5rem;
 
   /* â”€â”€ Spacing â”€â”€ */
   --spacing-stack-sm: 8px;
@@ -126,9 +139,14 @@ body {
   color: #0b1c30;
 }
 
-/* Cegah horizontal scroll tak disengaja di semua viewport */
+/* Cegah horizontal scroll tak disengaja di semua viewport + clearance bawah utk sticky bar saat keyboard */
 html, body {
   overflow-x: hidden;
+}
+/* Saat elemen (mis. input) di-scroll-into-view saat fokus/keyboard muncul, tambahkan
+   jarak dari bawah agar tidak tertutup sticky submit bar / bottom nav. */
+html {
+  scroll-padding-bottom: 6rem;
 }
 
 .glass-effect {
@@ -218,6 +236,11 @@ html, body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Safe-area bottom — iPhone home indicator / notched devices.
+   Dipakai oleh bottom nav & sticky bar yang menempel di dasar layar. */
+.safe-area-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0rem);
+}
 
 .glass-card {
   background: rgba(255, 255, 255, 0.8);

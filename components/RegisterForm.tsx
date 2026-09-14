@@ -159,6 +159,7 @@ export default function RegisterForm({
         </label>
         <input
           type="tel"
+          inputMode="numeric"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="081234..."
@@ -211,13 +212,13 @@ export default function RegisterForm({
       </div>
 
       {/* Consent */}
-      <div className="flex items-start space-x-2 pt-2">
+      <div className="flex items-start space-x-3 pt-2 min-h-[44px] py-2">
         <input
           type="checkbox"
           id="terms"
           checked={agreeTerms}
           onChange={(e) => setAgreeTerms(e.target.checked)}
-          className="mt-1 w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary"
+          className="mt-1 h-5 w-5 shrink-0 accent-primary rounded border-outline-variant focus:ring-primary"
         />
         <label
           htmlFor="terms"

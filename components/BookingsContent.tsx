@@ -76,7 +76,7 @@ export default function BookingsContent({ bookings }: Props) {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`pb-stack-sm border-b-2 text-sm font-semibold transition-colors ${
+              className={`min-h-[48px] inline-flex items-center pb-stack-sm border-b-2 text-sm font-semibold transition-colors ${
                 isActive
                   ? "border-primary text-primary font-bold"
                   : "border-transparent text-on-surface-variant hover:text-primary font-medium"

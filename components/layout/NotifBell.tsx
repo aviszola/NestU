@@ -142,7 +142,7 @@ export default function NotifBell() {
       <button
         type="button"
         onClick={toggleOpen}
-        className="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
+        className="relative min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
         aria-label="Notifikasi"
       >
         <span className="material-symbols-outlined">notifications</span>

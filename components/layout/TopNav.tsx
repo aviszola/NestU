@@ -63,7 +63,7 @@ export default function TopNav({
           <button
             type="button"
             onClick={onBackClick}
-            className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
+            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
             aria-label="Kembali"
           >
             <span className="material-symbols-outlined">arrow_back</span>
@@ -74,7 +74,7 @@ export default function TopNav({
         <button
           type="button"
           onClick={onMenuClick}
-          className="md:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
+          className="md:hidden min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
           aria-label="Ubuka sidebar"
         >
           <span className="material-symbols-outlined">menu</span>
@@ -126,7 +126,7 @@ export default function TopNav({
         {/* Help */}
         <button
           type="button"
-          className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
+          className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors"
           aria-label="Help"
         >
           <span className="material-symbols-outlined">help</span>
@@ -140,7 +140,7 @@ export default function TopNav({
           href={profileHref}
           aria-label={`Profil ${userName || ""}`.trim()}
           title="Profil"
-          className="w-8 h-8 rounded-full bg-surface-container overflow-hidden relative transition-opacity hover:opacity-80"
+          className="w-11 h-11 rounded-full bg-surface-container overflow-hidden relative transition-opacity hover:opacity-80"
         >
           <Image
             src={userAvatar}

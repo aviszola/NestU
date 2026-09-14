@@ -243,6 +243,8 @@ export default function CreateKosPage() {
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">+62</span>
                       <input
                         id="kos-wa"
+                        type="tel"
+                        inputMode="numeric"
                         value={whatsappNumber.replace("+62", "")}
                         onChange={(e) => {
                           const v = e.target.value.replace(/[^\d]/g, "");
@@ -380,10 +382,10 @@ export default function CreateKosPage() {
                   <label className="block font-label-md text-label-md text-on-surface-variant" htmlFor="kos-desc">Tuliskan keunggulan properti Anda</label>
                   <div className="border border-outline-variant rounded-lg overflow-hidden">
                     <div className="bg-surface-container-high p-2 flex gap-2 border-b border-outline-variant">
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_bold</button>
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_italic</button>
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_list_bulleted</button>
-                      <button type="button" className="p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">link</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_bold</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_italic</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">format_list_bulleted</button>
+                      <button type="button" className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center p-1 hover:bg-surface-container rounded transition-colors material-symbols-outlined text-[18px]">link</button>
                     </div>
                     <textarea
                       id="kos-desc"
@@ -397,8 +399,8 @@ export default function CreateKosPage() {
                 </div>
               </div>
 
-              {/* â”€â”€ STICKY SUBMIT BAR â”€â”€ */}
-              <div className="sticky bottom-4 z-10">
+              {/* â”€â”€ STICKY SUBMIT BAR â”€â”€ (safe-area aware) */}
+              <div className="sticky bottom-[calc(env(safe-area-inset-bottom)_+_1rem)] z-10">
                 <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-outline-variant card-shadow p-4 flex flex-col sm:flex-row items-center gap-stack-md justify-end">
                   {error && (
                     <p className="bg-error-container/20 text-on-error-container p-3 rounded-lg font-body-sm text-body-sm w-full sm:w-auto sm:mr-auto">{error}</p>
@@ -420,6 +422,8 @@ export default function CreateKosPage() {
                   </button>
                 </div>
               </div>
+              {/* Buffer ruang-scroll (mobile) agar field terakhir bisa lewat di atas sticky bar */}
+              <div aria-hidden="true" className="h-12 sm:hidden" />
             </div>
 
             {/* === SIDEBAR === */}
